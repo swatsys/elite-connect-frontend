@@ -924,6 +924,8 @@ class App {
 
   async verifyWithWorldID() {
     try {
+      console.log('🔵 Starting World ID verification...');
+      
       if (!MiniKit.isInstalled()) {
         Toast.error('Please open this app in World App');
         return;
@@ -934,10 +936,10 @@ class App {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: 'signin',
         signal: '',
-        verification_level: VerificationLevel.Device // Accept both Orb and Device
+        verification_level: VerificationLevel.Device
       });
 
-      console.log('World ID verification payload:', finalPayload);
+      console.log('🔵 World ID response:', finalPayload.status);
 
       if (finalPayload.status === 'success') {
         Toast.info('Verifying your World ID...');
@@ -949,7 +951,7 @@ class App {
         });
 
         const data = await res.json();
-        console.log('Backend response:', data);
+        console.log('🔵 Backend response:', data.success);
 
         if (data.success) {
           this.token = data.token;
@@ -958,19 +960,25 @@ class App {
           
           Toast.success('Welcome to Elite Connect!');
           
-          if (data.user.profile_completed) {
-            this.showHome();
-          } else {
-            this.showProfileSetup();
-          }
+          // FIXED: Add delay before navigation to ensure state is updated
+          setTimeout(() => {
+            console.log('🔵 Navigating...', data.user.profile_completed ? 'to home' : 'to profile setup');
+            if (data.user && data.user.profile_completed) {
+              this.showHome();
+            } else {
+              this.showProfileSetup();
+            }
+          }, 500);
         } else {
           Toast.error(data.error || 'Verification failed');
         }
+      } else if (finalPayload.status === 'error') {
+        Toast.error('Verification failed');
       } else {
         Toast.warning('Verification cancelled');
       }
     } catch (error) {
-      console.error('Verification error:', error);
+      console.error('❌ Verification error:', error);
       Toast.error('Verification failed. Please try again.');
     }
   }
@@ -1208,7 +1216,6 @@ class App {
       const status = await res.json();
 
       if (status.canConnect) {
-        // User can connect (has free connections or subscription)
         document.getElementById('app').innerHTML = `
           <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary)">
             <div class="card" style="max-width:400px;text-align:center">
@@ -1227,7 +1234,6 @@ class App {
           </div>
         `;
       } else {
-        // Need to upgrade
         document.getElementById('app').innerHTML = `
           <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary)">
             <div class="card" style="max-width:400px;text-align:center">
@@ -1265,7 +1271,6 @@ class App {
 
       Toast.info('Initiating payment...');
 
-      // Initiate transaction
       const initRes = await fetch(`${API}/subscription/initiate`, {
         method: 'POST',
         headers: {
@@ -1281,7 +1286,6 @@ class App {
         return;
       }
 
-      // Use MiniKit Pay command
       const { finalPayload } = await MiniKit.commandsAsync.pay({
         reference: initData.reference,
         to: WLD_RECEIVING_WALLET,
@@ -1297,7 +1301,6 @@ class App {
       if (finalPayload.status === 'success') {
         Toast.info('Verifying payment...');
         
-        // Verify payment
         const verifyRes = await fetch(`${API}/subscription/verify`, {
           method: 'POST',
           headers: {
@@ -1455,7 +1458,6 @@ class App {
         </div>
       `;
 
-      // Scroll to bottom
       setTimeout(() => {
         const container = document.getElementById('messages');
         container.scrollTop = container.scrollHeight;
