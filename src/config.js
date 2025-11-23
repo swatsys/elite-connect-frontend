@@ -1,4 +1,4 @@
-export const API = 'https://elite-connect-backend-ktv9.onrender.com/api'
+export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 export const APP_NAME = 'Elite Connect';
 
 // World App Configuration
