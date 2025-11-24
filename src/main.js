@@ -15,7 +15,7 @@
 //     this.themeManager = new ThemeManager();
 //     this.selectedImage = null;
 //     this.showEmojiPicker = false;
-    
+
 //     if (this.token) {
 //       this.init();
 //     } else {
@@ -28,7 +28,7 @@
 //       const res = await fetch(`${API}/auth/me`, {
 //         headers: { 'Authorization': `Bearer ${this.token}` }
 //       });
-      
+
 //       if (res.ok) {
 //         this.user = await res.json();
 //         if (this.user.profile_completed) {
@@ -87,7 +87,7 @@
 
 //       if (finalPayload.status === 'success') {
 //         Toast.info('Verifying your World ID...');
-        
+
 //         const res = await fetch(`${API}/auth/verify`, {
 //           method: 'POST',
 //           headers: { 'Content-Type': 'application/json' },
@@ -100,9 +100,9 @@
 //           this.token = data.token;
 //           this.user = data.user;
 //           localStorage.setItem('token', this.token);
-          
+
 //           Toast.success('Welcome to Elite Connect!');
-          
+
 //           if (data.user.profile_completed) {
 //             this.showHome();
 //           } else {
@@ -126,18 +126,18 @@
 //       <div style="padding:2rem 1rem;max-width:600px;margin:0 auto">
 //         <h1 style="font-size:2rem;margin-bottom:0.5rem">Create Your Profile</h1>
 //         <p style="color:var(--text-secondary);margin-bottom:2rem">Tell us about yourself</p>
-        
+
 //         <form id="profileForm" style="display:flex;flex-direction:column;gap:1.5rem">
 //           <div>
 //             <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Name</label>
 //             <input type="text" name="name" required placeholder="Your name" />
 //           </div>
-          
+
 //           <div>
 //             <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Age</label>
 //             <input type="number" name="age" min="18" max="100" required placeholder="18" />
 //           </div>
-          
+
 //           <div>
 //             <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Gender</label>
 //             <select name="gender" required>
@@ -148,12 +148,12 @@
 //               <option value="other">Other</option>
 //             </select>
 //           </div>
-          
+
 //           <div>
 //             <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Bio</label>
 //             <textarea name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
 //           </div>
-          
+
 //           <button type="submit" class="btn">Complete Profile</button>
 //         </form>
 //       </div>
@@ -169,7 +169,7 @@
 
 //     try {
 //       Toast.info('Creating your profile...');
-      
+
 //       const res = await fetch(`${API}/profile/create`, {
 //         method: 'POST',
 //         headers: {
@@ -199,7 +199,7 @@
 //     document.getElementById('app').innerHTML = `
 //       <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
 //         <div style="max-width:600px;margin:0 auto;padding:1rem">
-          
+
 //           <div class="card" style="text-align:center;margin-bottom:1.5rem">
 //             <div style="font-size:3rem;margin-bottom:0.5rem">💕</div>
 //             <h1 style="font-size:1.75rem;margin:0 0 0.5rem 0">Welcome Back!</h1>
@@ -212,7 +212,7 @@
 //               <h3 style="margin:0;font-size:1.25rem">Discover</h3>
 //               <p style="margin:0.25rem 0 0 0;color:var(--text-secondary);font-size:0.875rem">Find profiles</p>
 //             </div>
-            
+
 //             <div class="card" style="text-align:center;cursor:pointer" onclick="window.app.navigate('chat')">
 //               <div style="font-size:3rem;margin-bottom:0.5rem">💬</div>
 //               <h3 style="margin:0;font-size:1.25rem">Messages</h3>
@@ -227,7 +227,7 @@
 
 //   async showExplore() {
 //     this.currentPage = 'explore';
-    
+
 //     try {
 //       const res = await fetch(`${API}/explore/profiles`, {
 //         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -237,7 +237,7 @@
 
 //       if (data.profiles && data.profiles.length > 0) {
 //         const profile = data.profiles[0];
-        
+
 //         document.getElementById('app').innerHTML = `
 //           <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
 //             <div style="max-width:500px;margin:0 auto;padding:1rem">
@@ -249,7 +249,7 @@
 //                   ${profile.bio ? `<p style="color:var(--text-secondary);margin-top:1rem">${profile.bio}</p>` : ''}
 //                 </div>
 //               </div>
-              
+
 //               <div style="display:flex;gap:1rem;justify-content:center;margin-top:2rem">
 //                 <button class="action-btn pass" onclick="window.app.pass('${profile.id}')">✕</button>
 //                 <button class="action-btn like" onclick="window.app.like('${profile.id}')">♥</button>
@@ -272,7 +272,7 @@
 //       console.error('Explore error:', error);
 //       Toast.error('Failed to load profiles');
 //     }
-    
+
 //     this.renderNav();
 //   }
 
@@ -335,7 +335,7 @@
 //     const overlay = document.createElement('div');
 //     overlay.id = 'subscription-overlay';
 //     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem';
-    
+
 //     overlay.innerHTML = `
 //       <div class="card" style="max-width:450px;text-align:center;animation:slideUp 0.3s">
 //         <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
@@ -343,13 +343,13 @@
 //         <p style="color:var(--text-secondary);margin-bottom:2rem">
 //           You've used your ${PRICING.FREE_CONNECTIONS} free connections
 //         </p>
-        
+
 //         <div style="background:var(--gradient);color:white;padding:2rem;border-radius:16px;margin-bottom:2rem">
 //           <h3 style="margin:0 0 0.5rem 0;font-size:1.75rem">Unlimited for 1 Month</h3>
 //           <div style="font-size:3.5rem;font-weight:800;margin:0.5rem 0">${PRICING.MONTHLY_UNLIMITED_WLD} WLD</div>
 //           <div style="opacity:0.9">Unlimited connections for 30 days</div>
 //         </div>
-        
+
 //         <div style="text-align:left;background:var(--bg-secondary);padding:1.25rem;border-radius:12px;margin-bottom:2rem">
 //           <div style="display:flex;align-items:center;margin-bottom:0.75rem">
 //             <span style="font-size:1.25rem;margin-right:0.5rem">✅</span>
@@ -368,17 +368,17 @@
 //             <span>Priority support</span>
 //           </div>
 //         </div>
-        
+
 //         <button class="btn" onclick="window.app.purchaseSubscription('${matchId}')" style="margin-bottom:1rem">
 //           🌍 Pay ${PRICING.MONTHLY_UNLIMITED_WLD} WLD
 //         </button>
-        
+
 //         <button onclick="document.getElementById('subscription-overlay').remove();window.app.showExplore()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:1rem">
 //           Maybe Later
 //         </button>
 //       </div>
 //     `;
-    
+
 //     document.body.appendChild(overlay);
 //   }
 
@@ -503,7 +503,7 @@
 
 //   async showChat() {
 //     this.currentPage = 'chat';
-    
+
 //     try {
 //       const res = await fetch(`${API}/chat/matches`, {
 //         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -515,7 +515,7 @@
 //         <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
 //           <div style="max-width:600px;margin:0 auto;padding:1rem">
 //             <h1 style="font-size:2rem;margin-bottom:1.5rem">💬 Messages</h1>
-            
+
 //             ${data.matches && data.matches.length > 0 ? `
 //               <div style="display:flex;flex-direction:column;gap:1rem">
 //                 ${data.matches.map(match => `
@@ -549,14 +549,14 @@
 //       console.error('Chat error:', error);
 //       Toast.error('Failed to load chats');
 //     }
-    
+
 //     this.renderNav();
 //   }
 
 //   async openChat(matchId, name) {
 //     this.currentMatchId = matchId;
 //     this.currentMatchName = name;
-    
+
 //     try {
 //       const res = await fetch(`${API}/chat/messages/${matchId}`, {
 //         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -573,7 +573,7 @@
 //             </div>
 //             <h2 style="margin:0;font-size:1.25rem">${name}</h2>
 //           </div>
-          
+
 //           <div id="messageContainer" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem">
 //             ${data.messages && data.messages.length > 0 ? data.messages.map(msg => `
 //               <div style="display:flex;${msg.isMine ? 'justify-content:flex-end' : 'justify-content:flex-start'}">
@@ -587,7 +587,7 @@
 //               </div>
 //             `).join('') : '<p style="text-align:center;color:var(--text-secondary);margin:auto">Start your conversation...</p>'}
 //           </div>
-          
+
 //           <div style="background:var(--bg-primary);border-top:1px solid var(--border-color);padding:1rem">
 //             ${this.showEmojiPicker ? `
 //               <div class="emoji-picker-container" id="emojiPicker">
@@ -600,7 +600,7 @@
 //                 </div>
 //               </div>
 //             ` : ''}
-            
+
 //             <div style="display:flex;gap:0.5rem;align-items:center">
 //               <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="window.app.handleImageSelect(event)" />
 //               <button onclick="document.getElementById('imageInput').click()" class="image-upload-btn" title="Upload image">📷</button>
@@ -638,7 +638,7 @@
 //         Toast.error('Image too large. Max 5MB.');
 //         return;
 //       }
-      
+
 //       const reader = new FileReader();
 //       reader.onload = (e) => {
 //         this.selectedImage = e.target.result;
@@ -686,7 +686,7 @@
 
 //   async showWallet() {
 //     this.currentPage = 'wallet';
-    
+
 //     try {
 //       const res = await fetch(`${API}/subscription/status`, {
 //         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -697,9 +697,9 @@
 //       document.getElementById('app').innerHTML = `
 //         <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
 //           <div style="max-width:600px;margin:0 auto;padding:1rem">
-            
+
 //             <h1 style="font-size:2rem;margin-bottom:1.5rem">💳 Wallet</h1>
-            
+
 //             ${status.hasActiveSubscription ? `
 //               <div class="card" style="margin-bottom:1.5rem;background:var(--gradient);color:white;text-align:center;padding:2rem">
 //                 <div style="font-size:4rem;margin-bottom:1rem">💎</div>
@@ -714,21 +714,21 @@
 //                 <p style="margin:0;opacity:0.9">30 days unlimited connections</p>
 //               </div>
 //             `}
-            
+
 //             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
 //               <div class="card" style="text-align:center">
 //                 <div style="font-size:2.5rem;margin-bottom:0.5rem">${status.hasActiveSubscription ? '♾️' : '🔗'}</div>
 //                 <h3 style="margin:0;font-size:1.5rem">${status.hasActiveSubscription ? 'Unlimited' : status.freeConnectionsRemaining}</h3>
 //                 <p style="margin:0.25rem 0 0 0;color:var(--text-secondary)">Connections</p>
 //               </div>
-              
+
 //               <div class="card" style="text-align:center">
 //                 <div style="font-size:2.5rem;margin-bottom:0.5rem">📊</div>
 //                 <h3 style="margin:0;font-size:1.5rem">${status.totalConnectionsUsed || 0}</h3>
 //                 <p style="margin:0.25rem 0 0 0;color:var(--text-secondary)">Total Used</p>
 //               </div>
 //             </div>
-            
+
 //             <div class="card" style="background:var(--bg-tertiary)">
 //               <h3 style="margin:0 0 1rem 0">🌍 World ID Verified</h3>
 //               <p style="margin:0;color:var(--text-secondary)">Your identity is verified and secure</p>
@@ -740,19 +740,19 @@
 //       console.error('Wallet error:', error);
 //       Toast.error('Failed to load wallet');
 //     }
-    
+
 //     this.renderNav();
 //   }
 
 //   async showProfile() {
 //     this.currentPage = 'profile';
-    
+
 //     document.getElementById('app').innerHTML = `
 //       <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
 //         <div style="max-width:600px;margin:0 auto;padding:1rem">
-          
+
 //           <h1 style="font-size:2rem;margin-bottom:1.5rem">👤 Profile</h1>
-          
+
 //           <div class="card" style="margin-bottom:1.5rem;text-align:center">
 //             <div class="profile-image" style="margin:1rem auto">
 //               ${this.user.name ? this.user.name.charAt(0) : '?'}
@@ -760,7 +760,7 @@
 //             <h2 style="margin:0.5rem 0">${this.user.name || 'User'}</h2>
 //             <p style="color:var(--text-secondary);margin:0">🌍 World ID Verified</p>
 //           </div>
-          
+
 //           <div class="card" style="margin-bottom:1.5rem">
 //             <h3 style="margin:0 0 1rem 0">Theme</h3>
 //             <div class="theme-toggle">
@@ -775,14 +775,14 @@
 //               </button>
 //             </div>
 //           </div>
-          
+
 //           <button class="btn btn-danger" onclick="window.app.logout()">
 //             Logout
 //           </button>
 //         </div>
 //       </div>
 //     `;
-    
+
 //     this.renderNav();
 //   }
 
@@ -808,7 +808,7 @@
 //       wallet: () => this.showWallet(),
 //       profile: () => this.showProfile()
 //     };
-    
+
 //     if (pages[page]) {
 //       pages[page]();
 //     }
@@ -839,7 +839,7 @@
 //         <div>Profile</div>
 //       </button>
 //     `;
-    
+
 //     const existing = document.querySelector('.bottom-nav');
 //     if (existing) existing.remove();
 //     document.body.appendChild(nav);
@@ -867,7 +867,7 @@ class App {
     this.themeManager = new ThemeManager();
     this.selectedImage = null;
     this.showEmojiPicker = false;
-    
+
     if (this.token) {
       this.init();
     } else {
@@ -880,7 +880,7 @@ class App {
       const res = await fetch(`${API}/auth/me`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
       });
-      
+
       if (res.ok) {
         this.user = await res.json();
         if (this.user.profile_completed) {
@@ -922,16 +922,82 @@ class App {
     `;
   }
 
+  // async verifyWithWorldID() {
+  //   try {
+  //     console.log('🔵 Starting World ID verification...');
+
+  //     if (!MiniKit.isInstalled()) {
+  //       Toast.error('Please open this app in World App');
+  //       return;
+  //     }
+
+  //     Toast.info('Opening World ID verification...');
+
+  //     const { finalPayload } = await MiniKit.commandsAsync.verify({
+  //       action: 'signin',
+  //       signal: '',
+  //       verification_level: VerificationLevel.Device
+  //     });
+
+  //     console.log('🔵 World ID response:', finalPayload.status);
+
+  //     if (finalPayload.status === 'success') {
+  //       Toast.info('Verifying your World ID...');
+
+  //       const res = await fetch(`${API}/auth/verify`, {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(finalPayload)
+  //       });
+
+  //       const data = await res.json();
+  //       console.log('🔵 Backend response:', data.success);
+
+  //       if (data.success) {
+  //         this.token = data.token;
+  //         this.user = data.user;
+  //         localStorage.setItem('token', this.token);
+
+  //         Toast.success('Welcome to Elite Connect!');
+
+  //         // FIXED: Add delay before navigation to ensure state is updated
+  //         setTimeout(() => {
+  //           console.log('🔵 Navigating...', data.user.profile_completed ? 'to home' : 'to profile setup');
+  //           if (data.user && data.user.profile_completed) {
+  //             this.showHome();
+  //           } else {
+  //             this.showProfileSetup();
+  //           }
+  //         }, 500);
+  //       } else {
+  //         Toast.error(data.error || 'Verification failed');
+  //       }
+  //     } else if (finalPayload.status === 'error') {
+  //       Toast.error('Verification failed');
+  //     } else {
+  //       Toast.warning('Verification cancelled');
+  //     }
+  //   } catch (error) {
+  //     console.error('❌ Verification error:', error);
+  //     Toast.error('Verification failed. Please try again.');
+  //   }
+  // }
+  // Replace your verifyWithWorldID function with this DEBUG version
+  // This will help us see EXACTLY where it's failing
+
   async verifyWithWorldID() {
     try {
-      console.log('🔵 Starting World ID verification...');
-      
+      console.log('🔵 [1] Starting verification...');
+
       if (!MiniKit.isInstalled()) {
+        console.error('❌ [1.1] MiniKit not installed');
         Toast.error('Please open this app in World App');
         return;
       }
+      console.log('✅ [1.2] MiniKit installed');
 
       Toast.info('Opening World ID verification...');
+      console.log('🔵 [2] Calling MiniKit.commandsAsync.verify...');
 
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: 'signin',
@@ -939,49 +1005,73 @@ class App {
         verification_level: VerificationLevel.Device
       });
 
-      console.log('🔵 World ID response:', finalPayload.status);
+      console.log('🔵 [3] World ID response:', JSON.stringify(finalPayload));
 
       if (finalPayload.status === 'success') {
+        console.log('✅ [3.1] Verification successful');
         Toast.info('Verifying your World ID...');
-        
+
+        console.log('🔵 [4] Sending to backend...');
+        console.log('🔵 [4.1] API URL:', API);
+        console.log('🔵 [4.2] Payload:', JSON.stringify(finalPayload));
+
         const res = await fetch(`${API}/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(finalPayload)
         });
 
+        console.log('🔵 [5] Backend response status:', res.status);
+
         const data = await res.json();
-        console.log('🔵 Backend response:', data.success);
+        console.log('🔵 [6] Backend data:', JSON.stringify(data));
 
         if (data.success) {
+          console.log('✅ [6.1] Authentication successful');
           this.token = data.token;
           this.user = data.user;
           localStorage.setItem('token', this.token);
-          
+
+          console.log('🔵 [7] Token stored');
+          console.log('🔵 [8] User:', JSON.stringify(this.user));
+
           Toast.success('Welcome to Elite Connect!');
-          
-          // FIXED: Add delay before navigation to ensure state is updated
+
+          console.log('🔵 [9] Setting up navigation timeout...');
+          console.log('🔵 [9.1] Profile completed?', data.user.profile_completed);
+
           setTimeout(() => {
-            console.log('🔵 Navigating...', data.user.profile_completed ? 'to home' : 'to profile setup');
+            console.log('🔵 [10] Timeout executed, navigating...');
             if (data.user && data.user.profile_completed) {
+              console.log('🔵 [10.1] Navigating to home');
               this.showHome();
             } else {
+              console.log('🔵 [10.2] Navigating to profile setup');
               this.showProfileSetup();
             }
+            console.log('🔵 [11] Navigation complete');
           }, 500);
+
+          console.log('🔵 [9.2] Timeout set, waiting...');
         } else {
+          console.error('❌ [6.2] Backend returned error:', data.error);
           Toast.error(data.error || 'Verification failed');
         }
       } else if (finalPayload.status === 'error') {
+        console.error('❌ [3.2] World ID error:', finalPayload);
         Toast.error('Verification failed');
       } else {
+        console.log('⚠️ [3.3] Verification cancelled');
         Toast.warning('Verification cancelled');
       }
     } catch (error) {
-      console.error('❌ Verification error:', error);
+      console.error('❌ [ERROR] Caught exception:', error);
+      console.error('❌ [ERROR] Stack:', error.stack);
+      console.error('❌ [ERROR] Message:', error.message);
       Toast.error('Verification failed. Please try again.');
     }
   }
+
 
   showProfileSetup() {
     this.currentPage = 'setup';
@@ -1032,7 +1122,7 @@ class App {
 
     try {
       Toast.info('Creating your profile...');
-      
+
       const res = await fetch(`${API}/profile/create`, {
         method: 'POST',
         headers: {
@@ -1085,13 +1175,13 @@ class App {
         </div>
       </div>
     `;
-    
+
     this.renderNav();
   }
 
   async showExplore() {
     this.currentPage = 'explore';
-    
+
     try {
       const res = await fetch(`${API}/explore/profiles`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -1111,7 +1201,7 @@ class App {
         `;
       } else {
         const profile = data.profiles[0];
-        
+
         document.getElementById('app').innerHTML = `
           <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
             <div style="max-width:600px;margin:0 auto;padding:1rem">
@@ -1153,14 +1243,14 @@ class App {
       console.error('Explore error:', error);
       Toast.error('Failed to load profiles');
     }
-    
+
     this.renderNav();
   }
 
   async likeProfile(profileId) {
     try {
       Toast.info('Sending like...');
-      
+
       const res = await fetch(`${API}/explore/like`, {
         method: 'POST',
         headers: {
@@ -1222,10 +1312,10 @@ class App {
               <div style="font-size:5rem;margin-bottom:1rem">🎉</div>
               <h1 style="font-size:2rem;margin-bottom:1rem">It's a Match!</h1>
               <p style="color:var(--text-secondary);margin-bottom:2rem">
-                ${status.hasActiveSubscription 
-                  ? 'Start chatting with your match!' 
-                  : `You have ${status.freeConnectionsRemaining} free connection${status.freeConnectionsRemaining > 1 ? 's' : ''} left`
-                }
+                ${status.hasActiveSubscription
+            ? 'Start chatting with your match!'
+            : `You have ${status.freeConnectionsRemaining} free connection${status.freeConnectionsRemaining > 1 ? 's' : ''} left`
+          }
               </p>
               <button class="btn" onclick="window.app.unlockChat('${matchId}')">
                 Unlock Chat
@@ -1300,7 +1390,7 @@ class App {
 
       if (finalPayload.status === 'success') {
         Toast.info('Verifying payment...');
-        
+
         const verifyRes = await fetch(`${API}/subscription/verify`, {
           method: 'POST',
           headers: {
@@ -1337,7 +1427,7 @@ class App {
   async unlockChat(matchId) {
     try {
       Toast.info('Unlocking chat...');
-      
+
       const res = await fetch(`${API}/subscription/use-connection`, {
         method: 'POST',
         headers: {
@@ -1363,7 +1453,7 @@ class App {
 
   async showChat() {
     this.currentPage = 'chat';
-    
+
     try {
       const res = await fetch(`${API}/chat/matches`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -1397,10 +1487,10 @@ class App {
                     </div>
                     <div style="flex:1">
                       <h3 style="margin:0 0 0.25rem 0">${match.profile.name}, ${match.profile.age}</h3>
-                      ${match.lastMessage 
-                        ? `<p style="margin:0;color:var(--text-secondary);font-size:0.875rem">${match.lastMessage.content}</p>`
-                        : `<p style="margin:0;color:var(--text-tertiary);font-size:0.875rem">Start a conversation</p>`
-                      }
+                      ${match.lastMessage
+            ? `<p style="margin:0;color:var(--text-secondary);font-size:0.875rem">${match.lastMessage.content}</p>`
+            : `<p style="margin:0;color:var(--text-tertiary);font-size:0.875rem">Start a conversation</p>`
+          }
                     </div>
                   </div>
                 `).join('')}
@@ -1413,14 +1503,14 @@ class App {
       console.error('Chat error:', error);
       Toast.error('Failed to load chats');
     }
-    
+
     this.renderNav();
   }
 
   async openChat(matchId, matchName) {
     this.currentMatchId = matchId;
     this.currentMatchName = matchName;
-    
+
     try {
       const res = await fetch(`${API}/chat/messages/${matchId}`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -1440,15 +1530,15 @@ class App {
           </div>
           
           <div id="messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem">
-            ${data.messages && data.messages.length > 0 
-              ? data.messages.map(msg => `
+            ${data.messages && data.messages.length > 0
+          ? data.messages.map(msg => `
                 <div class="message-bubble ${msg.isMine ? 'mine' : 'theirs'}">
                   ${msg.content}
                   ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="message-image" />` : ''}
                 </div>
               `).join('')
-              : '<div style="text-align:center;color:var(--text-tertiary);margin:auto">Send a message to start chatting!</div>'
-            }
+          : '<div style="text-align:center;color:var(--text-tertiary);margin:auto">Send a message to start chatting!</div>'
+        }
           </div>
           
           <div style="background:var(--bg-primary);padding:1rem;border-top:1px solid var(--border-color);display:flex;gap:0.5rem;align-items:center">
@@ -1507,7 +1597,7 @@ class App {
 
   async showWallet() {
     this.currentPage = 'wallet';
-    
+
     try {
       const res = await fetch(`${API}/subscription/status`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -1561,13 +1651,13 @@ class App {
       console.error('Wallet error:', error);
       Toast.error('Failed to load wallet');
     }
-    
+
     this.renderNav();
   }
 
   async showProfile() {
     this.currentPage = 'profile';
-    
+
     try {
       const profileRes = await fetch(`${API}/profile/me`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
@@ -1615,7 +1705,7 @@ class App {
       console.error('Profile error:', error);
       Toast.error('Failed to load profile');
     }
-    
+
     this.renderNav();
   }
 
@@ -1641,7 +1731,7 @@ class App {
       wallet: () => this.showWallet(),
       profile: () => this.showProfile()
     };
-    
+
     if (pages[page]) {
       pages[page]();
     }
@@ -1672,7 +1762,7 @@ class App {
         <div>Profile</div>
       </button>
     `;
-    
+
     const existing = document.querySelector('.bottom-nav');
     if (existing) existing.remove();
     document.body.appendChild(nav);
