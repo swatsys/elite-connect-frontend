@@ -1002,7 +1002,7 @@ class App {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: 'signin',
         signal: '',
-        verification_level: VerificationLevel.orb
+        verification_level: VerificationLevel.Orb
       });
 
       console.log('🔵 [3] World ID response:', JSON.stringify(finalPayload));
