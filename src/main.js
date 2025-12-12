@@ -1938,27 +1938,43 @@ class App {
 
           Toast.success('Welcome to Elite Connect!');
 
-          console.log('🔵 [9] Navigating immediately...');
-          console.log('🔵 [9.1] Profile completed?', this.user?.profile_completed);
+          console.log('🔵 [9] Profile completed?', this.user?.profile_completed);
 
-          // ✅ IMMEDIATE NAVIGATION - NO DELAY
-          // Hide auth screen
-          const authScreen = document.getElementById('auth');
-          if (authScreen) {
-            authScreen.classList.add('hidden');
-            console.log('✅ Auth screen hidden');
-          }
+          // ✅ CRITICAL: Close World ID modal first, then navigate
+          console.log('🔵 [10] Closing World ID modal...');
           
-          // Navigate based on profile completion
-          if (this.user && this.user.profile_completed) {
-            console.log('🔵 [10] Navigating to home');
-            this.showHome();
-          } else {
-            console.log('🔵 [10] Navigating to profile setup');
-            this.showProfileSetup();
+          try {
+            // Close the World ID verification modal
+            await MiniKit.commandsAsync.closeModal();
+            console.log('✅ World ID modal closed');
+          } catch (error) {
+            console.warn('⚠️ Could not close modal:', error);
+            // Continue anyway
           }
+
+          // Small delay to let modal close completely
+          setTimeout(() => {
+            console.log('🔵 [11] Starting navigation...');
+            
+            // Hide auth screen
+            const authScreen = document.getElementById('auth');
+            if (authScreen) {
+              authScreen.classList.add('hidden');
+              console.log('✅ Auth screen hidden');
+            }
+            
+            // Navigate based on profile completion
+            if (this.user && this.user.profile_completed) {
+              console.log('🔵 [12] Navigating to home');
+              this.showHome();
+            } else {
+              console.log('🔵 [12] Navigating to profile setup');
+              this.showProfileSetup();
+            }
+            
+            console.log('🔵 [13] Navigation complete');
+          }, 300);  // Small delay for modal to close
           
-          console.log('🔵 [11] Navigation complete');
         } else {
           console.error('❌ [6.2] Backend returned error:', data.error);
           Toast.error(data.error || 'Verification failed');
