@@ -1772,7 +1772,7 @@
 // window.app = new App();
 
 
-import API from './config.js';
+const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
 import Toast from './toast.js';
 
