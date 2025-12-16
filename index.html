@@ -1,3 +1,18 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#ec4899" />
+    <title>Elite Connect</title>
+    <link rel="stylesheet" href="/src/style.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html> -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,9 +20,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#ec4899" />
     <title>Elite Connect</title>
+    <link rel="stylesheet" href="/src/style.css">
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      
+      <!-- 🔐 AUTH SCREEN -->
+      <div id="auth" class="screen">
+        <div class="min-h-screen flex items-center justify-center p-4">
+          <div class="card max-w-md w-full text-center">
+            <div class="profile-image mb-6">
+              💖
+            </div>
+            <h1 class="text-3xl font-bold mb-4">Elite Connect</h1>
+            <p class="text-secondary mb-8">
+              Verified dating for real people. Connect with verified World ID users.
+            </p>
+            <button id="signInBtn" class="btn">
+              🌍 Sign in with World ID
+            </button>
+            <p class="text-sm text-tertiary mt-4">
+              By signing in, you agree to our Terms of Service
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 👤 PROFILE SETUP SCREEN -->
+      <div id="profile-setup" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="card">
+              <h2 class="text-2xl font-bold mb-6">Complete Your Profile</h2>
+              <form id="profileForm">
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Name</label>
+                    <input type="text" id="name" name="name" required 
+                           placeholder="Your name" class="w-full">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Age</label>
+                    <input type="number" id="age" name="age" required 
+                           min="18" max="100" placeholder="Your age" class="w-full">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Gender</label>
+                    <select id="gender" name="gender" required class="w-full">
+                      <option value="">Select gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non-binary">Non-binary</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Bio</label>
+                    <textarea id="bio" name="bio" rows="4" 
+                              placeholder="Tell us about yourself..." class="w-full"></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Interests (comma-separated)</label>
+                    <input type="text" id="interests" name="interests" 
+                           placeholder="Travel, Music, Sports..." class="w-full">
+                  </div>
+
+                  <button type="submit" class="btn w-full mt-6">
+                    Save Profile
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🏠 HOME SCREEN -->
+      <div id="home" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="card text-center mb-6">
+              <h1 id="welcomeMessage" class="text-2xl font-bold mb-4">Welcome!</h1>
+              <p class="text-secondary mb-6">
+                Start exploring verified profiles and make meaningful connections
+              </p>
+              
+              <div class="space-y-4">
+                <button id="exploreBtn" class="btn w-full">
+                  🔍 Explore Profiles
+                </button>
+                
+                <button id="viewProfileBtn" class="btn btn-secondary w-full">
+                  👤 View My Profile
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="font-bold mb-4">Recent Activity</h3>
+              <p class="text-secondary">No recent matches yet. Start exploring!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+          <button class="nav-item active">
+            <span>🏠</span>
+            <span class="text-xs">Home</span>
+          </button>
+          <button class="nav-item" id="navExploreBtn">
+            <span>🔍</span>
+            <span class="text-xs">Explore</span>
+          </button>
+          <button class="nav-item" id="navProfileBtn">
+            <span>👤</span>
+            <span class="text-xs">Profile</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 👤 PROFILE SCREEN -->
+      <div id="profile" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="profile-card">
+              <div class="profile-image">
+                <span id="profileInitial">?</span>
+              </div>
+              
+              <div class="p-6 text-center">
+                <h2 id="profileName" class="text-2xl font-bold mb-2">Name</h2>
+                <p id="profileAge" class="text-secondary mb-4">Age</p>
+                <p id="profileBio" class="text-secondary mb-4">Bio</p>
+                
+                <div id="profileInterests" class="flex flex-wrap gap-2 justify-center mb-6">
+                  <!-- Interests will be inserted here -->
+                </div>
+
+                <div class="mb-6">
+                  <p class="text-sm text-tertiary mb-2">Subscription Status</p>
+                  <p id="subscriptionStatus" class="font-semibold">Loading...</p>
+                </div>
+
+                <div class="space-y-3">
+                  <button id="editProfileBtn" class="btn btn-secondary w-full">
+                    ✏️ Edit Profile
+                  </button>
+                  
+                  <button id="viewSubscriptionBtn" class="btn btn-secondary w-full">
+                    💎 Manage Subscription
+                  </button>
+                  
+                  <button id="viewTransactionsBtn" class="btn btn-secondary w-full">
+                    📊 View Transactions
+                  </button>
+                  
+                  <button id="logoutBtn" class="btn btn-danger w-full">
+                    🚪 Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+          <button class="nav-item" id="navHomeBtn2">
+            <span>🏠</span>
+            <span class="text-xs">Home</span>
+          </button>
+          <button class="nav-item" id="navExploreBtn2">
+            <span>🔍</span>
+            <span class="text-xs">Explore</span>
+          </button>
+          <button class="nav-item active">
+            <span>👤</span>
+            <span class="text-xs">Profile</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 🔍 EXPLORE SCREEN -->
+      <div id="explore" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <button id="backToHomeBtn" class="btn-secondary px-4 py-2 rounded-lg">
+                ← Back
+              </button>
+              <h2 class="text-xl font-bold">Explore</h2>
+              <div class="w-20"></div>
+            </div>
+
+            <div id="profilesList" class="space-y-4">
+              <div class="flex justify-center items-center py-20">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+          <button class="nav-item" id="navHomeBtn3">
+            <span>🏠</span>
+            <span class="text-xs">Home</span>
+          </button>
+          <button class="nav-item active">
+            <span>🔍</span>
+            <span class="text-xs">Explore</span>
+          </button>
+          <button class="nav-item" id="navProfileBtn3">
+            <span>👤</span>
+            <span class="text-xs">Profile</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 💬 CHAT SCREEN -->
+      <div id="chat" class="screen hidden">
+        <div class="min-h-screen flex flex-col">
+          <!-- Chat Header -->
+          <div class="bg-primary border-b border-color p-4 flex items-center gap-3">
+            <button id="chatBackBtn" class="text-2xl">←</button>
+            <div class="profile-image" style="width: 40px; height: 40px; font-size: 1.2rem;">
+              👤
+            </div>
+            <div>
+              <h3 id="chatUserName" class="font-bold">User</h3>
+              <p class="text-xs text-secondary">Online</p>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div id="messagesList" class="flex-1 p-4 overflow-y-auto" style="max-height: calc(100vh - 180px);">
+            <!-- Messages will be inserted here -->
+          </div>
+
+          <!-- Message Input -->
+          <div class="bg-primary border-t border-color p-4">
+            <div class="flex gap-2">
+              <input type="text" id="messageInput" 
+                     placeholder="Type a message..." 
+                     class="flex-1">
+              <button id="sendMessageBtn" class="btn" style="width: auto; padding: 0.75rem 1.5rem;">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 💎 SUBSCRIPTION SCREEN -->
+      <div id="subscription" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <button id="subscriptionBackBtn" class="btn-secondary px-4 py-2 rounded-lg">
+                ← Back
+              </button>
+              <h2 class="text-xl font-bold">Subscription</h2>
+              <div class="w-20"></div>
+            </div>
+
+            <div class="space-y-4">
+              <!-- Free Plan -->
+              <div class="card">
+                <h3 class="font-bold text-lg mb-2">Free Plan</h3>
+                <p class="text-secondary mb-4">Current Plan</p>
+                <ul class="space-y-2 mb-4">
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>2 free connections per month</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>Basic profile features</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Premium Plan -->
+              <div class="card" style="border: 2px solid #ec4899;">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-lg">Premium Plan</h3>
+                  <span class="bg-gradient text-white px-3 py-1 rounded-full text-sm font-bold">
+                    3 WLD/month
+                  </span>
+                </div>
+                <ul class="space-y-2 mb-6">
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>Unlimited connections</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>Priority matching</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>Advanced filters</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span>✓</span>
+                    <span>See who liked you</span>
+                  </li>
+                </ul>
+                <button id="subscribeBtn" class="btn w-full">
+                  🎯 Upgrade Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 TRANSACTIONS SCREEN -->
+      <div id="transactions" class="screen hidden">
+        <div class="min-h-screen p-4 pb-20">
+          <div class="max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <button id="transactionBackBtn" class="btn-secondary px-4 py-2 rounded-lg">
+                ← Back
+              </button>
+              <h2 class="text-xl font-bold">Transactions</h2>
+              <div class="w-20"></div>
+            </div>
+
+            <div id="transactionsList" class="space-y-4">
+              <div class="flex justify-center items-center py-20">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
