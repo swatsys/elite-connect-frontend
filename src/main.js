@@ -1264,6 +1264,8 @@
 // export default app;
 
 // HARDCODED API URL
+
+
 // HARDCODED API URL
 const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
@@ -1387,10 +1389,10 @@ class App {
             console.log('🔵 Checking profile_completed:', this.user.profile_completed);
             
             if (this.user.profile_completed) {
-              console.log('✅ Profile complete → Going to HOME');
+              console.log('→ Going to HOME');
               this.showHome();
             } else {
-              console.log('📝 Profile incomplete → Going to PROFILE SETUP');
+              console.log('→ Going to PROFILE SETUP');
               this.showProfileSetup();
             }
           }, 800);
@@ -1547,7 +1549,7 @@ class App {
   }
 
   // ========================================
-  // SCREEN NAVIGATION - CRITICAL METHODS
+  // SCREEN NAVIGATION - HANDLES INLINE STYLES
   // ========================================
 
   hideAllScreens() {
@@ -1557,77 +1559,56 @@ class App {
       const el = document.getElementById(id);
       if (el) {
         el.classList.add('hidden');
+        el.style.display = 'none'; // Also set inline style
         console.log(`  ❌ Hidden: ${id}`);
       }
     });
   }
 
-  showAuth() {
-    console.log('📍 SHOWING: AUTH SCREEN');
+  showScreen(screenId) {
+    console.log(`📍 SHOWING: ${screenId.toUpperCase()} SCREEN`);
     this.hideAllScreens();
-    const el = document.getElementById('auth');
+    const el = document.getElementById(screenId);
     if (el) {
       el.classList.remove('hidden');
-      console.log('  ✅ Auth screen is now visible');
+      el.style.display = 'block'; // Remove inline hidden style
+      console.log(`  ✅ ${screenId} screen is now visible`);
     } else {
-      console.error('  ❌ ERROR: Auth screen element not found!');
+      console.error(`  ❌ ERROR: ${screenId} screen element not found!`);
     }
-    this.currentScreen = 'auth';
+    this.currentScreen = screenId;
+  }
+
+  showAuth() {
+    this.showScreen('auth');
   }
 
   showProfileSetup() {
-    console.log('📍 SHOWING: PROFILE SETUP SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('profile-setup');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Profile setup screen is now visible');
-
-      // Populate form if editing
-      if (this.user && this.user.name) {
-        document.getElementById('name').value = this.user.name || '';
-        document.getElementById('age').value = this.user.age || '';
-        document.getElementById('gender').value = this.user.gender || '';
-        document.getElementById('bio').value = this.user.bio || '';
-        document.getElementById('interests').value = this.user.interests?.join(', ') || '';
-      }
-    } else {
-      console.error('  ❌ ERROR: Profile setup screen element not found!');
+    this.showScreen('profile-setup');
+    
+    // Populate form if editing
+    if (this.user && this.user.name) {
+      document.getElementById('name').value = this.user.name || '';
+      document.getElementById('age').value = this.user.age || '';
+      document.getElementById('gender').value = this.user.gender || '';
+      document.getElementById('bio').value = this.user.bio || '';
+      document.getElementById('interests').value = this.user.interests?.join(', ') || '';
     }
-    this.currentScreen = 'profile-setup';
   }
 
   showHome() {
-    console.log('📍 SHOWING: HOME SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('home');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Home screen is now visible');
-
-      // Update welcome message
-      const welcomeMsg = document.getElementById('welcomeMessage');
-      if (welcomeMsg && this.user) {
-        welcomeMsg.textContent = `Welcome, ${this.user.name || 'User'}!`;
-      }
-    } else {
-      console.error('  ❌ ERROR: Home screen element not found!');
+    this.showScreen('home');
+    
+    // Update welcome message
+    const welcomeMsg = document.getElementById('welcomeMessage');
+    if (welcomeMsg && this.user) {
+      welcomeMsg.textContent = `Welcome, ${this.user.name || 'User'}!`;
     }
-    this.currentScreen = 'home';
   }
 
   async showProfile() {
-    console.log('📍 SHOWING: PROFILE SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('profile');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Profile screen is now visible');
-    } else {
-      console.error('  ❌ ERROR: Profile screen element not found!');
-      return;
-    }
-
+    this.showScreen('profile');
+    
     // Load profile data
     try {
       const res = await fetch(`${API}/profile/me`, {
@@ -1655,61 +1636,23 @@ class App {
     } catch (error) {
       console.error('Error loading profile:', error);
     }
-
-    this.currentScreen = 'profile';
   }
 
   showExplore() {
-    console.log('📍 SHOWING: EXPLORE SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('explore');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Explore screen is now visible');
-    } else {
-      console.error('  ❌ ERROR: Explore screen element not found!');
-    }
-    this.currentScreen = 'explore';
+    this.showScreen('explore');
     this.loadExploreProfiles();
   }
 
   showChat() {
-    console.log('📍 SHOWING: CHAT SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('chat');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Chat screen is now visible');
-    } else {
-      console.error('  ❌ ERROR: Chat screen element not found!');
-    }
-    this.currentScreen = 'chat';
+    this.showScreen('chat');
   }
 
   showSubscription() {
-    console.log('📍 SHOWING: SUBSCRIPTION SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('subscription');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Subscription screen is now visible');
-    } else {
-      console.error('  ❌ ERROR: Subscription screen element not found!');
-    }
-    this.currentScreen = 'subscription';
+    this.showScreen('subscription');
   }
 
   showTransactions() {
-    console.log('📍 SHOWING: TRANSACTIONS SCREEN');
-    this.hideAllScreens();
-    const el = document.getElementById('transactions');
-    if (el) {
-      el.classList.remove('hidden');
-      console.log('  ✅ Transactions screen is now visible');
-    } else {
-      console.error('  ❌ ERROR: Transactions screen element not found!');
-    }
-    this.currentScreen = 'transactions';
+    this.showScreen('transactions');
   }
 }
 
