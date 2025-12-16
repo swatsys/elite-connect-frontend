@@ -1264,6 +1264,7 @@
 // export default app;
 
 // HARDCODED API URL
+// HARDCODED API URL
 const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
