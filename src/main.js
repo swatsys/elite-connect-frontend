@@ -1267,146 +1267,198 @@
 
 
 // HARDCODED API URL
-const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
+
+// ============================================
+// IMPORT CSS - THIS IS CRITICAL FOR VITE!
+// ============================================
+import './style.css';
+
+// ============================================
+// IMPORTS
+// ============================================
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
 import Toast from './toast.js';
 
+const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
+
+// ============================================
+// APP CLASS
+// ============================================
 class App {
   constructor() {
+    console.log('🎬 Elite Connect initializing...');
     this.token = localStorage.getItem('token');
     this.user = null;
     this.currentScreen = 'auth';
+    console.log('📍 Token exists:', !!this.token);
     this.init();
   }
 
   async init() {
-    console.log('🚀 App initializing...');
-    console.log('📍 Token exists:', !!this.token);
-
+    console.log('🔵 [INIT] Starting app initialization...');
+    
     // Initialize MiniKit
     if (MiniKit.isInstalled()) {
-      console.log('✅ MiniKit is installed');
+      console.log('✅ [INIT] MiniKit is installed');
       await MiniKit.install();
+      console.log('✅ [INIT] MiniKit installed successfully');
     } else {
-      console.warn('⚠️ MiniKit not installed - running outside World App');
+      console.warn('⚠️ [INIT] MiniKit not installed - running outside World App');
     }
 
-    // Check if user is logged in
+    // Set up event listeners
+    this.setupEventListeners();
+    console.log('✅ [INIT] Event listeners set up');
+
+    // Check if user is already logged in
     if (this.token) {
+      console.log('🔵 [INIT] Token exists, loading user...');
       await this.loadUser();
     } else {
+      console.log('🔵 [INIT] No token, showing auth screen...');
       this.showAuth();
     }
-
-    this.setupEventListeners();
+    
+    console.log('✅ [INIT] App initialization complete');
   }
 
   setupEventListeners() {
-    // Auth
+    // Sign in button
     document.getElementById('signInBtn')?.addEventListener('click', () => this.verifyWithWorldID());
-
-    // Profile Setup
+    
+    // Profile form
     document.getElementById('profileForm')?.addEventListener('submit', (e) => this.saveProfile(e));
-
-    // Home
+    
+    // Navigation buttons
     document.getElementById('viewProfileBtn')?.addEventListener('click', () => this.showProfile());
     document.getElementById('exploreBtn')?.addEventListener('click', () => this.showExplore());
-
-    // Profile
+    document.getElementById('backToHomeBtn')?.addEventListener('click', () => this.showHome());
     document.getElementById('editProfileBtn')?.addEventListener('click', () => this.showProfileSetup());
     document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
-
-    // Explore
-    document.getElementById('backToHomeBtn')?.addEventListener('click', () => this.showHome());
-
-    // Chat
     document.getElementById('chatBackBtn')?.addEventListener('click', () => this.showExplore());
     document.getElementById('sendMessageBtn')?.addEventListener('click', () => this.sendMessage());
+    document.getElementById('subscriptionBackBtn')?.addEventListener('click', () => this.showProfile());
+    document.getElementById('subscribeBtn')?.addEventListener('click', () => this.subscribe());
+    document.getElementById('transactionBackBtn')?.addEventListener('click', () => this.showProfile());
+    
+    // Message input
     document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') this.sendMessage();
     });
-
-    // Subscription
-    document.getElementById('subscriptionBackBtn')?.addEventListener('click', () => this.showProfile());
-    document.getElementById('subscribeBtn')?.addEventListener('click', () => this.subscribe());
-
-    // Transactions
-    document.getElementById('transactionBackBtn')?.addEventListener('click', () => this.showProfile());
   }
 
   async verifyWithWorldID() {
     try {
-      console.log('🔵 Starting World ID verification...');
+      console.log('');
+      console.log('═══════════════════════════════════════');
+      console.log('🔵 [1] STARTING WORLD ID VERIFICATION');
+      console.log('═══════════════════════════════════════');
 
       if (!MiniKit.isInstalled()) {
+        console.error('❌ [1.1] MiniKit not installed');
         Toast.error('Please open this app in World App');
         return;
       }
+      console.log('✅ [1.2] MiniKit is installed');
 
       Toast.info('Opening World ID verification...');
+      console.log('🔵 [2] Calling MiniKit.commandsAsync.verify...');
 
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: 'signin',
         signal: '',
-        verification_level: VerificationLevel.Orb
+        verification_level: VerificationLevel.Device
       });
 
-      console.log('🔵 Verification status:', finalPayload.status);
+      console.log('🔵 [3] World ID response:', JSON.stringify(finalPayload, null, 2));
 
       if (finalPayload.status === 'success') {
-        console.log('✅ World ID verification successful');
+        console.log('✅ [3.1] Verification successful');
         Toast.info('Verifying with backend...');
 
+        console.log('🔵 [4] Sending to backend:', API);
+        
         const res = await fetch(`${API}/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(finalPayload)
         });
 
-        console.log('🔵 Backend status:', res.status);
+        console.log('🔵 [5] Backend response status:', res.status);
+
         const data = await res.json();
-        console.log('🔵 Backend response:', data);
+        console.log('🔵 [6] Backend data:', JSON.stringify(data, null, 2));
 
         if (data.success) {
-          console.log('✅ Backend verification successful');
+          console.log('✅ [6.1] Backend authentication successful!');
+          
           this.token = data.token;
           this.user = data.user;
           localStorage.setItem('token', this.token);
 
-          Toast.success('Signed in successfully!');
+          console.log('✅ [7] Token stored');
+          console.log('✅ [8] User:', this.user);
 
-          // Close modal
+          Toast.success('Welcome to Elite Connect!');
+
+          // Close World ID modal
+          console.log('🔵 [9] Attempting to close World ID modal...');
+          
           try {
-            await MiniKit.commandsAsync.closeModal();
-            console.log('✅ Modal closed');
-          } catch (e) {
-            console.warn('⚠️ Could not close modal:', e);
+            if (MiniKit.commandsAsync.closeModal) {
+              await MiniKit.commandsAsync.closeModal();
+              console.log('✅ Modal closed successfully');
+            }
+          } catch (error) {
+            console.warn('⚠️ Could not close modal:', error);
           }
 
-          // Navigate after a short delay
+          // Navigate after delay
+          console.log('');
+          console.log('═══════════════════════════════════════');
+          console.log('🔵 [10] STARTING NAVIGATION');
+          console.log('═══════════════════════════════════════');
+          console.log('Profile completed?', this.user.profile_completed);
+          
           setTimeout(() => {
-            console.log('🔵 Checking profile_completed:', this.user.profile_completed);
+            console.log('🔵 [11] Executing navigation...');
             
-            if (this.user.profile_completed) {
-              console.log('→ Going to HOME');
+            if (this.user && this.user.profile_completed) {
+              console.log('✅ [12] Navigating to HOME (profile completed)');
               this.showHome();
             } else {
-              console.log('→ Going to PROFILE SETUP');
+              console.log('✅ [12] Navigating to PROFILE SETUP (profile incomplete)');
               this.showProfileSetup();
             }
-          }, 800);
-
+            
+            console.log('═══════════════════════════════════════');
+            console.log('✅ NAVIGATION COMPLETE');
+            console.log('═══════════════════════════════════════');
+            console.log('');
+          }, 500);
+          
         } else {
-          console.error('❌ Backend error:', data.error);
+          console.error('❌ [6.2] Backend error:', data.error);
           Toast.error(data.error || 'Verification failed');
         }
+      } else if (finalPayload.status === 'error') {
+        console.error('❌ [3.2] World ID error:', finalPayload);
+        Toast.error('Verification failed');
       } else {
-        console.log('⚠️ Verification cancelled or failed');
+        console.log('⚠️ [3.3] Verification cancelled');
         Toast.warning('Verification cancelled');
       }
     } catch (error) {
-      console.error('❌ Verification error:', error);
+      console.error('');
+      console.error('═══════════════════════════════════════');
+      console.error('❌ CRITICAL ERROR IN VERIFICATION');
+      console.error('═══════════════════════════════════════');
+      console.error('Error:', error);
+      console.error('Message:', error.message);
+      console.error('Stack:', error.stack);
+      console.error('═══════════════════════════════════════');
+      console.error('');
       Toast.error('Verification failed. Please try again.');
     }
   }
@@ -1549,7 +1601,7 @@ class App {
   }
 
   // ========================================
-  // SCREEN NAVIGATION - HANDLES INLINE STYLES
+  // SCREEN NAVIGATION
   // ========================================
 
   hideAllScreens() {
@@ -1559,7 +1611,7 @@ class App {
       const el = document.getElementById(id);
       if (el) {
         el.classList.add('hidden');
-        el.style.display = 'none'; // Also set inline style
+        el.style.display = 'none';
         console.log(`  ❌ Hidden: ${id}`);
       }
     });
@@ -1571,7 +1623,7 @@ class App {
     const el = document.getElementById(screenId);
     if (el) {
       el.classList.remove('hidden');
-      el.style.display = 'block'; // Remove inline hidden style
+      el.style.display = 'block';
       console.log(`  ✅ ${screenId} screen is now visible`);
     } else {
       console.error(`  ❌ ERROR: ${screenId} screen element not found!`);
@@ -1586,7 +1638,6 @@ class App {
   showProfileSetup() {
     this.showScreen('profile-setup');
     
-    // Populate form if editing
     if (this.user && this.user.name) {
       document.getElementById('name').value = this.user.name || '';
       document.getElementById('age').value = this.user.age || '';
@@ -1599,7 +1650,6 @@ class App {
   showHome() {
     this.showScreen('home');
     
-    // Update welcome message
     const welcomeMsg = document.getElementById('welcomeMessage');
     if (welcomeMsg && this.user) {
       welcomeMsg.textContent = `Welcome, ${this.user.name || 'User'}!`;
@@ -1609,7 +1659,6 @@ class App {
   async showProfile() {
     this.showScreen('profile');
     
-    // Load profile data
     try {
       const res = await fetch(`${API}/profile/me`, {
         headers: { 'Authorization': `Bearer ${this.token}` }
