@@ -17,9 +17,8 @@ const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 export default API;
 
 // World App Configuration
-export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162'; // Your actual app ID
-
-export const WLD_RECEIVING_WALLET = 'YourWalletAddressHere'; // Your wallet address
+export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
+export const WLD_RECEIVING_WALLET = 'YourWalletAddressHere';
 
 // Pricing
 export const PRICING = {
