@@ -28,57 +28,27 @@ body {
   overflow-x: hidden;
 }
 
-/* ========================================= */
-/* SCREEN MANAGEMENT - ULTRA IMPORTANT!!!   */
-/* THESE RULES MUST BE AT THE TOP!!!        */
-/* ========================================= */
+/* ============================================ */
+/* CRITICAL: HIDE/SHOW SCREENS                 */
+/* ============================================ */
 
-/* Hide all screens by default */
-#auth,
-#profile-setup,
-#home,
-#explore,
-#profile,
-#chat,
-#subscription,
-#transactions {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  min-height: 100vh;
-  background: var(--bg-secondary);
-}
-
-/* Show only the visible screen */
-#auth:not(.hidden),
-#profile-setup:not(.hidden),
-#home:not(.hidden),
-#explore:not(.hidden),
-#profile:not(.hidden),
-#chat:not(.hidden),
-#subscription:not(.hidden),
-#transactions:not(.hidden) {
-  display: block !important;
-  position: relative;
-}
-
-/* Universal hidden class - MAXIMUM SPECIFICITY */
-.hidden,
-*.hidden,
-div.hidden,
-section.hidden,
-[class*="hidden"] {
+/* Universal hidden class - ULTRA STRONG */
+.hidden {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }
 
-/* ========================================= */
-/* LAYOUT                                    */
-/* ========================================= */
+/* All screens take full height */
+.screen {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ============================================ */
+/* LAYOUT                                       */
+/* ============================================ */
 .container {
   max-width: 600px;
   margin: 0 auto;
@@ -129,9 +99,9 @@ h3 {
   margin-top: 2rem;
 }
 
-/* ========================================= */
-/* BUTTONS                                   */
-/* ========================================= */
+/* ============================================ */
+/* BUTTONS                                      */
+/* ============================================ */
 .btn {
   background: var(--gradient);
   color: white;
@@ -200,9 +170,9 @@ h3 {
   margin-top: 2rem;
 }
 
-/* ========================================= */
-/* FORMS                                     */
-/* ========================================= */
+/* ============================================ */
+/* FORMS                                        */
+/* ============================================ */
 .form-group {
   margin-bottom: 1.5rem;
   text-align: left;
@@ -237,9 +207,9 @@ textarea {
   font-family: inherit;
 }
 
-/* ========================================= */
-/* CARDS                                     */
-/* ========================================= */
+/* ============================================ */
+/* CARDS                                        */
+/* ============================================ */
 .card {
   background: var(--bg-primary);
   border-radius: 16px;
@@ -263,9 +233,9 @@ textarea {
   margin: 0 auto 1.5rem;
 }
 
-/* ========================================= */
-/* NAVIGATION                                */
-/* ========================================= */
+/* ============================================ */
+/* NAVIGATION                                   */
+/* ============================================ */
 .header {
   display: flex;
   justify-content: space-between;
@@ -311,9 +281,9 @@ textarea {
   background: rgba(236, 72, 153, 0.1);
 }
 
-/* ========================================= */
-/* MESSAGES                                  */
-/* ========================================= */
+/* ============================================ */
+/* MESSAGES                                     */
+/* ============================================ */
 .messages-container {
   max-height: calc(100vh - 200px);
   overflow-y: auto;
@@ -337,9 +307,9 @@ textarea {
   flex: 1;
 }
 
-/* ========================================= */
-/* PROFILES LIST                             */
-/* ========================================= */
+/* ============================================ */
+/* PROFILES LIST                                */
+/* ============================================ */
 #profilesList {
   display: grid;
   gap: 1rem;
@@ -360,9 +330,9 @@ textarea {
   box-shadow: 0 4px 12px var(--shadow);
 }
 
-/* ========================================= */
-/* ANIMATIONS                                */
-/* ========================================= */
+/* ============================================ */
+/* ANIMATIONS                                   */
+/* ============================================ */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -379,9 +349,9 @@ textarea {
   }
 }
 
-/* ========================================= */
-/* RESPONSIVE                                */
-/* ========================================= */
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
