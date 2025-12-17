@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,7 +11,7 @@
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
-</html>
+</html> -->
 
 <!-- <!DOCTYPE html>
 <html lang="en">
@@ -174,3 +174,279 @@
   <!-- <script type="module" src="/src/main.js"></script>
 </body>
 </html> --> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Elite Connect</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    
+    <!-- SIGNIN SCREEN -->
+    <div id="signin" class="screen">
+      <div class="container">
+        <div class="auth-box">
+          <div class="logo-container">
+            <div class="logo-circle">
+              <svg class="hearts" viewBox="0 0 100 100" width="80" height="80">
+                <defs>
+                  <linearGradient id="heartGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#c06cff;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="heartGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff1744;stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:#ff6b9d;stop-opacity:0.8" />
+                  </linearGradient>
+                </defs>
+                <path fill="url(#heartGradient1)" d="M50,80 C50,80 20,60 20,40 C20,30 25,25 32,25 C38,25 45,30 50,38 C55,30 62,25 68,25 C75,25 80,30 80,40 C80,60 50,80 50,80 Z" transform="translate(5, -5)"/>
+                <path fill="url(#heartGradient2)" d="M50,75 C50,75 25,57 25,40 C25,32 29,28 35,28 C40,28 46,32 50,39 C54,32 60,28 65,28 C71,28 75,32 75,40 C75,57 50,75 50,75 Z" transform="translate(-10, 5) scale(0.9)"/>
+              </svg>
+            </div>
+          </div>
+
+          <h1 class="app-title">Elite Connect</h1>
+          <p class="app-subtitle">Verified connections, genuine hearts</p>
+
+          <button id="signInBtn" class="btn-signin">
+            <span class="btn-icon">🌍</span>
+            <span>Sign in with World ID</span>
+          </button>
+
+          <p class="footer-text">One person, one profile. Verified humans only.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE SETUP SCREEN -->
+    <div id="profile-setup" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="header">
+          <h2>Complete Your Profile</h2>
+          <p class="subtitle">Tell us about yourself</p>
+        </div>
+        
+        <form id="profileForm" class="form">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Enter your name" maxlength="50">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Age *</label>
+              <input type="number" id="age" name="age" min="18" max="100" required placeholder="18">
+            </div>
+
+            <div class="form-group">
+              <label for="gender">Gender *</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..." maxlength="500"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="interests">Interests</label>
+            <input type="text" id="interests" name="interests" placeholder="Travel, Music, Cooking...">
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Save Profile & Continue
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div id="home" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="welcome-section">
+          <h1 id="welcomeMessage" class="welcome-title">Welcome!</h1>
+          <p class="welcome-subtitle">Start connecting with verified humans</p>
+        </div>
+        
+        <div class="action-cards">
+          <button class="action-card" onclick="app.showExplore()">
+            <div class="card-icon">🔍</div>
+            <div class="card-content">
+              <h3>Explore Profiles</h3>
+              <p>Discover new connections</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </button>
+
+          <button class="action-card" onclick="app.showChat()">
+            <div class="card-icon">💬</div>
+            <div class="card-content">
+              <h3>Messages</h3>
+              <p>Chat with your matches</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </button>
+
+          <button class="action-card" onclick="app.showProfile()">
+            <div class="card-icon">👤</div>
+            <div class="card-content">
+              <h3>My Profile</h3>
+              <p>View and edit your profile</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </button>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" onclick="app.showHome()">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" onclick="app.showExplore()">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Explore</span>
+        </button>
+        <button class="nav-item" onclick="app.showChat()">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </button>
+        <button class="nav-item" onclick="app.showProfile()">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- EXPLORE SCREEN -->
+    <div id="explore" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="header with-back">
+          <button class="btn-back" onclick="app.showHome()">←</button>
+          <h2>Discover</h2>
+          <div style="width: 40px;"></div>
+        </div>
+        
+        <div id="profilesList" class="profiles-grid"></div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" onclick="app.showHome()">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item active" onclick="app.showExplore()">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Explore</span>
+        </button>
+        <button class="nav-item" onclick="app.showChat()">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </button>
+        <button class="nav-item" onclick="app.showProfile()">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div id="chat" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="header">
+          <h2>Messages</h2>
+        </div>
+        
+        <div id="chatList" class="chat-list"></div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" onclick="app.showHome()">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" onclick="app.showExplore()">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Explore</span>
+        </button>
+        <button class="nav-item active" onclick="app.showChat()">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </button>
+        <button class="nav-item" onclick="app.showProfile()">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div id="profile" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="header">
+          <h2>My Profile</h2>
+        </div>
+        
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <span id="profileInitial">?</span>
+          </div>
+          
+          <div class="profile-info">
+            <h3 id="profileName">Loading...</h3>
+            <p id="profileAge" class="profile-meta"></p>
+            <p id="profileBio" class="profile-bio"></p>
+            
+            <div id="profileInterests" class="interests-list"></div>
+          </div>
+
+          <div class="profile-actions">
+            <button class="btn-secondary" onclick="app.showProfileSetup()">
+              <span>✏️</span> Edit Profile
+            </button>
+            <button class="btn-danger" onclick="app.logout()">
+              <span>🚪</span> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" onclick="app.showHome()">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" onclick="app.showExplore()">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Explore</span>
+        </button>
+        <button class="nav-item" onclick="app.showChat()">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </button>
+        <button class="nav-item active" onclick="app.showProfile()">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
