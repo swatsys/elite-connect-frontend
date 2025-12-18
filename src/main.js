@@ -2799,8 +2799,8 @@
 import './style.css';
 import { MiniKit, tokenToDecimals, Tokens, VerificationLevel } from '@worldcoin/minikit-js';
 import { API, APP_NAME, WORLD_APP_ID, WLD_RECEIVING_WALLET, PRICING } from './config.js';
-import { ThemeManager, THEMES } from './theme.js';
-import { Toast } from './toast.js';
+import { ThemeManager, THEMES } from './utils/theme.js'; // ✅ FIXED!
+import { Toast } from './utils/toast.js'; // ✅ FIXED!
 
 // Initialize MiniKit
 MiniKit.install(WORLD_APP_ID);
@@ -2904,11 +2904,14 @@ class App {
           
           Toast.success('Welcome to Elite Connect!');
           
-          if (data.user.profile_completed) {
-            this.showHome();
-          } else {
-            this.showProfileSetup();
-          }
+          // ✅ ADD SETTIMEOUT FOR NAVIGATION FIX!
+          setTimeout(() => {
+            if (data.user.profile_completed) {
+              this.showHome();
+            } else {
+              this.showProfileSetup();
+            }
+          }, 500);
         } else {
           Toast.error(data.error || 'Verification failed');
         }
@@ -2985,7 +2988,11 @@ class App {
       if (result.success) {
         this.user.profile_completed = true;
         Toast.success('Profile created successfully!');
-        this.showHome();
+        
+        // ✅ ADD SETTIMEOUT HERE TOO!
+        setTimeout(() => {
+          this.showHome();
+        }, 500);
       } else {
         Toast.error(result.error || 'Failed to create profile');
       }
