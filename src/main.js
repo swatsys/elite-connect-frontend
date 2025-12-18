@@ -2172,8 +2172,8 @@
 const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
-import { ThemeManager, THEMES } from './utils/theme.js';
-import Toast from './utils/toast.js';
+import { ThemeManager, THEMES } from './theme.js';
+import { Toast } from './toast.js';
 
 class App {
   constructor() {
