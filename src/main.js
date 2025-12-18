@@ -2851,7 +2851,7 @@ class App {
           <div style="width:120px;height:120px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:4rem;margin:0 auto 1.5rem;box-shadow:0 8px 16px var(--shadow)">
             💕
           </div>
-          <h1 style="font-size:2.5rem;margin-bottom:0.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">
+          <h1 style="font-size:2.5rem;margin-bottom:0.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:var(--text-tertiary);font-weight:800">
             ${APP_NAME}
           </h1>
           <p style="color:var(--text-secondary);margin-bottom:2rem;font-size:1.1rem">
