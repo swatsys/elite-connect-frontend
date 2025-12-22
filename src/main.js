@@ -1673,8 +1673,8 @@
 import './style.css';
 import { MiniKit, tokenToDecimals, Tokens, VerificationLevel } from '@worldcoin/minikit-js';
 import { API, APP_NAME, WORLD_APP_ID, WLD_RECEIVING_WALLET, PRICING } from './config.js';
-import { ThemeManager, THEMES } from './theme.js';
-import { Toast } from './toast.js';
+import { ThemeManager, THEMES } from './utils/theme.js';
+import { Toast } from './utils/toast.js';
 
 // ============================================
 // INITIALIZE MINIKIT PROPERLY
