@@ -1672,8 +1672,8 @@
 
 // main.js
 
-import { API } from './config.js';
-import Toast from './toast.js';
+import { API } from './src/config.js';
+import Toast from './utils/toast.js';
 
 // Entry point
 document.addEventListener('DOMContentLoaded', () => {
