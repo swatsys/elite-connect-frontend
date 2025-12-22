@@ -259,6 +259,9 @@
 // ✨ TOAST NOTIFICATION SYSTEM
 // Shows success, error, warning, and info messages
 
+// ✨ TOAST NOTIFICATION SYSTEM
+// Shows success, error, warning, and info messages
+
 export class Toast {
   static show(message, type = 'info', duration = 3000) {
     // Remove any existing toast

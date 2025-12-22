@@ -117,6 +117,9 @@
 // ✨ THEME MANAGER
 // Handles light/dark/system theme switching
 
+// ✨ THEME MANAGER
+// Handles light/dark/system theme switching
+
 export const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',

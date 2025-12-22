@@ -1672,7 +1672,7 @@
 
 import './style.css';
 import { MiniKit, tokenToDecimals, Tokens, VerificationLevel } from '@worldcoin/minikit-js';
-import { API, APP_NAME, WORLD_APP_ID, WLD_RECEIVING_WALLET, PRICING, PRODUCTION_URL, isInWorldApp } from './config.js';
+import { API, APP_NAME, WORLD_APP_ID, WLD_RECEIVING_WALLET, PRICING } from './config.js';
 import { ThemeManager, THEMES } from './utils/theme.js';
 import { Toast } from './utils/toast.js';
 
@@ -1720,66 +1720,30 @@ class App {
   showAuth() {
     this.currentPage = 'auth';
     
-    // ✅ CHECK IF IN WORLD APP
-    if (!isInWorldApp()) {
-      // Show instructions to open in World App
-      document.getElementById('app').innerHTML = `
-        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary)">
-          <div class="card" style="max-width:500px;width:100%;text-align:center">
-            <div style="font-size:4rem;margin-bottom:1rem">📱</div>
-            <h1 style="font-size:2rem;margin-bottom:1rem">Open in World App</h1>
-            <p style="color:var(--text-secondary);margin-bottom:2rem">
-              This app needs to be opened inside the World App to work properly.
-            </p>
-            
-            <div style="background:var(--bg-tertiary);padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;text-align:left">
-              <h3 style="margin:0 0 1rem 0">📋 How to open:</h3>
-              <ol style="margin:0;padding-left:1.5rem;color:var(--text-secondary)">
-                <li style="margin-bottom:0.5rem">Open <strong>World App</strong> on your phone</li>
-                <li style="margin-bottom:0.5rem">Tap the <strong>QR scanner</strong> icon</li>
-                <li style="margin-bottom:0.5rem">Scan this QR code:</li>
-              </ol>
-            </div>
-            
-            <div id="qrcode" style="background:white;padding:1rem;border-radius:12px;display:inline-block;margin-bottom:1rem"></div>
-            
-            <p style="font-size:0.875rem;color:var(--text-tertiary);margin-bottom:1rem">
-              Or copy this link and paste it in World App:
-            </p>
-            <div style="background:var(--bg-tertiary);padding:0.75rem;border-radius:8px;font-family:monospace;font-size:0.875rem;word-break:break-all;margin-bottom:1.5rem">
-              ${PRODUCTION_URL}
-            </div>
-            
-            <button class="btn btn-secondary" onclick="window.location.reload()">
-              Refresh Page
-            </button>
-          </div>
-        </div>
-      `;
-      
-      // Generate QR code
-      this.generateQRCode();
-      return;
-    }
-    
-    // ✅ NORMAL AUTH SCREEN (When in World App)
+    // ✅ ALWAYS SHOW SIGN-IN SCREEN - NO DETECTION!
     document.getElementById('app').innerHTML = `
       <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg-secondary)">
         <div class="card" style="max-width:400px;width:100%;text-align:center">
-          <!-- ✨ GRADIENT HEART LOGO -->
-          <div style="width:120px;height:120px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:4rem;margin:0 auto 1.5rem;box-shadow:0 8px 20px rgba(236, 72, 153, 0.4)">
+          
+          <!-- ✨ GRADIENT HEART LOGO WITH PULSE -->
+          <div class="profile-image" style="width:120px;height:120px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:4rem;margin:0 auto 1.5rem;box-shadow:0 8px 20px rgba(236, 72, 153, 0.4)">
             💕
           </div>
-          <!-- ✨ GRADIENT TEXT -->
-          <h1 style="font-size:2.5rem;margin-bottom:0.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">
+          
+          <!-- ✨ GRADIENT TEXT TITLE -->
+          <h1 class="gradient-text" style="font-size:2.5rem;margin-bottom:0.5rem">
             ${APP_NAME}
           </h1>
+          
           <p style="color:var(--text-secondary);margin-bottom:2rem;font-size:1.1rem">
             Verified connections, genuine hearts
           </p>
+          
+          <!-- ✨ GRADIENT SIGN IN BUTTON -->
           <button class="btn" onclick="window.app.verifyWithWorldID()">
             🌍 Sign in with World ID
           </button>
+          
           <p style="margin-top:1.5rem;font-size:0.875rem;color:var(--text-tertiary)">
             One person, one profile. Verified humans only.
           </p>
@@ -1788,21 +1752,11 @@ class App {
     `;
   }
 
-  generateQRCode() {
-    // Simple QR code generation using an API
-    const qrContainer = document.getElementById('qrcode');
-    if (qrContainer) {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(PRODUCTION_URL)}`;
-      qrContainer.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width:200px;height:200px;display:block" />`;
-    }
-  }
-
   async verifyWithWorldID() {
     try {
-      // Double-check we're in World App
+      // Check if MiniKit is available
       if (!MiniKit.isInstalled()) {
         Toast.error('Please open this app in World App');
-        this.showAuth(); // Show the instructions screen
         return;
       }
 
@@ -1835,13 +1789,12 @@ class App {
           
           Toast.success('Welcome to Elite Connect!');
           
-          setTimeout(() => {
-            if (data.user.profile_completed) {
-              this.showHome();
-            } else {
-              this.showProfileSetup();
-            }
-          }, 500);
+          // ✅ DIRECT NAVIGATION - NO DELAY!
+          if (data.user.profile_completed) {
+            this.showHome();
+          } else {
+            this.showProfileSetup();
+          }
         } else {
           Toast.error(data.error || 'Verification failed');
         }
@@ -1857,39 +1810,88 @@ class App {
   showProfileSetup() {
     this.currentPage = 'setup';
     document.getElementById('app').innerHTML = `
-      <div style="padding:2rem 1rem;max-width:600px;margin:0 auto">
-        <h1 style="font-size:2rem;margin-bottom:0.5rem">Create Your Profile</h1>
-        <p style="color:var(--text-secondary);margin-bottom:2rem">Tell us about yourself</p>
-        
-        <form id="profileForm" style="display:flex;flex-direction:column;gap:1.5rem">
-          <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Name</label>
-            <input type="text" name="name" required placeholder="Your name" />
+      <div style="min-height:100vh;padding:2rem 1rem;background:var(--bg-secondary)">
+        <div style="max-width:600px;margin:0 auto">
+          
+          <!-- Header -->
+          <div style="text-align:center;margin-bottom:2rem">
+            <div style="font-size:3rem;margin-bottom:0.5rem">👤</div>
+            <h1 style="font-size:2rem;margin-bottom:0.5rem">Create Your Profile</h1>
+            <p style="color:var(--text-secondary)">Tell us about yourself</p>
           </div>
           
-          <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Age</label>
-            <input type="number" name="age" min="18" max="100" required placeholder="18" />
+          <!-- Profile Form -->
+          <div class="card">
+            <form id="profileForm" style="display:flex;flex-direction:column;gap:1.5rem">
+              
+              <!-- Name -->
+              <div>
+                <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">
+                  Name *
+                </label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  required 
+                  placeholder="Your name"
+                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:1rem"
+                />
+              </div>
+              
+              <!-- Age -->
+              <div>
+                <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">
+                  Age *
+                </label>
+                <input 
+                  type="number" 
+                  name="age" 
+                  min="18" 
+                  max="100" 
+                  required 
+                  placeholder="18"
+                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:1rem"
+                />
+              </div>
+              
+              <!-- Gender -->
+              <div>
+                <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">
+                  Gender *
+                </label>
+                <select 
+                  name="gender" 
+                  required
+                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:1rem"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="non-binary">Non-binary</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <!-- Bio -->
+              <div>
+                <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">
+                  Bio
+                </label>
+                <textarea 
+                  name="bio" 
+                  rows="4" 
+                  placeholder="Tell us about yourself..."
+                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:1rem;resize:vertical"
+                ></textarea>
+              </div>
+              
+              <!-- Submit Button -->
+              <button type="submit" class="btn" style="margin-top:0.5rem">
+                Complete Profile
+              </button>
+            </form>
           </div>
-          
-          <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Gender</label>
-            <select name="gender" required>
-              <option value="">Select gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="non-binary">Non-binary</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          
-          <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Bio</label>
-            <textarea name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
-          </div>
-          
-          <button type="submit" class="btn">Complete Profile</button>
-        </form>
+        </div>
       </div>
     `;
 
@@ -1919,9 +1921,8 @@ class App {
         this.user.profile_completed = true;
         Toast.success('Profile created successfully!');
         
-        setTimeout(() => {
-          this.showHome();
-        }, 500);
+        // ✅ DIRECT NAVIGATION - NO DELAY!
+        this.showHome();
       } else {
         Toast.error(result.error || 'Failed to create profile');
       }
@@ -1937,24 +1938,36 @@ class App {
       <div style="padding-bottom:85px;min-height:100vh;background:var(--bg-secondary)">
         <div style="max-width:600px;margin:0 auto;padding:1rem">
           
-          <div class="card" style="text-align:center;margin-bottom:1.5rem">
+          <!-- Welcome Card -->
+          <div class="card" style="text-align:center;margin-bottom:1.5rem;background:var(--gradient);color:white;border:none">
             <div style="font-size:3rem;margin-bottom:0.5rem">💕</div>
-            <h1 style="font-size:1.75rem;margin:0 0 0.5rem 0">Welcome Back!</h1>
-            <p style="color:var(--text-secondary);margin:0">Ready to find your match?</p>
+            <h1 style="font-size:1.75rem;margin:0 0 0.5rem 0;color:white">Welcome Back!</h1>
+            <p style="margin:0;opacity:0.9">Ready to find your match?</p>
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-            <div class="card" style="text-align:center;cursor:pointer" onclick="window.app.navigate('explore')">
+          <!-- Action Cards -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+            
+            <!-- Discover Card -->
+            <div class="card" style="text-align:center;cursor:pointer;transition:all 0.3s" onclick="window.app.navigate('explore')">
               <div style="font-size:3rem;margin-bottom:0.5rem">🔍</div>
               <h3 style="margin:0;font-size:1.25rem">Discover</h3>
               <p style="margin:0.25rem 0 0 0;color:var(--text-secondary);font-size:0.875rem">Find profiles</p>
             </div>
             
-            <div class="card" style="text-align:center;cursor:pointer" onclick="window.app.navigate('chat')">
+            <!-- Messages Card -->
+            <div class="card" style="text-align:center;cursor:pointer;transition:all 0.3s" onclick="window.app.navigate('chat')">
               <div style="font-size:3rem;margin-bottom:0.5rem">💬</div>
               <h3 style="margin:0;font-size:1.25rem">Messages</h3>
               <p style="margin:0.25rem 0 0 0;color:var(--text-secondary);font-size:0.875rem">Your chats</p>
             </div>
+          </div>
+
+          <!-- Info Card -->
+          <div class="card" style="background:var(--bg-tertiary);border:none">
+            <p style="margin:0;text-align:center;color:var(--text-secondary)">
+              🌍 Verified with World ID
+            </p>
           </div>
         </div>
       </div>

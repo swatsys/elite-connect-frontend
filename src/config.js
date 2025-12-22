@@ -15,6 +15,10 @@
 // ✨ ELITE CONNECT - CONFIGURATION FILE
 // All your app settings in one place!
 
+
+// ✨ ELITE CONNECT - CONFIGURATION FILE
+// All your app settings in one place!
+
 // Backend API
 export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
@@ -66,8 +70,6 @@ if (DEBUG) {
     isInWorldApp: isInWorldApp()
   });
 }
-
-
 
 // const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
