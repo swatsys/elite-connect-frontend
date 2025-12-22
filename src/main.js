@@ -1670,445 +1670,154 @@
 // window.app = new App();
 
 
-// ⚡ ULTRA SIMPLE VERSION - MAXIMUM DEBUGGING
-console.log('===== ELITE CONNECT STARTING =====');
+// main.js
 
-import './style.css';
-console.log('✅ Style imported');
+import { API } from './config.js';
+import Toast from './toast.js';
 
-import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
-console.log('✅ MiniKit imported');
+// Entry point
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
 
-// Configuration
-const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
-const APP_NAME = 'Elite Connect';
-const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
-
-console.log('✅ Config set');
-console.log('API:', API);
-console.log('WORLD_APP_ID:', WORLD_APP_ID);
-
-// Initialize MiniKit
-console.log('Initializing MiniKit...');
-MiniKit.install(WORLD_APP_ID);
-console.log('✅ MiniKit installed');
-
-// Simple Toast
-class Toast {
-  static show(message, type = 'info') {
-    console.log(`[TOAST ${type.toUpperCase()}] ${message}`);
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#333;color:white;padding:1rem 1.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:9999;font-size:14px;';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+  if (path === '/' || path === '/index.html') {
+    showSignInPage();
+  } else if (path === '/profile-setup') {
+    showProfileSetupPage();
+  } else if (path === '/home') {
+    showHomePage();
+  } else {
+    showNotFound();
   }
-  static success(msg) { this.show(msg, 'success'); }
-  static error(msg) { this.show(msg, 'error'); }
-  static info(msg) { this.show(msg, 'info'); }
+});
+
+// Show sign-in page
+function showSignInPage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="card">
+      <h2>Elite Connect</h2>
+      <p>Verified connections, genuine hearts.</p>
+      <button class="btn" id="signInBtn">Sign in with World ID</button>
+    </div>
+  `;
+
+  document.getElementById('signInBtn').addEventListener('click', async () => {
+    try {
+      Toast.info('Verifying World ID...');
+      
+      // Simulate World ID payload (replace with real MiniKit integration)
+      const payload = {
+        nullifier_hash: 'demo_hash_' + Date.now(),
+        proof: 'demo_proof',
+        merkle_root: 'demo_root',
+        verification_level: 'orb'
+      };
+
+      const res = await fetch(`${API}/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+
+        if (data.user.profile_completed) {
+          window.location.replace('/home');
+        } else {
+          window.location.replace('/profile-setup');
+        }
+      } else {
+        Toast.error(data.error || 'Verification failed');
+      }
+    } catch (err) {
+      Toast.error('Network error');
+    }
+  });
 }
 
-console.log('✅ Toast class created');
+// Show profile setup page
+function showProfileSetupPage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="card">
+      <h2>Complete Your Profile</h2>
+      <input type="text" id="name" placeholder="Name" />
+      <input type="number" id="age" placeholder="Age" />
+      <select id="gender">
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="non-binary">Non-binary</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea id="bio" placeholder="Bio"></textarea>
+      <button class="btn" id="saveProfileBtn">Save Profile</button>
+    </div>
+  `;
 
-class App {
-  constructor() {
-    console.log('===== APP CONSTRUCTOR CALLED =====');
-    
-    // Check if #app exists
-    const appElement = document.getElementById('app');
-    console.log('#app element:', appElement);
-    
-    if (!appElement) {
-      console.error('❌ CRITICAL: #app element not found!');
-      document.body.innerHTML = '<div style="padding:2rem;background:red;color:white;text-align:center"><h1>ERROR: #app not found</h1><p>Check index.html</p></div>';
-      return;
-    }
-    
-    console.log('✅ #app element found');
-    
-    this.token = localStorage.getItem('token');
-    console.log('Token from localStorage:', this.token ? 'EXISTS' : 'NULL');
-    
-    this.user = null;
-    this.currentPage = 'auth';
-    
-    console.log('Starting app flow...');
-    
-    if (this.token) {
-      console.log('Token exists, calling init()...');
-      this.init();
-    } else {
-      console.log('No token, calling showAuth()...');
-      this.showAuth();
-    }
-  }
+  document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return Toast.error('Not authenticated');
 
-  async init() {
-    console.log('init() called');
-    try {
-      const res = await fetch(`${API}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${this.token}` }
-      });
-      
-      console.log('Auth check response:', res.status);
-      
-      if (res.ok) {
-        this.user = await res.json();
-        console.log('User data:', this.user);
-        
-        if (this.user.profile_completed) {
-          console.log('Profile completed, showing home');
-          this.showHome();
-        } else {
-          console.log('Profile NOT completed, showing setup');
-          this.showProfileSetup();
-        }
-      } else {
-        console.log('Auth failed, logging out');
-        this.logout();
-      }
-    } catch (error) {
-      console.error('Init error:', error);
-      this.logout();
-    }
-  }
-
-  showAuth() {
-    console.log('===== SHOWAUTH() CALLED =====');
-    this.currentPage = 'auth';
-    
-    const app = document.getElementById('app');
-    if (!app) {
-      console.error('❌ #app not found in showAuth!');
-      return;
-    }
-    
-    console.log('Building auth HTML...');
-    
-    const html = `
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-        <div style="background:white;border-radius:20px;padding:3rem;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-          
-          <div style="width:100px;height:100px;background:linear-gradient(135deg, #ec4899, #8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto 2rem;box-shadow:0 8px 20px rgba(236, 72, 153, 0.4)">
-            💕
-          </div>
-          
-          <h1 style="font-size:2.5rem;margin-bottom:0.5rem;background:linear-gradient(135deg, #ec4899, #8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">
-            ${APP_NAME}
-          </h1>
-          
-          <p style="color:#666;margin-bottom:2rem;font-size:1.1rem">
-            Verified connections, genuine hearts
-          </p>
-          
-          <button 
-            id="signInBtn"
-            style="background:linear-gradient(135deg, #ec4899, #8b5cf6);color:white;border:none;padding:1rem 2rem;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(236, 72, 153, 0.3)"
-          >
-            🌍 Sign in with World ID
-          </button>
-          
-          <p style="margin-top:1.5rem;font-size:0.875rem;color:#999">
-            One person, one profile. Verified humans only.
-          </p>
-        </div>
-      </div>
-    `;
-    
-    console.log('Setting innerHTML...');
-    app.innerHTML = html;
-    console.log('✅ HTML set!');
-    
-    // Add event listener
-    console.log('Adding button event listener...');
-    const btn = document.getElementById('signInBtn');
-    if (btn) {
-      btn.onclick = () => {
-        console.log('Sign in button clicked!');
-        this.verifyWithWorldID();
-      };
-      console.log('✅ Button event listener added');
-    } else {
-      console.error('❌ Sign in button not found!');
-    }
-    
-    console.log('===== AUTH SCREEN RENDERED =====');
-    Toast.success('Auth screen loaded!');
-  }
-
-  async verifyWithWorldID() {
-    console.log('===== VERIFY WITH WORLD ID CALLED =====');
-    
-    try {
-      console.log('Checking if MiniKit is installed...');
-      if (!MiniKit.isInstalled()) {
-        console.error('MiniKit not installed!');
-        Toast.error('Please open this app in World App');
-        return;
-      }
-      console.log('✅ MiniKit is installed');
-
-      Toast.info('Opening World ID verification...');
-      console.log('Calling MiniKit.commandsAsync.verify...');
-
-      const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: 'signin',
-        signal: '',
-        verification_level: VerificationLevel.Device
-      });
-
-      console.log('World ID verification response:', finalPayload);
-
-      if (finalPayload.status === 'success') {
-        console.log('✅ World ID verification successful!');
-        Toast.info('Verifying your World ID...');
-        
-        console.log('Calling backend verify endpoint...');
-        const res = await fetch(`${API}/auth/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(finalPayload)
-        });
-
-        const data = await res.json();
-        console.log('Backend verify response:', data);
-
-        if (data.success) {
-          console.log('✅ Backend verification successful!');
-          this.token = data.token;
-          this.user = data.user;
-          localStorage.setItem('token', this.token);
-          console.log('Token saved:', this.token);
-          
-          Toast.success('Welcome to Elite Connect!');
-          
-          console.log('User profile_completed:', data.user.profile_completed);
-          if (data.user.profile_completed) {
-            console.log('Navigating to home...');
-            this.showHome();
-          } else {
-            console.log('Navigating to profile setup...');
-            this.showProfileSetup();
-          }
-        } else {
-          console.error('Backend verification failed:', data.error);
-          Toast.error(data.error || 'Verification failed');
-        }
-      } else {
-        console.log('World ID verification cancelled or failed');
-        Toast.error('Verification cancelled');
-      }
-    } catch (error) {
-      console.error('❌ Verification error:', error);
-      console.error('Error stack:', error.stack);
-      Toast.error('Error: ' + error.message);
-    }
-  }
-
-  showProfileSetup() {
-    console.log('===== SHOWPROFILESETUP() CALLED =====');
-    this.currentPage = 'setup';
-    
-    const app = document.getElementById('app');
-    app.innerHTML = `
-      <div style="min-height:100vh;padding:2rem 1rem;background:#f5f5f5">
-        <div style="max-width:600px;margin:0 auto">
-          
-          <div style="text-align:center;margin-bottom:2rem">
-            <div style="font-size:3rem;margin-bottom:0.5rem">👤</div>
-            <h1 style="font-size:2rem;margin-bottom:0.5rem">Create Your Profile</h1>
-            <p style="color:#666">Tell us about yourself</p>
-          </div>
-          
-          <div style="background:white;border-radius:16px;padding:2rem;box-shadow:0 4px 6px rgba(0,0,0,0.1)">
-            <form id="profileForm" style="display:flex;flex-direction:column;gap:1.5rem">
-              
-              <div>
-                <label style="display:block;margin-bottom:0.5rem;font-weight:600">Name *</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  required 
-                  placeholder="Your name"
-                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid #ddd;font-size:1rem"
-                />
-              </div>
-              
-              <div>
-                <label style="display:block;margin-bottom:0.5rem;font-weight:600">Age *</label>
-                <input 
-                  type="number" 
-                  name="age" 
-                  min="18" 
-                  max="100" 
-                  required 
-                  placeholder="18"
-                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid #ddd;font-size:1rem"
-                />
-              </div>
-              
-              <div>
-                <label style="display:block;margin-bottom:0.5rem;font-weight:600">Gender *</label>
-                <select 
-                  name="gender" 
-                  required
-                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid #ddd;font-size:1rem"
-                >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="non-binary">Non-binary</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              
-              <div>
-                <label style="display:block;margin-bottom:0.5rem;font-weight:600">Bio</label>
-                <textarea 
-                  name="bio" 
-                  rows="4" 
-                  placeholder="Tell us about yourself..."
-                  style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid #ddd;font-size:1rem;resize:vertical"
-                ></textarea>
-              </div>
-              
-              <button type="submit" style="background:linear-gradient(135deg, #ec4899, #8b5cf6);color:white;border:none;padding:1rem 2rem;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;width:100%">
-                Complete Profile
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    `;
-
-    console.log('Profile setup HTML rendered');
-    
-    const form = document.getElementById('profileForm');
-    form.onsubmit = (e) => {
-      console.log('Profile form submitted!');
-      this.submitProfile(e);
+    const profile = {
+      name: document.getElementById('name').value,
+      age: parseInt(document.getElementById('age').value),
+      gender: document.getElementById('gender').value,
+      bio: document.getElementById('bio').value
     };
-    
-    console.log('===== PROFILE SETUP RENDERED =====');
-  }
-
-  async submitProfile(e) {
-    console.log('===== SUBMITPROFILE() CALLED =====');
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-    console.log('Form data:', data);
 
     try {
-      Toast.info('Creating your profile...');
-      console.log('Calling backend create profile...');
-      
       const res = await fetch(`${API}/profile/create`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(profile)
       });
 
-      const result = await res.json();
-      console.log('Create profile response:', result);
+      const data = await res.json();
 
-      if (result.success) {
-        console.log('✅ Profile created successfully!');
-        this.user.profile_completed = true;
-        Toast.success('Profile created!');
-        console.log('Navigating to home...');
-        this.showHome();
+      if (data.success) {
+        Toast.success('Profile saved!');
+        window.location.replace('/home');
       } else {
-        console.error('Profile creation failed:', result.error);
-        Toast.error(result.error || 'Failed to create profile');
+        Toast.error(data.error || 'Failed to save profile');
       }
-    } catch (error) {
-      console.error('❌ Profile creation error:', error);
-      Toast.error('Failed to create profile');
+    } catch (err) {
+      Toast.error('Network error');
     }
-  }
-
-  showHome() {
-    console.log('===== SHOWHOME() CALLED =====');
-    this.currentPage = 'home';
-    
-    const app = document.getElementById('app');
-    app.innerHTML = `
-      <div style="padding:2rem 1rem;min-height:100vh;background:#f5f5f5">
-        <div style="max-width:600px;margin:0 auto">
-          
-          <div style="background:linear-gradient(135deg, #ec4899, #8b5cf6);color:white;border-radius:16px;padding:2rem;text-align:center;margin-bottom:1.5rem">
-            <div style="font-size:3rem;margin-bottom:0.5rem">💕</div>
-            <h1 style="font-size:1.75rem;margin:0 0 0.5rem 0">Welcome Back!</h1>
-            <p style="margin:0;opacity:0.9">Ready to find your match?</p>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
-            <div style="background:white;border-radius:16px;padding:2rem;text-align:center;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.1)" onclick="alert('Explore feature coming soon!')">
-              <div style="font-size:3rem;margin-bottom:0.5rem">🔍</div>
-              <h3 style="margin:0;font-size:1.25rem">Discover</h3>
-              <p style="margin:0.25rem 0 0 0;color:#666;font-size:0.875rem">Find profiles</p>
-            </div>
-            
-            <div style="background:white;border-radius:16px;padding:2rem;text-align:center;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.1)" onclick="alert('Chat feature coming soon!')">
-              <div style="font-size:3rem;margin-bottom:0.5rem">💬</div>
-              <h3 style="margin:0;font-size:1.25rem">Messages</h3>
-              <p style="margin:0.25rem 0 0 0;color:#666;font-size:0.875rem">Your chats</p>
-            </div>
-          </div>
-          
-          <button id="logoutBtn" style="background:white;color:#666;border:1px solid #ddd;padding:1rem 2rem;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;width:100%">
-            Logout
-          </button>
-        </div>
-      </div>
-    `;
-    
-    console.log('Home HTML rendered');
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.onclick = () => {
-      console.log('Logout clicked!');
-      this.logout();
-    };
-    
-    console.log('===== HOME RENDERED =====');
-    Toast.success('Welcome home!');
-  }
-
-  logout() {
-    console.log('===== LOGOUT() CALLED =====');
-    localStorage.removeItem('token');
-    this.token = null;
-    this.user = null;
-    Toast.info('Logged out');
-    console.log('Calling showAuth...');
-    this.showAuth();
-  }
+  });
 }
 
-// Start the app
-console.log('===== CREATING APP INSTANCE =====');
-try {
-  window.app = new App();
-  console.log('===== APP INSTANCE CREATED SUCCESSFULLY =====');
-} catch (error) {
-  console.error('===== FATAL ERROR CREATING APP =====');
-  console.error('Error:', error);
-  console.error('Stack:', error.stack);
-  document.body.innerHTML = `
-    <div style="padding:2rem;text-align:center;background:#ff0000;color:white;min-height:100vh;display:flex;align-items:center;justify-content:center">
-      <div>
-        <h1 style="font-size:3rem;margin-bottom:1rem">❌ ERROR</h1>
-        <h2>App Failed to Start</h2>
-        <p style="font-size:1.2rem;margin:1rem 0">${error.message}</p>
-        <p style="font-size:0.9rem;opacity:0.8">Check console (F12) for details</p>
-      </div>
+// Show home page
+function showHomePage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="card">
+      <h2>Welcome to Elite Connect 💕</h2>
+      <p>Your profile is verified. Start exploring!</p>
+      <button class="btn" id="logoutBtn">Logout</button>
+    </div>
+  `;
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.replace('/');
+  });
+}
+
+// Show 404
+function showNotFound() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="card">
+      <h2>404 - Page Not Found</h2>
+      <p>Oops! This route doesn't exist.</p>
+      <button class="btn" onclick="window.location.replace('/')">Go Home</button>
     </div>
   `;
 }
-
-console.log('===== SCRIPT END =====');
