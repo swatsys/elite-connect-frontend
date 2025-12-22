@@ -1,23 +1,9 @@
-// export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
-// export const APP_NAME = 'Elite Connect';
-
-// // World App Configuration
-// export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162'; // Your actual app ID
-// export const WLD_RECEIVING_WALLET = '0xYourWalletAddressHere'; // Your wallet address
-
-// // Pricing
-// export const PRICING = {
-//   FREE_CONNECTIONS: 2,
-//   MONTHLY_UNLIMITED_WLD: 3,
-//   MONTHLY_UNLIMITED_DAYS: 30
-// };
-
 export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 export const APP_NAME = 'Elite Connect';
 
 // World App Configuration
-export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
-export const WLD_RECEIVING_WALLET = '0xYourWalletAddressHere'; // Update this with your actual wallet
+export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162'; // Your actual app ID
+export const WLD_RECEIVING_WALLET = '0xYourWalletAddressHere'; // Your wallet address
 
 // Pricing
 export const PRICING = {
@@ -26,22 +12,8 @@ export const PRICING = {
   MONTHLY_UNLIMITED_DAYS: 30
 };
 
-// ✨ PRODUCTION URL - VERY IMPORTANT!
-// Replace this with your actual Vercel URL
-export const PRODUCTION_URL = 'https://elite-connect-frontend-swatsys-projects.vercel.app';
 
-// Helper function to check if running in World App
-export const isInWorldApp = () => {
-  if (typeof window === 'undefined') return false;
-  
-  // Check for World App user agent
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  const isWorldApp = userAgent.includes('worldapp') || 
-                     userAgent.includes('minikit') ||
-                     window.hasOwnProperty('MiniKit');
-  
-  return isWorldApp;
-};
+
 
 
 // const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
