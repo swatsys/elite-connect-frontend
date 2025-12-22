@@ -262,112 +262,6 @@
 // ✨ TOAST NOTIFICATION SYSTEM
 // Shows success, error, warning, and info messages
 
-// export class Toast {
-//   static show(message, type = 'info', duration = 3000) {
-//     // Remove any existing toast
-//     const existing = document.querySelector('.toast');
-//     if (existing) existing.remove();
-
-//     // Create toast element
-//     const toast = document.createElement('div');
-//     toast.className = `toast toast-${type}`;
-    
-//     // Icon based on type
-//     const icons = {
-//       success: '✅',
-//       error: '❌',
-//       warning: '⚠️',
-//       info: 'ℹ️'
-//     };
-    
-//     toast.innerHTML = `
-//       <span style="font-size:1.25rem;margin-right:0.5rem">${icons[type]}</span>
-//       <span>${message}</span>
-//     `;
-
-//     // Add to body
-//     document.body.appendChild(toast);
-
-//     // Trigger animation
-//     setTimeout(() => toast.classList.add('show'), 10);
-
-//     // Remove after duration
-//     setTimeout(() => {
-//       toast.classList.remove('show');
-//       setTimeout(() => toast.remove(), 300);
-//     }, duration);
-//   }
-
-//   static success(message, duration) {
-//     this.show(message, 'success', duration);
-//   }
-
-//   static error(message, duration) {
-//     this.show(message, 'error', duration);
-//   }
-
-//   static warning(message, duration) {
-//     this.show(message, 'warning', duration);
-//   }
-
-//   static info(message, duration) {
-//     this.show(message, 'info', duration);
-//   }
-// }
-
-// // Add toast styles dynamically
-// const style = document.createElement('style');
-// style.textContent = `
-//   .toast {
-//     position: fixed;
-//     top: 20px;
-//     right: 20px;
-//     background: var(--bg-primary);
-//     color: var(--text-primary);
-//     padding: 1rem 1.5rem;
-//     border-radius: 12px;
-//     box-shadow: 0 8px 16px var(--shadow);
-//     border: 1px solid var(--border-color);
-//     display: flex;
-//     align-items: center;
-//     z-index: 10000;
-//     transform: translateX(400px);
-//     opacity: 0;
-//     transition: all 0.3s ease;
-//     max-width: 400px;
-//   }
-
-//   .toast.show {
-//     transform: translateX(0);
-//     opacity: 1;
-//   }
-
-//   .toast-success {
-//     border-left: 4px solid var(--success);
-//   }
-
-//   .toast-error {
-//     border-left: 4px solid var(--error);
-//   }
-
-//   .toast-warning {
-//     border-left: 4px solid var(--warning);
-//   }
-
-//   .toast-info {
-//     border-left: 4px solid var(--info);
-//   }
-
-//   @media (max-width: 768px) {
-//     .toast {
-//       left: 20px;
-//       right: 20px;
-//       max-width: none;
-//     }
-//   }
-// `;
-// document.head.appendChild(style);
-
 export class Toast {
   static show(message, type = 'info', duration = 3000) {
     // Remove any existing toast
@@ -391,6 +285,7 @@ export class Toast {
       <span>${message}</span>
     `;
 
+    // Add to body
     document.body.appendChild(toast);
 
     // Trigger animation
@@ -420,9 +315,6 @@ export class Toast {
   }
 }
 
-// ✅ Support both named and default export
-export default Toast;
-
 // Add toast styles dynamically
 const style = document.createElement('style');
 style.textContent = `
@@ -450,10 +342,21 @@ style.textContent = `
     opacity: 1;
   }
 
-  .toast-success { border-left: 4px solid var(--success); }
-  .toast-error { border-left: 4px solid var(--error); }
-  .toast-warning { border-left: 4px solid var(--warning); }
-  .toast-info { border-left: 4px solid var(--info); }
+  .toast-success {
+    border-left: 4px solid var(--success);
+  }
+
+  .toast-error {
+    border-left: 4px solid var(--error);
+  }
+
+  .toast-warning {
+    border-left: 4px solid var(--warning);
+  }
+
+  .toast-info {
+    border-left: 4px solid var(--info);
+  }
 
   @media (max-width: 768px) {
     .toast {
@@ -464,3 +367,4 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
