@@ -20,56 +20,56 @@
 // All your app settings in one place!
 
 // Backend API
-export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
+// export const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
 // App Name
-export const APP_NAME = 'Elite Connect';
+// export const APP_NAME = 'Elite Connect';
 
-// World App Configuration
-export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
-export const WLD_RECEIVING_WALLET = '0xYourWalletAddressHere'; // Update with your actual wallet
+// // World App Configuration
+// export const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
+// export const WLD_RECEIVING_WALLET = '0xYourWalletAddressHere'; // Update with your actual wallet
 
-// ⚠️ IMPORTANT: Your Production URL
-// Make sure this matches your Vercel production URL!
-export const PRODUCTION_URL = 'https://elite-connect-frontend.vercel.app';
+// // ⚠️ IMPORTANT: Your Production URL
+// // Make sure this matches your Vercel production URL!
+// export const PRODUCTION_URL = 'https://elite-connect-frontend.vercel.app';
 
-// Pricing Configuration
-export const PRICING = {
-  FREE_CONNECTIONS: 2,
-  MONTHLY_UNLIMITED_WLD: 3,
-  MONTHLY_UNLIMITED_DAYS: 30
-};
+// // Pricing Configuration
+// export const PRICING = {
+//   FREE_CONNECTIONS: 2,
+//   MONTHLY_UNLIMITED_WLD: 3,
+//   MONTHLY_UNLIMITED_DAYS: 30
+// };
 
-// ✨ Helper function to check if running in World App
-export const isInWorldApp = () => {
-  if (typeof window === 'undefined') return false;
+// // ✨ Helper function to check if running in World App
+// export const isInWorldApp = () => {
+//   if (typeof window === 'undefined') return false;
   
-  // Check for World App user agent
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  const isWorldApp = userAgent.includes('worldapp') || 
-                     userAgent.includes('minikit') ||
-                     window.hasOwnProperty('MiniKit');
+//   // Check for World App user agent
+//   const userAgent = window.navigator.userAgent.toLowerCase();
+//   const isWorldApp = userAgent.includes('worldapp') || 
+//                      userAgent.includes('minikit') ||
+//                      window.hasOwnProperty('MiniKit');
   
-  console.log('🌍 World App Check:', {
-    userAgent: userAgent.substring(0, 50) + '...',
-    isWorldApp: isWorldApp
-  });
+//   console.log('🌍 World App Check:', {
+//     userAgent: userAgent.substring(0, 50) + '...',
+//     isWorldApp: isWorldApp
+//   });
   
-  return isWorldApp;
-};
+//   return isWorldApp;
+// };
 
-// Debug mode - set to false in production
-export const DEBUG = false;
+// // Debug mode - set to false in production
+// export const DEBUG = false;
 
-// Log configuration on load
-if (DEBUG) {
-  console.log('🎯 Elite Connect Configuration:', {
-    API,
-    WORLD_APP_ID,
-    PRODUCTION_URL,
-    isInWorldApp: isInWorldApp()
-  });
-}
+// // Log configuration on load
+// if (DEBUG) {
+//   console.log('🎯 Elite Connect Configuration:', {
+//     API,
+//     WORLD_APP_ID,
+//     PRODUCTION_URL,
+//     isInWorldApp: isInWorldApp()
+//   });
+// }
 
 // const API = 'https://elite-connect-backend-ktv9.onrender.com/api';
 
