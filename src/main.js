@@ -848,25 +848,41 @@ const ACTION_ID = 'signin';
 
 // ===== INITIALIZE MINIKIT =====
 console.log('🔧 Initializing MiniKit...');
+console.log('MiniKit available:', !!MiniKit);
+console.log('VerificationLevel available:', !!VerificationLevel);
+
 try {
   MiniKit.install(WORLD_APP_ID);
-  console.log('✅ MiniKit installed');
+  console.log('✅ MiniKit installed successfully');
 } catch (error) {
   console.error('❌ MiniKit installation error:', error);
 }
 
 // ===== WORLD APP DETECTION =====
 function isInWorldApp() {
+  console.log('🔍 Checking if in World App...');
+  
+  if (!MiniKit) {
+    console.log('❌ MiniKit not available');
+    return false;
+  }
+  
   try {
-    if (!MiniKit) {
-      console.log('❌ MiniKit not available');
-      return false;
-    }
     const installed = MiniKit.isInstalled();
-    console.log('🔍 MiniKit.isInstalled():', installed);
-    return installed;
+    console.log('📱 MiniKit.isInstalled():', installed);
+    
+    // Additional check: User agent
+    const ua = navigator.userAgent.toLowerCase();
+    const hasWorldAppUA = ua.includes('worldapp') || ua.includes('world-app');
+    console.log('🌐 User Agent:', navigator.userAgent);
+    console.log('🌐 Has World App UA:', hasWorldAppUA);
+    
+    const result = installed;
+    console.log('✅ Final decision - In World App:', result);
+    return result;
+    
   } catch (error) {
-    console.error('Error checking MiniKit:', error);
+    console.error('❌ Error checking MiniKit:', error);
     return false;
   }
 }
@@ -874,7 +890,7 @@ function isInWorldApp() {
 // ===== TOAST NOTIFICATIONS =====
 class Toast {
   static show(message, type = 'info', duration = 3000) {
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    console.log(`[TOAST ${type.toUpperCase()}] ${message}`);
     
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -910,42 +926,61 @@ class Toast {
 class App {
   constructor() {
     console.log('🚀 Elite Connect Starting...');
-    console.log('Environment:', {
-      MiniKit: !!MiniKit,
-      VerificationLevel: !!VerificationLevel,
-      userAgent: navigator.userAgent
-    });
+    console.log('📊 Environment Check:');
+    console.log('   - Window location:', window.location.href);
+    console.log('   - Document ready:', document.readyState);
+    console.log('   - MiniKit:', !!MiniKit);
+    console.log('   - VerificationLevel:', !!VerificationLevel);
     
     this.token = localStorage.getItem('token');
     this.user = null;
     this.currentPage = 'auth';
+    
+    console.log('💾 Local Storage:');
+    console.log('   - Token exists:', !!this.token);
     
     // Always show SOMETHING (never white screen)
     this.render();
   }
 
   render() {
-    console.log('📱 Rendering app...');
+    console.log('📱 Starting render...');
+    
+    // Verify #app element exists
+    const appEl = document.getElementById('app');
+    if (!appEl) {
+      console.error('❌ CRITICAL: #app element not found in DOM!');
+      document.body.innerHTML = `
+        <div style="padding:2rem;text-align:center;color:red">
+          <h1>Error: App container not found</h1>
+          <p>The #app element is missing from index.html</p>
+        </div>
+      `;
+      return;
+    }
+    console.log('✅ #app element found');
     
     // Check if in World App
     const inWorldApp = isInWorldApp();
-    console.log('In World App:', inWorldApp);
+    console.log('🎯 Render Decision:');
+    console.log('   - In World App:', inWorldApp);
+    console.log('   - Has Token:', !!this.token);
     
     if (!inWorldApp) {
       // NOT in World App - show instructions
-      console.log('➡️ Showing World App required screen');
+      console.log('➡️ Showing: World App Required screen');
       this.showWorldAppRequired();
       return;
     }
     
     // IN World App - continue with normal flow
-    console.log('➡️ In World App, checking auth...');
+    console.log('➡️ In World App, proceeding...');
     
     if (this.token) {
-      console.log('🔑 Token found, checking authentication');
+      console.log('➡️ Showing: Checking authentication');
       this.init();
     } else {
-      console.log('🆕 No token, showing sign-in');
+      console.log('➡️ Showing: Sign-in screen');
       this.showAuth();
     }
   }
@@ -989,21 +1024,27 @@ class App {
             🔄 Reload Page
           </button>
           
-          <p class="footer-text" style="margin-top:1.5rem">
-            🔒 Privacy-preserving • ✅ Verified humans only
+          <p class="footer-text" style="margin-top:1.5rem;font-size:0.75rem;color:#666">
+            Debug: Not in World App (MiniKit.isInstalled() = false)
           </p>
         </div>
       </div>
     `;
     
-    console.log('✅ World App Required screen rendered');
+    console.log('✅ World App Required screen rendered successfully');
   }
 
   // ===== SIGN-IN SCREEN =====
   showAuth() {
     console.log('🔐 Rendering: Sign-in screen');
     
-    document.getElementById('app').innerHTML = `
+    const appEl = document.getElementById('app');
+    if (!appEl) {
+      console.error('❌ #app element not found!');
+      return;
+    }
+    
+    appEl.innerHTML = `
       <div class="auth-container">
         <div class="auth-card">
           <div class="logo">💕</div>
@@ -1023,6 +1064,10 @@ class App {
               ✓ Proof of unique human
             </p>
           </div>
+          
+          <p style="margin-top:1.5rem;font-size:0.75rem;color:#666">
+            Debug: In World App ✅
+          </p>
         </div>
       </div>
     `;
@@ -1031,8 +1076,12 @@ class App {
     const btn = document.getElementById('signInBtn');
     if (btn) {
       btn.onclick = () => this.verifyWithWorldID();
-      console.log('✅ Sign-in button ready');
+      console.log('✅ Sign-in button event listener attached');
+    } else {
+      console.error('❌ Sign-in button not found!');
     }
+    
+    console.log('✅ Sign-in screen rendered successfully');
   }
 
   // ===== WORLD ID VERIFICATION =====
@@ -1040,6 +1089,7 @@ class App {
     console.log('🌍 Starting World ID verification...');
     
     if (!MiniKit) {
+      console.error('❌ MiniKit not available');
       Toast.error('MiniKit not available. Please refresh.');
       return;
     }
@@ -1097,7 +1147,7 @@ class App {
           Toast.error(data.error || 'Verification failed');
         }
       } else {
-        console.log('⚠️ Verification not successful:', finalPayload.status);
+        console.log('⚠️ Verification status:', finalPayload.status);
         Toast.warning('Verification cancelled');
       }
     } catch (error) {
@@ -1184,6 +1234,7 @@ class App {
     const form = document.getElementById('profileForm');
     if (form) {
       form.onsubmit = (e) => this.submitProfile(e);
+      console.log('✅ Profile form event listener attached');
     }
   }
 
@@ -1193,6 +1244,7 @@ class App {
     
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
+    console.log('📋 Profile data:', data);
 
     try {
       Toast.info('Creating your profile...');
@@ -1207,6 +1259,7 @@ class App {
       });
 
       const result = await res.json();
+      console.log('📥 Profile response:', result);
 
       if (result.success) {
         console.log('✅ Profile created');
@@ -1259,6 +1312,8 @@ class App {
         </div>
       </div>
     `;
+    
+    console.log('✅ Home screen rendered successfully');
   }
 
   // ===== LOGOUT =====
@@ -1273,17 +1328,37 @@ class App {
 }
 
 // ===== START APP =====
-console.log('🎬 Initializing Elite Connect...');
+console.log('🎬 Script executing...');
+console.log('📄 Document state:', document.readyState);
 
 // Wait for DOM to be ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM ready, creating app');
-    window.app = new App();
-  });
-} else {
-  console.log('📄 DOM already ready, creating app');
+function initApp() {
+  console.log('🚀 Initializing app...');
+  
+  // Verify #app exists
+  const appEl = document.getElementById('app');
+  if (!appEl) {
+    console.error('❌ CRITICAL: #app element not found!');
+    document.body.innerHTML = `
+      <div style="padding:2rem;text-align:center;color:red">
+        <h1>Error: App container missing</h1>
+        <p>Check index.html for #app element</p>
+      </div>
+    `;
+    return;
+  }
+  
+  console.log('✅ #app element verified');
   window.app = new App();
+  console.log('✅ App initialized successfully');
 }
 
-console.log('✅ Script loaded');
+if (document.readyState === 'loading') {
+  console.log('⏳ Waiting for DOM...');
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  console.log('✅ DOM ready, initializing immediately');
+  initApp();
+}
+
+console.log('✅ Script loaded successfully');
