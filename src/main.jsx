@@ -7,7 +7,6 @@ import './index.css'
 console.log('🔧 Installing MiniKit...')
 
 // Install MiniKit with your App ID
-// IMPORTANT: Replace with your actual App ID from https://developer.worldcoin.org
 MiniKit.install('app_486e187afe7bc69a19456a3fa901a162')
 
 console.log('✅ MiniKit installed')
