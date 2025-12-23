@@ -838,38 +838,67 @@
 // window.app = new App();
 
 import './style.css';
-import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
 
 // ===== CONFIGURATION =====
-const API = 'http://localhost:3000/api'; // Change to your backend URL
+const API = 'https://your-backend.onrender.com/api'; // Change to your backend URL
 const APP_NAME = 'Elite Connect';
 const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
 const ACTION_ID = 'signin';
 
-// ===== INITIALIZE MINIKIT =====
-console.log('🔧 Initializing MiniKit...');
-MiniKit.install(WORLD_APP_ID);
+// ===== GLOBAL ERROR HANDLER =====
+window.addEventListener('error', (e) => {
+  console.error('Global error:', e.error);
+  document.getElementById('app').innerHTML = `
+    <div style="padding:2rem;text-align:center;color:red">
+      <h1>Error Loading App</h1>
+      <p>${e.error?.message || 'Unknown error'}</p>
+      <p style="font-size:0.875rem;color:#666">Check console (F12) for details</p>
+    </div>
+  `;
+});
+
+// ===== SAFE MINIKIT IMPORT =====
+let MiniKit = null;
+let VerificationLevel = null;
+
+try {
+  const miniKitModule = await import('@worldcoin/minikit-js');
+  MiniKit = miniKitModule.MiniKit;
+  VerificationLevel = miniKitModule.VerificationLevel;
+  console.log('✅ MiniKit imported successfully');
+  
+  // Initialize MiniKit
+  if (MiniKit) {
+    MiniKit.install(WORLD_APP_ID);
+    console.log('✅ MiniKit installed');
+  }
+} catch (error) {
+  console.error('❌ Failed to import MiniKit:', error);
+  console.log('⚠️ App will run in demo mode');
+}
 
 // ===== WORLD APP DETECTION =====
 function isInWorldApp() {
-  // Check if MiniKit is installed and available
-  const miniKitInstalled = MiniKit.isInstalled();
+  if (!MiniKit) {
+    console.log('❌ MiniKit not available');
+    return false;
+  }
   
-  // Additional check: World App user agent
-  const userAgent = navigator.userAgent || '';
-  const isWorldAppUserAgent = userAgent.toLowerCase().includes('worldapp');
-  
-  console.log('🔍 World App Detection:');
-  console.log('   - MiniKit installed:', miniKitInstalled);
-  console.log('   - World App user agent:', isWorldAppUserAgent);
-  console.log('   - User agent:', userAgent);
-  
-  return miniKitInstalled;
+  try {
+    const installed = MiniKit.isInstalled();
+    console.log('🔍 MiniKit.isInstalled():', installed);
+    return installed;
+  } catch (error) {
+    console.error('Error checking MiniKit:', error);
+    return false;
+  }
 }
 
 // ===== TOAST NOTIFICATIONS =====
 class Toast {
   static show(message, type = 'info', duration = 3000) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     
@@ -903,72 +932,99 @@ class Toast {
 // ===== MAIN APP =====
 class App {
   constructor() {
-    console.log('🚀 Elite Connect App Starting...');
+    console.log('🚀 Elite Connect Starting...');
+    console.log('Environment:', {
+      MiniKit: !!MiniKit,
+      VerificationLevel: !!VerificationLevel,
+      userAgent: navigator.userAgent
+    });
     
     this.token = localStorage.getItem('token');
     this.user = null;
     this.currentPage = 'auth';
     
-    // ⚠️ CRITICAL: Check if in World App FIRST
-    if (!isInWorldApp()) {
-      console.warn('⚠️ NOT in World App! Showing instructions...');
+    // Always show SOMETHING (never white screen)
+    this.render();
+  }
+
+  render() {
+    console.log('📱 Rendering app...');
+    
+    // Check if in World App
+    const inWorldApp = isInWorldApp();
+    console.log('In World App:', inWorldApp);
+    
+    if (!inWorldApp) {
+      // NOT in World App - show instructions
+      console.log('➡️ Showing World App required screen');
       this.showWorldAppRequired();
-      return; // Stop here - don't continue
+      return;
     }
     
-    console.log('✅ Running in World App!');
+    // IN World App - continue with normal flow
+    console.log('➡️ In World App, checking auth...');
     
-    // Continue with normal flow
     if (this.token) {
-      console.log('🔑 Token found, checking authentication...');
+      console.log('🔑 Token found, checking authentication');
       this.init();
     } else {
-      console.log('🆕 No token, showing sign-in...');
+      console.log('🆕 No token, showing sign-in');
       this.showAuth();
     }
   }
 
   // ===== WORLD APP REQUIRED SCREEN =====
   showWorldAppRequired() {
-    console.log('📱 Showing "World App Required" screen');
+    console.log('📱 Rendering: World App Required');
     
-    document.getElementById('app').innerHTML = `
+    const appEl = document.getElementById('app');
+    if (!appEl) {
+      console.error('❌ #app element not found!');
+      return;
+    }
+    
+    appEl.innerHTML = `
       <div class="auth-container">
         <div class="auth-card">
-          <div class="logo">🌍</div>
+          <div class="logo" style="background:linear-gradient(135deg, #667eea, #764ba2)">🌍</div>
           <h1 class="gradient-text">Open in World App</h1>
-          <p class="subtitle">This app only works inside World App</p>
+          <p class="subtitle">This app requires World App to function</p>
           
-          <div class="info-box" style="background:#f0f9ff;padding:1.5rem;border-radius:12px;margin:2rem 0">
+          <div style="background:#f0f9ff;padding:1.5rem;border-radius:12px;margin:2rem 0;text-align:left">
             <h3 style="margin:0 0 1rem 0;color:#0369a1">📱 How to Open:</h3>
-            <ol style="text-align:left;margin:0;padding-left:1.5rem;line-height:2">
+            <ol style="margin:0;padding-left:1.5rem;line-height:2;color:#0c4a6e">
               <li>Open <strong>World App</strong> on your phone</li>
               <li>Tap the <strong>Browser</strong> tab</li>
-              <li>Enter this URL or scan QR code</li>
-              <li>App will open automatically!</li>
+              <li>Enter this URL: <code style="background:#e0f2fe;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.875rem">${window.location.href}</code></li>
+              <li>App will work automatically! ✅</li>
             </ol>
           </div>
           
-          <div class="info-box" style="background:#fef3c7;padding:1rem;border-radius:8px">
+          <div style="background:#fef3c7;padding:1rem;border-radius:8px;margin:1rem 0">
             <p style="margin:0;font-size:0.875rem;color:#92400e">
-              <strong>Why World App?</strong><br>
-              Elite Connect uses World ID for verification.<br>
+              <strong>⚠️ Why World App?</strong><br>
+              Elite Connect uses World ID for secure verification.<br>
               World ID only works inside World App.
             </p>
           </div>
           
-          <p class="footer-text" style="margin-top:2rem">
+          <button class="btn" onclick="window.location.reload()" style="background:#667eea;margin-top:1rem">
+            🔄 Reload Page
+          </button>
+          
+          <p class="footer-text" style="margin-top:1.5rem">
             🔒 Privacy-preserving • ✅ Verified humans only
           </p>
         </div>
       </div>
     `;
+    
+    console.log('✅ World App Required screen rendered');
   }
 
-  // ===== SIGN-IN SCREEN (WORLD APP ONLY) =====
+  // ===== SIGN-IN SCREEN =====
   showAuth() {
-    console.log('🔐 Showing sign-in screen');
-    this.currentPage = 'auth';
+    console.log('🔐 Rendering: Sign-in screen');
     
     document.getElementById('app').innerHTML = `
       <div class="auth-container">
@@ -977,13 +1033,13 @@ class App {
           <h1 class="gradient-text">${APP_NAME}</h1>
           <p class="subtitle">Verified connections, genuine hearts</p>
           
-          <button class="btn" onclick="window.app.verifyWithWorldID()">
+          <button class="btn" id="signInBtn">
             🌍 Sign in with World ID
           </button>
           
           <p class="footer-text">One person, one profile. Verified humans only.</p>
           
-          <div class="info-box" style="margin-top:1.5rem;background:#f0fdf4;padding:1rem;border-radius:8px">
+          <div style="background:#f0fdf4;padding:1rem;border-radius:8px;margin-top:1.5rem">
             <p style="font-size:0.875rem;color:#166534;margin:0;line-height:1.6">
               ✓ Privacy-preserving verification<br>
               ✓ No personal data shared<br>
@@ -993,9 +1049,87 @@ class App {
         </div>
       </div>
     `;
+    
+    // Add event listener
+    const btn = document.getElementById('signInBtn');
+    if (btn) {
+      btn.onclick = () => this.verifyWithWorldID();
+      console.log('✅ Sign-in button ready');
+    }
   }
 
-  // ===== AUTHENTICATION =====
+  // ===== WORLD ID VERIFICATION =====
+  async verifyWithWorldID() {
+    console.log('🌍 Starting World ID verification...');
+    
+    if (!MiniKit) {
+      Toast.error('MiniKit not available. Please refresh.');
+      return;
+    }
+    
+    try {
+      if (!MiniKit.isInstalled()) {
+        console.error('❌ MiniKit not installed');
+        Toast.error('Please open this app in World App');
+        this.showWorldAppRequired();
+        return;
+      }
+
+      Toast.info('Opening World ID verification...');
+      console.log('📞 Calling MiniKit.commandsAsync.verify...');
+
+      const { finalPayload } = await MiniKit.commandsAsync.verify({
+        action: ACTION_ID,
+        signal: '',
+        verification_level: VerificationLevel.Device
+      });
+
+      console.log('📦 World ID response:', finalPayload);
+
+      if (finalPayload.status === 'success') {
+        console.log('✅ World ID verification successful');
+        Toast.info('Verifying with backend...');
+        
+        const res = await fetch(`${API}/auth/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            payload: finalPayload,
+            action: ACTION_ID,
+            signal: ''
+          })
+        });
+
+        const data = await res.json();
+        console.log('📥 Backend response:', data);
+
+        if (data.success) {
+          console.log('✅ Backend verification successful');
+          this.token = data.token;
+          this.user = data.user;
+          localStorage.setItem('token', this.token);
+          
+          Toast.success('Welcome to Elite Connect!');
+          
+          if (data.user.profile_completed) {
+            this.showHome();
+          } else {
+            this.showProfileSetup();
+          }
+        } else {
+          Toast.error(data.error || 'Verification failed');
+        }
+      } else {
+        console.log('⚠️ Verification not successful:', finalPayload.status);
+        Toast.warning('Verification cancelled');
+      }
+    } catch (error) {
+      console.error('❌ Verification error:', error);
+      Toast.error('Verification failed: ' + error.message);
+    }
+  }
+
+  // ===== AUTHENTICATION CHECK =====
   async init() {
     try {
       console.log('🔍 Checking authentication...');
@@ -1013,7 +1147,7 @@ class App {
           this.showProfileSetup();
         }
       } else {
-        console.log('❌ Authentication failed, logging out');
+        console.log('❌ Authentication failed');
         this.logout();
       }
     } catch (error) {
@@ -1022,83 +1156,9 @@ class App {
     }
   }
 
-  // ===== WORLD ID VERIFICATION =====
-  async verifyWithWorldID() {
-    console.log('🌍 Starting World ID verification...');
-    
-    try {
-      // Double-check MiniKit is available
-      if (!MiniKit.isInstalled()) {
-        console.error('❌ MiniKit not installed!');
-        Toast.error('Please open this app in World App');
-        this.showWorldAppRequired();
-        return;
-      }
-
-      Toast.info('Opening World ID verification...');
-      console.log('📞 Calling MiniKit.commandsAsync.verify...');
-
-      // Request World ID verification
-      const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: ACTION_ID,
-        signal: '',
-        verification_level: VerificationLevel.Device
-      });
-
-      console.log('📦 World ID response:', finalPayload);
-
-      if (finalPayload.status === 'success') {
-        console.log('✅ World ID verification successful!');
-        Toast.info('Verifying with backend...');
-        
-        // Send proof to backend
-        const res = await fetch(`${API}/auth/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            payload: finalPayload,
-            action: ACTION_ID,
-            signal: ''
-          })
-        });
-
-        const data = await res.json();
-        console.log('📥 Backend response:', data);
-
-        if (data.success) {
-          console.log('✅ Backend verification successful!');
-          this.token = data.token;
-          this.user = data.user;
-          localStorage.setItem('token', this.token);
-          
-          Toast.success('Welcome to Elite Connect!');
-          
-          if (data.user.profile_completed) {
-            this.showHome();
-          } else {
-            this.showProfileSetup();
-          }
-        } else {
-          console.error('❌ Backend verification failed:', data.error);
-          Toast.error(data.error || 'Verification failed');
-        }
-      } else if (finalPayload.status === 'error') {
-        console.error('❌ World ID error:', finalPayload);
-        Toast.error('Verification failed. Please try again.');
-      } else {
-        console.log('⚠️ Verification cancelled');
-        Toast.warning('Verification cancelled');
-      }
-    } catch (error) {
-      console.error('❌ Verification error:', error);
-      Toast.error('Verification failed: ' + error.message);
-    }
-  }
-
   // ===== PROFILE SETUP =====
   showProfileSetup() {
-    console.log('📝 Showing profile setup');
-    this.currentPage = 'setup';
+    console.log('📝 Rendering: Profile Setup');
     
     document.getElementById('app').innerHTML = `
       <div class="page-container">
@@ -1144,7 +1204,10 @@ class App {
       </div>
     `;
 
-    document.getElementById('profileForm').onsubmit = (e) => this.submitProfile(e);
+    const form = document.getElementById('profileForm');
+    if (form) {
+      form.onsubmit = (e) => this.submitProfile(e);
+    }
   }
 
   async submitProfile(e) {
@@ -1169,12 +1232,11 @@ class App {
       const result = await res.json();
 
       if (result.success) {
-        console.log('✅ Profile created!');
+        console.log('✅ Profile created');
         this.user.profile_completed = true;
         Toast.success('Profile created successfully!');
         this.showHome();
       } else {
-        console.error('❌ Profile creation failed:', result.error);
         Toast.error(result.error || 'Failed to create profile');
       }
     } catch (error) {
@@ -1185,8 +1247,7 @@ class App {
 
   // ===== HOME PAGE =====
   showHome() {
-    console.log('🏠 Showing home page');
-    this.currentPage = 'home';
+    console.log('🏠 Rendering: Home');
     
     document.getElementById('app').innerHTML = `
       <div class="page-container with-nav">
@@ -1198,13 +1259,13 @@ class App {
           </div>
 
           <div class="action-grid">
-            <div class="action-card" onclick="window.app.navigate('explore')">
+            <div class="action-card" onclick="alert('Explore coming soon!')">
               <div class="action-icon">🔍</div>
               <h3>Discover</h3>
               <p>Find profiles</p>
             </div>
             
-            <div class="action-card" onclick="window.app.navigate('chat')">
+            <div class="action-card" onclick="alert('Chat coming soon!')">
               <div class="action-icon">💬</div>
               <h3>Messages</h3>
               <p>Your chats</p>
@@ -1214,140 +1275,38 @@ class App {
           <div class="info-card">
             <p>🌍 Verified with World ID</p>
           </div>
+          
+          <button class="btn btn-logout" onclick="window.app.logout()" style="margin-top:2rem">
+            Logout
+          </button>
         </div>
       </div>
     `;
-    
-    this.renderNav();
   }
 
-  // ===== OTHER PAGES =====
-  async showExplore() {
-    this.currentPage = 'explore';
-    document.getElementById('app').innerHTML = `
-      <div class="page-container with-nav">
-        <div class="content-wrapper centered">
-          <div class="empty-state">
-            <div class="empty-icon">🔍</div>
-            <h2>Explore Feature</h2>
-            <p>Coming soon!</p>
-          </div>
-        </div>
-      </div>
-    `;
-    this.renderNav();
-  }
-
-  async showChat() {
-    this.currentPage = 'chat';
-    document.getElementById('app').innerHTML = `
-      <div class="page-container with-nav">
-        <div class="content-wrapper centered">
-          <div class="empty-state">
-            <div class="empty-icon">💬</div>
-            <h2>No Messages Yet</h2>
-            <p>Start swiping to make connections!</p>
-          </div>
-        </div>
-      </div>
-    `;
-    this.renderNav();
-  }
-
-  async showWallet() {
-    this.currentPage = 'wallet';
-    document.getElementById('app').innerHTML = `
-      <div class="page-container with-nav">
-        <div class="content-wrapper">
-          <h1 class="page-title">💳 Wallet</h1>
-          <div class="wallet-card">
-            <div class="wallet-icon">💎</div>
-            <h2>Premium Features</h2>
-            <p>Coming Soon!</p>
-          </div>
-        </div>
-      </div>
-    `;
-    this.renderNav();
-  }
-
-  async showProfile() {
-    this.currentPage = 'profile';
-    const profile = this.user || {};
-    
-    document.getElementById('app').innerHTML = `
-      <div class="page-container with-nav">
-        <div class="content-wrapper">
-          <h1 class="page-title">👤 Profile</h1>
-          <div class="profile-header-card">
-            <div class="profile-avatar">${profile.name ? profile.name.charAt(0) : '?'}</div>
-            <h2>${profile.name || 'User'}</h2>
-            <p>🌍 World ID Verified</p>
-          </div>
-          <button class="btn btn-logout" onclick="window.app.logout()">Logout</button>
-        </div>
-      </div>
-    `;
-    this.renderNav();
-  }
-
-  // ===== NAVIGATION =====
+  // ===== LOGOUT =====
   logout() {
-    console.log('👋 Logging out...');
+    console.log('👋 Logging out');
     localStorage.removeItem('token');
     this.token = null;
     this.user = null;
     Toast.info('Logged out successfully');
     this.showAuth();
   }
-
-  navigate(page) {
-    const pages = {
-      home: () => this.showHome(),
-      explore: () => this.showExplore(),
-      chat: () => this.showChat(),
-      wallet: () => this.showWallet(),
-      profile: () => this.showProfile()
-    };
-    
-    if (pages[page]) {
-      pages[page]();
-    }
-  }
-
-  renderNav() {
-    const nav = document.createElement('nav');
-    nav.className = 'bottom-nav';
-    nav.innerHTML = `
-      <button class="nav-item ${this.currentPage === 'home' ? 'active' : ''}" onclick="window.app.navigate('home')">
-        <span>🏠</span>
-        <div>Home</div>
-      </button>
-      <button class="nav-item ${this.currentPage === 'explore' ? 'active' : ''}" onclick="window.app.navigate('explore')">
-        <span>🔍</span>
-        <div>Explore</div>
-      </button>
-      <button class="nav-item ${this.currentPage === 'wallet' ? 'active' : ''}" onclick="window.app.navigate('wallet')">
-        <span>💎</span>
-        <div>Wallet</div>
-      </button>
-      <button class="nav-item ${this.currentPage === 'chat' ? 'active' : ''}" onclick="window.app.navigate('chat')">
-        <span>💬</span>
-        <div>Chat</div>
-      </button>
-      <button class="nav-item ${this.currentPage === 'profile' ? 'active' : ''}" onclick="window.app.navigate('profile')">
-        <span>👤</span>
-        <div>Profile</div>
-      </button>
-    `;
-    
-    const existing = document.querySelector('.bottom-nav');
-    if (existing) existing.remove();
-    document.body.appendChild(nav);
-  }
 }
 
 // ===== START APP =====
 console.log('🎬 Initializing Elite Connect...');
-window.app = new App();
-console.log('✅ App initialized!');
+
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM ready, creating app');
+    window.app = new App();
+  });
+} else {
+  console.log('📄 DOM already ready, creating app');
+  window.app = new App();
+}
+
+console.log('✅ Script loaded');
