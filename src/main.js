@@ -838,53 +838,30 @@
 // window.app = new App();
 
 import './style.css';
+import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
 
 // ===== CONFIGURATION =====
-const API = 'https://your-backend.onrender.com/api'; // Change to your backend URL
+const API = 'http://localhost:3000/api'; // Change to your backend URL
 const APP_NAME = 'Elite Connect';
 const WORLD_APP_ID = 'app_486e187afe7bc69a19456a3fa901a162';
 const ACTION_ID = 'signin';
 
-// ===== GLOBAL ERROR HANDLER =====
-window.addEventListener('error', (e) => {
-  console.error('Global error:', e.error);
-  document.getElementById('app').innerHTML = `
-    <div style="padding:2rem;text-align:center;color:red">
-      <h1>Error Loading App</h1>
-      <p>${e.error?.message || 'Unknown error'}</p>
-      <p style="font-size:0.875rem;color:#666">Check console (F12) for details</p>
-    </div>
-  `;
-});
-
-// ===== SAFE MINIKIT IMPORT =====
-let MiniKit = null;
-let VerificationLevel = null;
-
+// ===== INITIALIZE MINIKIT =====
+console.log('🔧 Initializing MiniKit...');
 try {
-  const miniKitModule = await import('@worldcoin/minikit-js');
-  MiniKit = miniKitModule.MiniKit;
-  VerificationLevel = miniKitModule.VerificationLevel;
-  console.log('✅ MiniKit imported successfully');
-  
-  // Initialize MiniKit
-  if (MiniKit) {
-    MiniKit.install(WORLD_APP_ID);
-    console.log('✅ MiniKit installed');
-  }
+  MiniKit.install(WORLD_APP_ID);
+  console.log('✅ MiniKit installed');
 } catch (error) {
-  console.error('❌ Failed to import MiniKit:', error);
-  console.log('⚠️ App will run in demo mode');
+  console.error('❌ MiniKit installation error:', error);
 }
 
 // ===== WORLD APP DETECTION =====
 function isInWorldApp() {
-  if (!MiniKit) {
-    console.log('❌ MiniKit not available');
-    return false;
-  }
-  
   try {
+    if (!MiniKit) {
+      console.log('❌ MiniKit not available');
+      return false;
+    }
     const installed = MiniKit.isInstalled();
     console.log('🔍 MiniKit.isInstalled():', installed);
     return installed;
