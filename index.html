@@ -11,16 +11,1247 @@
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html> -->
-<!doctype html>
+
+
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elite Connect</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Connect - Dating App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen {
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    .screen-content {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .logo {
+      font-size: 4rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;  /* ← Added for compatibility */
+      color: transparent;  
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      width: auto;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-top: 1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem;
+      width: auto;
+      margin: 0;
+      transition: color 0.2s;
+    }
+
+    .nav-btn:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .nav-btn.active {
+      color: #8b5cf6;
+    }
+
+    .nav-btn span {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Swipe Card */
+    .swipe-container {
+      position: relative;
+      height: 70vh;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .swipe-card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .swipe-card.swiping {
+      transition: none;
+    }
+
+    .swipe-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      margin-bottom: 1rem;
+    }
+
+    .swipe-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .swipe-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .swipe-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Match Modal */
+    .match-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .match-content {
+      text-align: center;
+      color: white;
+    }
+
+    .match-content .logo {
+      font-size: 6rem;
+      animation: bounce 0.5s;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* Lists */
+    .list-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .list-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .list-info {
+      flex: 1;
+    }
+
+    .list-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .list-detail {
+      font-size: 0.875rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+
+    .badge {
+      background: #8b5cf6;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    /* Chat */
+    .chat-messages {
+      height: 60vh;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .message {
+      background: white;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      max-width: 80%;
+    }
+
+    .message.own {
+      background: #8b5cf6;
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .message.other {
+      background: #e9ecef;
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    .message-input-container {
+      display: flex;
+      gap: 0.5rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+    }
+
+    .message-input-container input {
+      margin-top: 0;
+      flex: 1;
+    }
+
+    .message-input-container button {
+      margin-top: 0;
+      width: auto;
+      padding: 0.875rem 1.5rem;
+    }
+
+    /* Premium Plans */
+    .plan-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 2px solid #e0e0e0;
+      transition: all 0.2s;
+    }
+
+    .plan-card:hover {
+      border-color: #8b5cf6;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+
+    .plan-card.featured {
+      border-color: #8b5cf6;
+      position: relative;
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .plan-price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+      margin: 0.5rem 0;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin: 1rem 0;
+    }
+
+    .plan-features li {
+      padding: 0.5rem 0;
+      color: #666;
+    }
+
+    .plan-features li:before {
+      content: "✓ ";
+      color: #10b981;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+
+    /* Utilities */
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #999;
+    }
+
+    .empty-state .logo {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="module">
+    import { MiniKit, VerificationLevel } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.9.6/+esm'
+
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // CHANGE THIS!
+    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // CHANGE FOR PRODUCTION!
+
+    console.log('🔧 Installing MiniKit...')
+    MiniKit.install(APP_ID)
+    console.log('✅ MiniKit installed')
+
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    let state = {
+      screen: 'loading',
+      user: null,
+      profile: null,
+      token: localStorage.getItem('token'),
+      
+      // Explore
+      exploreUsers: [],
+      currentUserIndex: 0,
+      
+      // Matches
+      matches: [],
+      
+      // Chat
+      currentMatch: null,
+      messages: [],
+      conversations: [],
+      
+      // Subscription
+      subscription: null,
+      plans: []
+    }
+
+    // ============================================
+    // API FUNCTIONS
+    // ============================================
+    async function api(endpoint, options = {}) {
+      const headers = { 'Content-Type': 'application/json' }
+      if (state.token) {
+        headers['Authorization'] = `Bearer ${state.token}`
+      }
+      
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: { ...headers, ...options.headers }
+      })
+      
+      return response.json()
+    }
+
+    // ============================================
+    // AUTH FUNCTIONS
+    // ============================================
+    async function handleSignIn() {
+      try {
+        console.log('🔐 Signing in...')
+        
+        const { finalPayload } = await MiniKit.commandsAsync.verify({
+          action: 'login',
+          signal: '',
+          verification_level: VerificationLevel.Orb
+        })
+
+        if (finalPayload.status === 'success') {
+          const data = await api('/api/auth/verify', {
+            method: 'POST',
+            body: JSON.stringify({ payload: finalPayload, action: 'login' })
+          })
+
+          if (data.success) {
+            state.user = data.user
+            state.token = data.token
+            localStorage.setItem('token', data.token)
+            
+            // Check if profile exists
+            await loadProfile()
+          } else {
+            alert('Sign in failed: ' + data.error)
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        alert('Error: ' + error.message)
+      }
+    }
+
+    async function handleLogout() {
+      localStorage.removeItem('token')
+      state = { ...state, screen: 'signin', user: null, profile: null, token: null }
+      render()
+    }
+
+    // ============================================
+    // PROFILE FUNCTIONS
+    // ============================================
+    async function loadProfile() {
+      try {
+        const data = await api('/api/profile/me')
+        if (data.profile) {
+          state.profile = data.profile
+          state.screen = 'explore'
+          await loadExploreUsers()
+        } else {
+          state.screen = 'profileSetup'
+        }
+        render()
+      } catch (error) {
+        state.screen = 'profileSetup'
+        render()
+      }
+    }
+
+    async function handleProfileSubmit(event) {
+      event.preventDefault()
+      try {
+        const formData = {
+          name: document.getElementById('name').value,
+          age: document.getElementById('age').value,
+          gender: document.getElementById('gender').value,
+          bio: document.getElementById('bio').value,
+          interests: document.getElementById('interests')?.value.split(',').map(i => i.trim()).filter(Boolean) || []
+        }
+
+        const data = await api('/api/profile/create', {
+          method: 'POST',
+          body: JSON.stringify(formData)
+        })
+
+        if (data.success) {
+          state.profile = data.profile
+          state.screen = 'explore'
+          await loadExploreUsers()
+          render()
+        } else {
+          alert('Failed: ' + data.error)
+        }
+      } catch (error) {
+        alert('Error: ' + error.message)
+      }
+    }
+
+    // ============================================
+    // EXPLORE FUNCTIONS
+    // ============================================
+    async function loadExploreUsers() {
+      try {
+        const data = await api('/api/explore/users', { method: 'POST' })
+        if (data.success) {
+          state.exploreUsers = data.users
+          state.currentUserIndex = 0
+        }
+      } catch (error) {
+        console.error('Error loading users:', error)
+      }
+    }
+
+    async function handleSwipe(action) {
+      if (state.currentUserIndex >= state.exploreUsers.length) {
+        await loadExploreUsers()
+        render()
+        return
+      }
+
+      const currentUser = state.exploreUsers[state.currentUserIndex]
+      
+      try {
+        const data = await api('/api/explore/swipe', {
+          method: 'POST',
+          body: JSON.stringify({
+            target_user_id: currentUser.id,
+            action
+          })
+        })
+
+        if (data.success) {
+          if (data.is_match) {
+            // Show match modal
+            showMatchModal(currentUser)
+          }
+          
+          state.currentUserIndex++
+          render()
+        }
+      } catch (error) {
+        console.error('Error swiping:', error)
+      }
+    }
+
+    function showMatchModal(user) {
+      const modal = document.createElement('div')
+      modal.className = 'match-modal'
+      modal.innerHTML = `
+        <div class="match-content">
+          <div class="logo">🎉</div>
+          <h1 style="color: white; font-size: 3rem;">It's a Match!</h1>
+          <p style="color: white; font-size: 1.2rem; margin: 1rem 0;">
+            You and ${user.name} liked each other!
+          </p>
+          <button onclick="closeMatchModal()">Send Message</button>
+          <button class="btn-secondary" onclick="closeMatchModal(); changeScreen('explore')">Keep Swiping</button>
+        </div>
+      `
+      document.body.appendChild(modal)
+      
+      window.closeMatchModal = () => {
+        modal.remove()
+        changeScreen('matches')
+      }
+    }
+
+    // ============================================
+    // MATCHES FUNCTIONS
+    // ============================================
+    async function loadMatches() {
+      try {
+        const data = await api('/api/explore/matches')
+        if (data.success) {
+          state.matches = data.matches
+          render()
+        }
+      } catch (error) {
+        console.error('Error loading matches:', error)
+      }
+    }
+
+    // ============================================
+    // CHAT FUNCTIONS
+    // ============================================
+    async function loadConversations() {
+      try {
+        const data = await api('/api/chat/conversations')
+        if (data.success) {
+          state.conversations = data.conversations
+          render()
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error)
+      }
+    }
+
+    async function openChat(matchId) {
+      state.currentMatch = matchId
+      await loadMessages(matchId)
+      render()
+    }
+
+    function closeChat() {
+      state.currentMatch = null
+      render()
+    }
+
+    async function loadMessages(matchId) {
+      try {
+        const data = await api(`/api/chat/messages/${matchId}`)
+        if (data.success) {
+          state.messages = data.messages
+          render()
+          setTimeout(scrollToBottom, 100)
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error)
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput')
+      const text = input.value.trim()
+      if (!text) return
+
+      try {
+        const data = await api('/api/chat/send', {
+          method: 'POST',
+          body: JSON.stringify({
+            match_id: state.currentMatch,
+            text
+          })
+        })
+
+        if (data.success) {
+          input.value = ''
+          await loadMessages(state.currentMatch)
+        }
+      } catch (error) {
+        console.error('Error sending message:', error)
+      }
+    }
+
+    function scrollToBottom() {
+      const messagesDiv = document.getElementById('messages')
+      if (messagesDiv) {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight
+      }
+    }
+
+    // ============================================
+    // SUBSCRIPTION FUNCTIONS
+    // ============================================
+    async function loadSubscriptionInfo() {
+      try {
+        const [plansData, statusData] = await Promise.all([
+          api('/api/subscription/plans'),
+          api('/api/subscription/status')
+        ])
+        
+        if (plansData.success) state.plans = plansData.plans
+        if (statusData.success) state.subscription = statusData.subscription
+        
+        render()
+      } catch (error) {
+        console.error('Error loading subscription:', error)
+      }
+    }
+
+    async function subscribe(planId) {
+      try {
+        const data = await api('/api/subscription/subscribe', {
+          method: 'POST',
+          body: JSON.stringify({ plan: planId })
+        })
+
+        if (data.success) {
+          alert('✅ Subscription successful!')
+          await loadSubscriptionInfo()
+        } else {
+          alert('Failed: ' + data.error)
+        }
+      } catch (error) {
+        alert('Error: ' + error.message)
+      }
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    window.changeScreen = function(screen) {
+      state.screen = screen
+      
+      if (screen === 'explore') {
+        loadExploreUsers()
+      } else if (screen === 'matches') {
+        loadMatches()
+      } else if (screen === 'chat') {
+        state.currentMatch = null
+        loadConversations()
+      } else if (screen === 'subscription') {
+        loadSubscriptionInfo()
+      }
+      
+      render()
+    }
+
+    window.openWorldApp = function() {
+      const url = window.location.href
+      window.location.href = `https://worldcoin.org/mini-apps?url=${encodeURIComponent(url)}`
+    }
+
+    window.handleSignIn = handleSignIn
+    window.handleLogout = handleLogout
+    window.handleProfileSubmit = handleProfileSubmit
+    window.handleSwipe = handleSwipe
+    window.openChat = openChat
+    window.closeChat = closeChat
+    window.sendMessage = sendMessage
+    window.subscribe = subscribe
+
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
+    function renderLoading() {
+      return `
+        <div class="container">
+          <div class="card">
+            <div class="logo">💕</div>
+            <h1>Elite Connect</h1>
+            <p class="text-center">Loading...</p>
+          </div>
+        </div>
+      `
+    }
+
+    function renderNotWorldApp() {
+      return `
+        <div class="container">
+          <div class="card">
+            <div class="logo">🌍</div>
+            <h1>Open in World App</h1>
+            <p class="text-center">This app only works inside World App</p>
+            <button class="btn-success" onclick="openWorldApp()">
+              🚀 Open in World App
+            </button>
+          </div>
+        </div>
+      `
+    }
+
+    function renderSignIn() {
+      return `
+        <div class="container">
+          <div class="card">
+            <div class="logo">💕</div>
+            <h1>Elite Connect</h1>
+            <p class="text-center">Verified connections, genuine hearts</p>
+            <button onclick="handleSignIn()">
+              🌍 Sign in with World ID
+            </button>
+            <div class="text-center mt-3" style="font-size: 0.875rem; color: #666;">
+              <p>✓ Privacy-preserving verification</p>
+              <p>✓ One person, one profile</p>
+              <p>✓ Verified humans only</p>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    function renderProfileSetup() {
+      return `
+        <div class="container">
+          <div class="card">
+            <div class="logo">✨</div>
+            <h1>Create Your Profile</h1>
+            <p class="text-center">Tell us about yourself</p>
+            <form onsubmit="handleProfileSubmit(event)">
+              <label>Name *</label>
+              <input type="text" id="name" required placeholder="Your name">
+              
+              <label>Age *</label>
+              <input type="number" id="age" required min="18" max="100" placeholder="Your age">
+              
+              <label>Gender *</label>
+              <select id="gender" required>
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              
+              <label>Bio</label>
+              <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+              
+              <label>Interests (comma-separated)</label>
+              <input type="text" id="interests" placeholder="e.g. hiking, music, travel">
+              
+              <button type="submit" class="mt-2">✅ Create Profile</button>
+            </form>
+          </div>
+        </div>
+      `
+    }
+
+    function renderExplore() {
+      const currentUser = state.exploreUsers[state.currentUserIndex]
+      
+      if (!currentUser) {
+        return `
+          <div class="screen">
+            <div class="screen-content">
+              <div class="empty-state">
+                <div class="logo">🔍</div>
+                <h2>No More Users</h2>
+                <p>Check back later for more profiles!</p>
+                <button onclick="changeScreen('explore')" class="mt-2">🔄 Refresh</button>
+              </div>
+            </div>
+          </div>
+          ${renderNav('explore')}
+        `
+      }
+
+      const emoji = currentUser.gender === 'male' ? '👨' : currentUser.gender === 'female' ? '👩' : '🧑'
+      
+      return `
+        <div class="screen">
+          <div class="screen-content">
+            <h2 class="text-center mb-2">Discover</h2>
+            <div class="swipe-container">
+              <div class="swipe-card">
+                <div class="swipe-photo">${emoji}</div>
+                <h2>${currentUser.name}, ${currentUser.age}</h2>
+                <p style="color: #999;">${currentUser.bio || 'No bio yet'}</p>
+                ${currentUser.interests && currentUser.interests.length > 0 ? `
+                  <div style="margin-top: 1rem;">
+                    ${currentUser.interests.map(i => `<span class="badge">${i}</span>`).join(' ')}
+                  </div>
+                ` : ''}
+                <div class="swipe-actions">
+                  <button class="swipe-btn btn-danger" onclick="handleSwipe('pass')">✖️</button>
+                  <button class="swipe-btn btn-success" onclick="handleSwipe('like')">💚</button>
+                  <button class="swipe-btn btn-secondary" onclick="handleSwipe('super_like')">⭐</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        ${renderNav('explore')}
+      `
+    }
+
+    function renderMatches() {
+      return `
+        <div class="screen">
+          <div class="screen-content">
+            <h2 class="mb-2">Your Matches</h2>
+            ${state.matches.length === 0 ? `
+              <div class="empty-state">
+                <div class="logo">💔</div>
+                <p>No matches yet. Keep swiping!</p>
+                <button onclick="changeScreen('explore')" class="mt-2">Start Swiping</button>
+              </div>
+            ` : `
+              ${state.matches.map(match => {
+                const emoji = match.user.gender === 'male' ? '👨' : match.user.gender === 'female' ? '👩' : '🧑'
+                return `
+                  <div class="list-item" onclick="openChat('${match.match_id}')">
+                    <div class="list-avatar">${emoji}</div>
+                    <div class="list-info">
+                      <div class="list-name">${match.user.name}, ${match.user.age}</div>
+                      <div class="list-detail">Matched ${new Date(match.matched_at).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                `
+              }).join('')}
+            `}
+          </div>
+        </div>
+        ${renderNav('matches')}
+      `
+    }
+
+    function renderChat() {
+      if (!state.currentMatch) {
+        return `
+          <div class="screen">
+            <div class="screen-content">
+              <h2 class="mb-2">Messages</h2>
+              ${state.conversations.length === 0 ? `
+                <div class="empty-state">
+                  <div class="logo">💬</div>
+                  <p>No conversations yet</p>
+                  <button onclick="changeScreen('matches')" class="mt-2">View Matches</button>
+                </div>
+              ` : `
+                ${state.conversations.map(conv => {
+                  const emoji = conv.user?.gender === 'male' ? '👨' : conv.user?.gender === 'female' ? '👩' : '🧑'
+                  return `
+                    <div class="list-item" onclick="openChat('${conv.match_id}')">
+                      <div class="list-avatar">${emoji}</div>
+                      <div class="list-info">
+                        <div class="list-name">${conv.user?.name || 'User'}</div>
+                        <div class="list-detail">
+                          ${conv.last_message ? (conv.last_message.is_mine ? 'You: ' : '') + conv.last_message.text.substring(0, 40) + '...' : 'Say hi!'}
+                        </div>
+                      </div>
+                      ${conv.unread_count > 0 ? `<span class="badge">${conv.unread_count}</span>` : ''}
+                    </div>
+                  `
+                }).join('')}
+              `}
+            </div>
+          </div>
+          ${renderNav('chat')}
+        `
+      }
+
+      const conversation = state.conversations.find(c => c.match_id === state.currentMatch)
+      const userName = conversation?.user?.name || 'User'
+      
+      return `
+        <div class="screen">
+          <div class="screen-content">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: white; padding: 1rem; border-radius: 12px;">
+              <button onclick="closeChat()" class="btn-small">← Back</button>
+              <h2 style="margin: 0;">${userName}</h2>
+            </div>
+            <div class="chat-messages" id="messages">
+              ${state.messages.length === 0 ? `
+                <p class="text-center" style="color: #999;">No messages yet. Say hi!</p>
+              ` : `
+                ${state.messages.map(msg => `
+                  <div class="message ${msg.is_mine ? 'own' : 'other'}">
+                    <p>${msg.text}</p>
+                    <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
+                  </div>
+                `).join('')}
+              `}
+            </div>
+            <div class="message-input-container">
+              <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Type a message..." 
+                onkeypress="if(event.key==='Enter') sendMessage()"
+              >
+              <button onclick="sendMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+        ${renderNav('chat')}
+      `
+    }
+
+    function renderSubscription() {
+      return `
+        <div class="screen">
+          <div class="screen-content">
+            <h2 class="mb-2">Premium Plans</h2>
+            ${state.subscription ? `
+              <div class="plan-card featured">
+                <div class="plan-badge">ACTIVE</div>
+                <h3>${state.subscription.plan.toUpperCase()}</h3>
+                <div class="plan-price">Active</div>
+                <p>Expires: ${new Date(state.subscription.expires_at).toLocaleDateString()}</p>
+              </div>
+            ` : ''}
+            ${state.plans.map(plan => `
+              <div class="plan-card ${plan.id === 'premium' ? 'featured' : ''}">
+                ${plan.id === 'premium' ? '<div class="plan-badge">POPULAR</div>' : ''}
+                <h3>${plan.name}</h3>
+                <div class="plan-price">$${plan.price}<span style="font-size: 1rem;">/mo</span></div>
+                <ul class="plan-features">
+                  ${plan.features.unlimited_likes ? '<li>Unlimited Likes</li>' : ''}
+                  ${plan.features.super_likes > 0 ? `<li>${plan.features.super_likes} Super Likes</li>` : ''}
+                  ${plan.features.rewind ? '<li>Rewind</li>' : ''}
+                  ${plan.features.see_who_liked_you ? '<li>See Who Liked You</li>' : ''}
+                  ${plan.features.boost > 0 ? `<li>${plan.features.boost} Boosts</li>` : ''}
+                  ${plan.features.no_ads ? '<li>No Ads</li>' : ''}
+                </ul>
+                <button onclick="subscribe('${plan.id}')" ${state.subscription ? 'disabled' : ''}>
+                  ${state.subscription ? 'Subscribed' : 'Subscribe'}
+                </button>
+              </div>
+            `).join('')}
+            <div class="text-center mt-3">
+              <button class="btn-secondary" onclick="changeScreen('explore')">Back to App</button>
+            </div>
+          </div>
+        </div>
+        ${renderNav('subscription')}
+      `
+    }
+
+    function renderNav(active) {
+      return `
+        <div class="nav">
+          <button class="nav-btn ${active === 'explore' ? 'active' : ''}" onclick="changeScreen('explore')">
+            <span>🔥</span>
+            Explore
+          </button>
+          <button class="nav-btn ${active === 'matches' ? 'active' : ''}" onclick="changeScreen('matches')">
+            <span>💕</span>
+            Matches
+          </button>
+          <button class="nav-btn ${active === 'chat' ? 'active' : ''}" onclick="changeScreen('chat')">
+            <span>💬</span>
+            Chat
+          </button>
+          <button class="nav-btn ${active === 'subscription' ? 'active' : ''}" onclick="changeScreen('subscription')">
+            <span>⭐</span>
+            Premium
+          </button>
+        </div>
+      `
+    }
+
+    // ============================================
+    // MAIN RENDER
+    // ============================================
+    function render() {
+      const app = document.getElementById('app')
+      let html = ''
+
+      switch (state.screen) {
+        case 'loading':
+          html = renderLoading()
+          break
+        case 'notWorldApp':
+          html = renderNotWorldApp()
+          break
+        case 'signin':
+          html = renderSignIn()
+          break
+        case 'profileSetup':
+          html = renderProfileSetup()
+          break
+        case 'explore':
+          html = renderExplore()
+          break
+        case 'matches':
+          html = renderMatches()
+          break
+        case 'chat':
+          html = renderChat()
+          break
+        case 'subscription':
+          html = renderSubscription()
+          break
+      }
+
+      app.innerHTML = html
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    async function init() {
+      console.log('App starting...')
+      
+      setTimeout(async () => {
+        const isInstalled = MiniKit.isInstalled()
+        console.log('World App detected:', isInstalled)
+
+        if (!isInstalled) {
+          state.screen = 'notWorldApp'
+          render()
+          return
+        }
+
+        if (state.token) {
+          try {
+            await loadProfile()
+          } catch (error) {
+            state.screen = 'signin'
+            render()
+          }
+        } else {
+          state.screen = 'signin'
+          render()
+        }
+      }, 1000)
+    }
+
+    render()
+    init()
+    
+    console.log('✅ Elite Connect loaded!')
+  </script>
+</body>
 </html>
