@@ -1249,369 +1249,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Elite Connect</title>
-  
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      position: fixed;
-      overscroll-behavior: none;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .container {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      overflow-y: auto;
-    }
-
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 500px;
-      width: 100%;
-      animation: slideUp 0.5s ease-out;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .logo {
-      font-size: 4rem;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    h1 {
-      font-size: 2rem;
-      text-align: center;
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 1rem;
-    }
-
-    h2 {
-      font-size: 1.5rem;
-      color: #333;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    button {
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 0.5rem;
-      transition: all 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-      touch-action: manipulation;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-    }
-
-    .error-message {
-      background: #fee;
-      border: 2px solid #fcc;
-      padding: 1rem;
-      border-radius: 12px;
-      color: #c33;
-      margin: 1rem 0;
-      text-align: left;
-      font-size: 0.875rem;
-    }
-
-    .success-message {
-      background: #d4edda;
-      border: 2px solid #28a745;
-      padding: 1rem;
-      border-radius: 12px;
-      color: #155724;
-      margin: 1rem 0;
-      text-align: left;
-    }
-
-    .info-box {
-      background: #e3f2fd;
-      border: 2px solid #2196f3;
-      padding: 1rem;
-      border-radius: 12px;
-      color: #0d47a1;
-      margin: 1rem 0;
-      text-align: left;
-      font-size: 0.875rem;
-    }
-
-    .warning-box {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      padding: 1rem;
-      border-radius: 12px;
-      color: #856404;
-      margin: 1rem 0;
-      text-align: left;
-      font-size: 0.875rem;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 2rem;
-    }
-
-    .loading::after {
-      content: '...';
-      animation: dots 1.5s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 0.875rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 1rem;
-      margin-top: 0.5rem;
-      font-family: inherit;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #8b5cf6;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      color: #333;
-      margin-top: 1rem;
-      text-align: left;
-    }
-
-    details {
-      margin-top: 1rem;
-      font-size: 0.75rem;
-      color: #666;
-    }
-
-    summary {
-      cursor: pointer;
-      color: #999;
-      user-select: none;
-    }
-
-    .debug-log {
-      max-height: 150px;
-      overflow-y: auto;
-      background: #f5f5f5;
-      padding: 0.5rem;
-      border-radius: 8px;
-      margin-top: 0.5rem;
-      font-family: monospace;
-      font-size: 0.7rem;
-    }
-
-    .debug-log div {
-      margin: 0.25rem 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow-x: hidden; }
+    .container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .card { background: white; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); max-width: 500px; width: 100%; animation: slideUp 0.5s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .screen { min-height: 100vh; padding-bottom: 80px; }
+    .screen-content { max-width: 500px; margin: 0 auto; padding: 1rem; }
+    .logo { font-size: 4rem; text-align: center; margin-bottom: 1rem; }
+    h1 { font-size: 2rem; text-align: center; background: linear-gradient(135deg, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; margin-bottom: 1rem; }
+    h2 { font-size: 1.5rem; color: #333; margin-bottom: 1rem; }
+    p { color: #666; line-height: 1.6; margin-bottom: 1rem; }
+    button { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: all 0.2s; -webkit-appearance: none; appearance: none; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .btn-small { padding: 0.5rem 1rem; font-size: 0.875rem; width: auto; }
+    input, textarea, select { width: 100%; padding: 0.875rem; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; margin-top: 0.5rem; font-family: inherit; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #8b5cf6; }
+    label { display: block; font-weight: 600; color: #333; margin-top: 1rem; }
+    .hidden { display: none !important; }
+    .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 0.75rem; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1); z-index: 1000; }
+    .nav-btn { background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 0.5rem; width: auto; margin: 0; transition: color 0.2s; }
+    .nav-btn:hover { transform: none; box-shadow: none; }
+    .nav-btn.active { color: #8b5cf6; }
+    .nav-btn span { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .swipe-container { position: relative; height: 70vh; max-width: 400px; margin: 0 auto; }
+    .swipe-card { position: absolute; width: 100%; height: 100%; background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .swipe-photo { width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 6rem; margin-bottom: 1rem; }
+    .swipe-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    .swipe-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; }
+    .swipe-btn:hover { transform: scale(1.1); }
+    .list-item { background: white; padding: 1rem; border-radius: 12px; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 1rem; }
+    .list-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .list-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+    .list-info { flex: 1; }
+    .list-name { font-weight: bold; font-size: 1.1rem; color: #333; }
+    .list-detail { font-size: 0.875rem; color: #666; margin-top: 0.25rem; }
+    .badge { background: #8b5cf6; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+    .chat-messages { height: 60vh; overflow-y: auto; margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 12px; }
+    .message { background: white; padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 0.5rem; max-width: 80%; }
+    .message.own { background: #8b5cf6; color: white; margin-left: auto; text-align: right; }
+    .message.other { background: #e9ecef; }
+    .message-time { font-size: 0.75rem; opacity: 0.7; margin-top: 0.25rem; }
+    .message-input-container { display: flex; gap: 0.5rem; background: white; padding: 1rem; border-radius: 12px; }
+    .message-input-container input { margin-top: 0; flex: 1; }
+    .message-input-container button { margin-top: 0; width: auto; padding: 0.875rem 1.5rem; }
+    .info-box { background: #e3f2fd; border: 2px solid #2196f3; padding: 1rem; border-radius: 12px; color: #0d47a1; margin: 1rem 0; font-size: 0.875rem; }
+    .error-message { background: #fee; border: 2px solid #fcc; padding: 1rem; border-radius: 12px; color: #c33; margin: 1rem 0; }
+    .success-message { background: #d4edda; border: 2px solid #28a745; padding: 1rem; border-radius: 12px; color: #155724; margin: 1rem 0; }
+    .text-center { text-align: center; }
+    .loading { text-align: center; padding: 2rem; }
+    .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
+    @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #999; }
+    .empty-state .logo { font-size: 3rem; opacity: 0.3; }
   </style>
 </head>
 <body>
-  <div id="app">
-    <div class="container">
-      <div class="card">
-        <div class="logo">💕</div>
-        <h1>Elite Connect</h1>
-        <p>Loading...</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ============================================
-    // SAFER REDIRECT PREVENTION (NO ERRORS!)
-    // ============================================
-    
-    console.log('🔒 Installing redirect blockers...')
-
-    // 1. Block window.open
-    const originalOpen = window.open
-    window.open = function(...args) {
-      console.warn('🚫 BLOCKED: window.open', args[0])
-      return null
-    }
-    console.log('✅ window.open blocked')
-
-    // 2. Intercept location changes via methods (safer than redefining property)
-    const originalAssign = window.location.assign
-    const originalReplace = window.location.replace
-    
-    try {
-      window.location.assign = function(...args) {
-        console.warn('🚫 BLOCKED: location.assign', args[0])
-        return false
-      }
-      console.log('✅ location.assign blocked')
-    } catch (e) {
-      console.warn('⚠️ Could not override location.assign:', e.message)
-    }
-
-    try {
-      window.location.replace = function(...args) {
-        console.warn('🚫 BLOCKED: location.replace', args[0])
-        return false
-      }
-      console.log('✅ location.replace blocked')
-    } catch (e) {
-      console.warn('⚠️ Could not override location.replace:', e.message)
-    }
-
-    // 3. Block all forms
-    document.addEventListener('submit', (e) => {
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      console.warn('🚫 BLOCKED: Form submission')
-      return false
-    }, true)
-    console.log('✅ Form submissions blocked')
-
-    // 4. Block all external link clicks
-    document.addEventListener('click', (e) => {
-      let target = e.target
-      while (target && target !== document) {
-        if (target.tagName === 'A' && target.href) {
-          const href = target.href
-          if (!href.startsWith('#') && 
-              !href.includes('javascript:') &&
-              !href.includes('worldapp://') &&
-              href.includes('://')) {
-            e.preventDefault()
-            e.stopImmediatePropagation()
-            console.warn('🚫 BLOCKED: Link click to', href)
-            return false
-          }
-        }
-        target = target.parentElement
-      }
-    }, true)
-    console.log('✅ External links blocked')
-
-    // 5. Monitor location changes
-    let lastHref = window.location.href
-    setInterval(() => {
-      if (window.location.href !== lastHref) {
-        console.warn('⚠️ URL changed to:', window.location.href)
-        lastHref = window.location.href
-      }
-    }, 100)
-    console.log('✅ URL monitoring active')
-
-    // 6. Block beforeunload navigation
-    window.addEventListener('beforeunload', (e) => {
-      e.preventDefault()
-      console.warn('🚫 Navigation attempt detected')
-    }, true)
-    console.log('✅ beforeunload blocked')
-
-    // 7. Intercept fetch to OAuth endpoints
-    const originalFetch = window.fetch
-    window.fetch = function(...args) {
-      const url = typeof args[0] === 'string' ? args[0] : args[0]?.url
-      if (url && typeof url === 'string') {
-        if (url.includes('/authorize') || 
-            url.includes('/oauth') || 
-            (url.includes('worldcoin.org') && url.includes('/token'))) {
-          console.warn('⚠️ DETECTED: OAuth endpoint fetch', url)
-          // Don't block, but log it
-        }
-      }
-      return originalFetch.apply(this, args)
-    }
-    console.log('✅ Fetch monitoring active')
-
-    console.log('✅ All redirect blockers installed successfully!')
-  </script>
+  <div id="app"></div>
 
   <script type="module">
-    // ============================================
-    // IMPORT MINIKIT
-    // ============================================
-    
     import { MiniKit, VerificationLevel } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.9.6/+esm'
 
     // ============================================
     // CONFIGURATION
     // ============================================
     const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ CHANGE THIS
-    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ CHANGE THIS
+    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api'// ⚠️ CHANGE THIS
 
     console.log('🚀 Elite Connect initializing...')
-    console.log('📱 APP_ID:', APP_ID)
-    console.log('🌐 API_URL:', API_URL)
-
-    // ============================================
-    // MINIKIT INSTALLATION
-    // ============================================
-    
-    try {
-      MiniKit.install(APP_ID)
-      console.log('✅ MiniKit installed')
-    } catch (error) {
-      console.error('❌ MiniKit install error:', error)
-    }
+    MiniKit.install(APP_ID)
+    console.log('✅ MiniKit installed')
 
     // ============================================
     // STATE MANAGEMENT
@@ -1622,20 +1337,12 @@
       profile: null,
       token: localStorage.getItem('token'),
       error: null,
-      loading: false,
-      debugLog: []
-    }
-
-    function log(message, type = 'info') {
-      const timestamp = new Date().toLocaleTimeString()
-      const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️'
-      const logEntry = `${timestamp} ${emoji} ${message}`
-      state.debugLog.push(logEntry)
-      console.log(logEntry)
-      
-      if (state.debugLog.length > 50) {
-        state.debugLog = state.debugLog.slice(-50)
-      }
+      exploreUsers: [],
+      currentUserIndex: 0,
+      matches: [],
+      currentMatch: null,
+      messages: [],
+      conversations: []
     }
 
     // ============================================
@@ -1643,106 +1350,316 @@
     // ============================================
     async function api(endpoint, options = {}) {
       const headers = { 'Content-Type': 'application/json' }
-      if (state.token) {
-        headers['Authorization'] = `Bearer ${state.token}`
-      }
+      if (state.token) headers['Authorization'] = `Bearer ${state.token}`
       
       try {
-        log(`API call: ${endpoint}`)
-        const response = await fetch(`${API_URL}${endpoint}`, {
-          ...options,
-          headers: { ...headers, ...options.headers }
-        })
-        
+        const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers })
         const data = await response.json()
-        log(`API response: ${data.success ? 'success' : 'failed'}`)
         return data
       } catch (error) {
-        log(`API error: ${error.message}`, 'error')
+        console.error('API Error:', error)
         throw error
       }
     }
+
+    // ============================================
+    // AUTH FUNCTIONS
+    // ============================================
+    async function handleSignIn() {
+      try {
+        console.log('🔐 Starting sign in...')
+        state.error = null
+        state.loading = true
+        render()
+        
+        const { finalPayload } = await MiniKit.commandsAsync.verify({
+          action: 'login',
+          signal: '',
+          verification_level: VerificationLevel.Device
+        })
+
+        console.log('✅ World ID verification:', finalPayload.status)
+
+        if (finalPayload.status === 'success') {
+          const data = await api('/api/auth/verify', {
+            method: 'POST',
+            body: JSON.stringify({ payload: finalPayload, action: 'login' })
+          })
+
+          if (data.success) {
+            console.log('✅ Backend auth successful!')
+            state.user = data.user
+            state.token = data.token
+            localStorage.setItem('token', data.token)
+            
+            // CHECK IF PROFILE EXISTS
+            await loadProfile()
+          } else {
+            throw new Error(data.error || 'Authentication failed')
+          }
+        } else {
+          throw new Error('World ID verification failed')
+        }
+      } catch (error) {
+        console.error('❌ Sign in error:', error)
+        state.error = error.message || 'Sign in failed'
+        state.loading = false
+        state.screen = 'signin'
+        render()
+      }
+    }
+
+    async function handleLogout() {
+      localStorage.removeItem('token')
+      state = { ...state, screen: 'signin', user: null, profile: null, token: null }
+      render()
+    }
+
+    // ============================================
+    // PROFILE FUNCTIONS
+    // ============================================
+    async function loadProfile() {
+      try {
+        console.log('📋 Loading profile...')
+        const data = await api('/api/profile/me')
+        
+        if (data.profile) {
+          console.log('✅ Profile found!')
+          state.profile = data.profile
+          state.screen = 'explore'
+          await loadExploreUsers()
+        } else {
+          console.log('📝 No profile, showing setup')
+          state.screen = 'profileSetup'
+        }
+        render()
+      } catch (error) {
+        console.error('❌ Profile load error:', error)
+        state.screen = 'profileSetup'
+        render()
+      }
+    }
+
+    async function handleProfileSubmit(event) {
+      event.preventDefault()
+      try {
+        const formData = {
+          name: document.getElementById('name').value,
+          age: document.getElementById('age').value,
+          gender: document.getElementById('gender').value,
+          bio: document.getElementById('bio').value,
+          interests: document.getElementById('interests')?.value.split(',').map(i => i.trim()).filter(Boolean) || []
+        }
+
+        const data = await api('/api/profile/create', {
+          method: 'POST',
+          body: JSON.stringify(formData)
+        })
+
+        if (data.success) {
+          console.log('✅ Profile created!')
+          state.profile = data.profile
+          state.screen = 'explore'  // ✅ NAVIGATE TO EXPLORE PAGE
+          await loadExploreUsers()
+          render()
+        } else {
+          alert('Failed: ' + data.error)
+        }
+      } catch (error) {
+        alert('Error: ' + error.message)
+      }
+    }
+
+    // ============================================
+    // EXPLORE FUNCTIONS
+    // ============================================
+    async function loadExploreUsers() {
+      try {
+        const data = await api('/api/explore/users', { method: 'POST' })
+        if (data.success) {
+          state.exploreUsers = data.users
+          state.currentUserIndex = 0
+        }
+      } catch (error) {
+        console.error('Error loading users:', error)
+      }
+    }
+
+    async function handleSwipe(action) {
+      if (state.currentUserIndex >= state.exploreUsers.length) {
+        await loadExploreUsers()
+        render()
+        return
+      }
+
+      const currentUser = state.exploreUsers[state.currentUserIndex]
+      
+      try {
+        const data = await api('/api/explore/swipe', {
+          method: 'POST',
+          body: JSON.stringify({ target_user_id: currentUser.id, action })
+        })
+
+        if (data.success) {
+          if (data.is_match) {
+            alert(`🎉 It's a Match with ${currentUser.name}!`)
+          }
+          state.currentUserIndex++
+          render()
+        }
+      } catch (error) {
+        console.error('Error swiping:', error)
+      }
+    }
+
+    // ============================================
+    // MATCHES FUNCTIONS
+    // ============================================
+    async function loadMatches() {
+      try {
+        const data = await api('/api/explore/matches')
+        if (data.success) {
+          state.matches = data.matches
+          render()
+        }
+      } catch (error) {
+        console.error('Error loading matches:', error)
+      }
+    }
+
+    // ============================================
+    // CHAT FUNCTIONS
+    // ============================================
+    async function loadConversations() {
+      try {
+        const data = await api('/api/chat/conversations')
+        if (data.success) {
+          state.conversations = data.conversations
+          render()
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error)
+      }
+    }
+
+    async function openChat(matchId) {
+      state.currentMatch = matchId
+      await loadMessages(matchId)
+      render()
+    }
+
+    function closeChat() {
+      state.currentMatch = null
+      render()
+    }
+
+    async function loadMessages(matchId) {
+      try {
+        const data = await api(`/api/chat/messages/${matchId}`)
+        if (data.success) {
+          state.messages = data.messages
+          render()
+          setTimeout(scrollToBottom, 100)
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error)
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput')
+      const text = input.value.trim()
+      if (!text) return
+
+      try {
+        const data = await api('/api/chat/send', {
+          method: 'POST',
+          body: JSON.stringify({ match_id: state.currentMatch, text })
+        })
+
+        if (data.success) {
+          input.value = ''
+          await loadMessages(state.currentMatch)
+        }
+      } catch (error) {
+        console.error('Error sending message:', error)
+      }
+    }
+
+    function scrollToBottom() {
+      const messagesDiv = document.getElementById('messages')
+      if (messagesDiv) messagesDiv.scrollTop = messagesDiv.scrollHeight
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    window.changeScreen = function(screen) {
+      state.screen = screen
+      state.error = null
+      
+      if (screen === 'explore') loadExploreUsers()
+      else if (screen === 'matches') loadMatches()
+      else if (screen === 'chat') { state.currentMatch = null; loadConversations() }
+      
+      render()
+    }
+
+    window.handleSignIn = handleSignIn
+    window.handleLogout = handleLogout
+    window.handleProfileSubmit = handleProfileSubmit
+    window.handleSwipe = handleSwipe
+    window.openChat = openChat
+    window.closeChat = closeChat
+    window.sendMessage = sendMessage
 
     // ============================================
     // RENDER FUNCTIONS
     // ============================================
     function render() {
       const app = document.getElementById('app')
-      
-      const debugSection = state.debugLog.length > 0 ? `
-        <details style="margin-top: 1rem;">
-          <summary>🐛 Debug Log (${state.debugLog.length})</summary>
-          <div class="debug-log">
-            ${state.debugLog.slice(-20).map(log => `<div>${log}</div>`).join('')}
-          </div>
-        </details>
-      ` : ''
-      
+      let html = ''
+
       if (state.screen === 'loading') {
-        app.innerHTML = `
+        html = `
           <div class="container">
             <div class="card">
               <div class="logo">💕</div>
               <h1>Elite Connect</h1>
-              <p class="loading">Initializing app</p>
-              ${debugSection}
+              <p class="loading">Initializing</p>
             </div>
           </div>
         `
       } else if (state.screen === 'signin') {
-        app.innerHTML = `
+        html = `
           <div class="container">
             <div class="card">
               <div class="logo">💕</div>
               <h1>Elite Connect</h1>
-              <p>Verified connections, genuine hearts</p>
+              <p class="text-center">Verified connections, genuine hearts</p>
               
-              ${state.error ? `
-                <div class="error-message">
-                  <strong>⚠️ Error:</strong><br>
-                  ${state.error}
-                </div>
-              ` : ''}
+              ${state.error ? `<div class="error-message">⚠️ ${state.error}</div>` : ''}
               
-              ${state.loading ? `
-                <p class="loading">Verifying with World ID</p>
-                <div class="info-box">
-                  <strong>Please wait...</strong><br>
-                  • Approve the request in World App<br>
-                  • Stay in this app<br>
-                  • This may take a few seconds
-                </div>
-              ` : `
-                <button onclick="handleSignIn()">
-                  🌍 Sign in with World ID
-                </button>
-                
-                <div class="info-box" style="margin-top: 1rem;">
-                  <strong>✓</strong> Privacy-preserving verification<br>
-                  <strong>✓</strong> One person, one profile<br>
-                  <strong>✓</strong> Verified humans only
-                </div>
-              `}
+              <button onclick="handleSignIn()">🌍 Sign in with World ID</button>
               
-              ${debugSection}
+              <div class="info-box" style="margin-top: 2rem;">
+                <strong>✓</strong> Privacy-preserving verification<br>
+                <strong>✓</strong> One person, one profile<br>
+                <strong>✓</strong> Verified humans only
+              </div>
             </div>
           </div>
         `
       } else if (state.screen === 'profileSetup') {
-        app.innerHTML = `
+        html = `
           <div class="container">
             <div class="card">
               <div class="logo">✨</div>
               <h1>Create Your Profile</h1>
-              <p>Tell us about yourself</p>
-              
-              ${state.error ? `
-                <div class="error-message">${state.error}</div>
-              ` : ''}
-              
+              <p class="text-center">Tell us about yourself</p>
               <form onsubmit="handleProfileSubmit(event)">
                 <label>Name *</label>
-                <input type="text" id="name" required placeholder="Your name" autocomplete="off">
+                <input type="text" id="name" required placeholder="Your name">
                 
                 <label>Age *</label>
                 <input type="number" id="age" required min="18" max="100" placeholder="Your age">
@@ -1761,207 +1678,212 @@
                 <label>Interests (comma-separated)</label>
                 <input type="text" id="interests" placeholder="e.g. hiking, music, travel">
                 
-                <button type="submit" style="margin-top: 1.5rem;">
-                  ✅ Create Profile
-                </button>
+                <button type="submit" class="mt-2">✅ Create Profile</button>
               </form>
-              
-              ${debugSection}
             </div>
           </div>
         `
-      } else if (state.screen === 'success') {
-        app.innerHTML = `
-          <div class="container">
-            <div class="card">
-              <div class="logo">🎉</div>
-              <h1>Welcome!</h1>
-              <div class="success-message">
-                <strong>✅ Success!</strong><br><br>
-                ${state.profile ? `
-                  <strong>${state.profile.name}</strong>, ${state.profile.age}<br>
-                  ${state.profile.bio ? `"${state.profile.bio}"` : ''}
-                ` : ''}
+      } else if (state.screen === 'explore') {
+        const currentUser = state.exploreUsers[state.currentUserIndex]
+        
+        if (!currentUser) {
+          html = `
+            <div class="screen">
+              <div class="screen-content">
+                <div class="empty-state">
+                  <div class="logo">🔍</div>
+                  <h2>No More Users</h2>
+                  <p>Check back later!</p>
+                  <button onclick="changeScreen('explore')" class="mt-2">🔄 Refresh</button>
+                </div>
               </div>
-              <p style="color: #999; font-size: 0.875rem; margin-top: 2rem;">
-                In the full app, you would now see:<br>
-                • Swipe & Match system<br>
-                • Real-time chat<br>
-                • Premium subscriptions<br>
-                • And more!
-              </p>
-              <button onclick="location.reload()" class="btn-secondary" style="margin-top: 1rem;">
-                🔄 Restart Demo
-              </button>
-              
-              ${debugSection}
+            </div>
+            ${renderNav('explore')}
+          `
+        } else {
+          const emoji = currentUser.gender === 'male' ? '👨' : currentUser.gender === 'female' ? '👩' : '🧑'
+          html = `
+            <div class="screen">
+              <div class="screen-content">
+                <h2 class="text-center mb-2">Discover</h2>
+                <div class="swipe-container">
+                  <div class="swipe-card">
+                    <div class="swipe-photo">${emoji}</div>
+                    <h2>${currentUser.name}, ${currentUser.age}</h2>
+                    <p style="color: #999;">${currentUser.bio || 'No bio yet'}</p>
+                    ${currentUser.interests?.length > 0 ? `
+                      <div style="margin-top: 1rem;">
+                        ${currentUser.interests.map(i => `<span class="badge">${i}</span>`).join(' ')}
+                      </div>
+                    ` : ''}
+                    <div class="swipe-actions">
+                      <button class="swipe-btn btn-danger" onclick="handleSwipe('pass')">✖️</button>
+                      <button class="swipe-btn btn-success" onclick="handleSwipe('like')">💚</button>
+                      <button class="swipe-btn btn-secondary" onclick="handleSwipe('super_like')">⭐</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            ${renderNav('explore')}
+          `
+        }
+      } else if (state.screen === 'matches') {
+        html = `
+          <div class="screen">
+            <div class="screen-content">
+              <h2 class="mb-2">Your Matches</h2>
+              ${state.matches.length === 0 ? `
+                <div class="empty-state">
+                  <div class="logo">💔</div>
+                  <p>No matches yet. Keep swiping!</p>
+                  <button onclick="changeScreen('explore')" class="mt-2">Start Swiping</button>
+                </div>
+              ` : `
+                ${state.matches.map(match => {
+                  const emoji = match.user.gender === 'male' ? '👨' : match.user.gender === 'female' ? '👩' : '🧑'
+                  return `
+                    <div class="list-item" onclick="openChat('${match.match_id}')">
+                      <div class="list-avatar">${emoji}</div>
+                      <div class="list-info">
+                        <div class="list-name">${match.user.name}, ${match.user.age}</div>
+                        <div class="list-detail">Matched ${new Date(match.matched_at).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                  `
+                }).join('')}
+              `}
             </div>
           </div>
+          ${renderNav('matches')}
         `
-      }
-    }
-
-    // ============================================
-    // AUTH FUNCTIONS
-    // ============================================
-    window.handleSignIn = async function() {
-      try {
-        log('Sign in started', 'info')
-        state.error = null
-        state.loading = true
-        render()
-        
-        await new Promise(resolve => setTimeout(resolve, 500))
-        
-        log('Calling MiniKit.verify...', 'info')
-        
-        const result = await MiniKit.commandsAsync.verify({
-          action: 'login',
-          signal: '',
-          verification_level: VerificationLevel.Device
-        })
-
-        log(`MiniKit response: ${result.finalPayload?.status}`, 'info')
-
-        const { finalPayload } = result
-
-        if (finalPayload.status === 'success') {
-          log('World ID verification successful!', 'success')
-          log('Sending to backend...', 'info')
+      } else if (state.screen === 'chat') {
+        if (!state.currentMatch) {
+          html = `
+            <div class="screen">
+              <div class="screen-content">
+                <h2 class="mb-2">Messages</h2>
+                ${state.conversations.length === 0 ? `
+                  <div class="empty-state">
+                    <div class="logo">💬</div>
+                    <p>No conversations yet</p>
+                    <button onclick="changeScreen('matches')" class="mt-2">View Matches</button>
+                  </div>
+                ` : `
+                  ${state.conversations.map(conv => {
+                    const emoji = conv.user?.gender === 'male' ? '👨' : conv.user?.gender === 'female' ? '👩' : '🧑'
+                    return `
+                      <div class="list-item" onclick="openChat('${conv.match_id}')">
+                        <div class="list-avatar">${emoji}</div>
+                        <div class="list-info">
+                          <div class="list-name">${conv.user?.name || 'User'}</div>
+                          <div class="list-detail">
+                            ${conv.last_message ? (conv.last_message.is_mine ? 'You: ' : '') + conv.last_message.text.substring(0, 40) + '...' : 'Say hi!'}
+                          </div>
+                        </div>
+                        ${conv.unread_count > 0 ? `<span class="badge">${conv.unread_count}</span>` : ''}
+                      </div>
+                    `
+                  }).join('')}
+                `}
+              </div>
+            </div>
+            ${renderNav('chat')}
+          `
+        } else {
+          const conversation = state.conversations.find(c => c.match_id === state.currentMatch)
+          const userName = conversation?.user?.name || 'User'
           
-          const data = await api('/api/auth/verify', {
-            method: 'POST',
-            body: JSON.stringify({ 
-              payload: finalPayload, 
-              action: 'login' 
-            })
-          })
-
-          if (data.success) {
-            log('Backend authentication successful!', 'success')
-            state.user = data.user
-            state.token = data.token
-            state.loading = false
-            localStorage.setItem('token', data.token)
-            
-            await loadProfile()
-          } else {
-            throw new Error(data.error || 'Backend authentication failed')
-          }
-        } else if (finalPayload.status === 'error') {
-          throw new Error(finalPayload.error_message || 'World ID verification failed')
-        } else {
-          throw new Error('Verification cancelled or failed: ' + finalPayload.status)
+          html = `
+            <div class="screen">
+              <div class="screen-content">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: white; padding: 1rem; border-radius: 12px;">
+                  <button onclick="closeChat()" class="btn-small">← Back</button>
+                  <h2 style="margin: 0;">${userName}</h2>
+                </div>
+                <div class="chat-messages" id="messages">
+                  ${state.messages.length === 0 ? `
+                    <p class="text-center" style="color: #999;">No messages yet. Say hi!</p>
+                  ` : `
+                    ${state.messages.map(msg => `
+                      <div class="message ${msg.is_mine ? 'own' : 'other'}">
+                        <p>${msg.text}</p>
+                        <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
+                      </div>
+                    `).join('')}
+                  `}
+                </div>
+                <div class="message-input-container">
+                  <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type a message..." 
+                    onkeypress="if(event.key==='Enter') sendMessage()"
+                  >
+                  <button onclick="sendMessage()">Send</button>
+                </div>
+              </div>
+            </div>
+            ${renderNav('chat')}
+          `
         }
-      } catch (error) {
-        log(`Sign in error: ${error.message}`, 'error')
-        state.error = error.message || 'Sign in failed. Please try again.'
-        state.loading = false
-        state.screen = 'signin'
-        render()
       }
+
+      app.innerHTML = html
+    }
+
+    function renderNav(active) {
+      return `
+        <div class="nav">
+          <button class="nav-btn ${active === 'explore' ? 'active' : ''}" onclick="changeScreen('explore')">
+            <span>🔥</span>
+            Explore
+          </button>
+          <button class="nav-btn ${active === 'matches' ? 'active' : ''}" onclick="changeScreen('matches')">
+            <span>💕</span>
+            Matches
+          </button>
+          <button class="nav-btn ${active === 'chat' ? 'active' : ''}" onclick="changeScreen('chat')">
+            <span>💬</span>
+            Chat
+          </button>
+        </div>
+      `
     }
 
     // ============================================
-    // PROFILE FUNCTIONS
-    // ============================================
-    async function loadProfile() {
-      try {
-        log('Loading profile...', 'info')
-        const data = await api('/api/profile/me')
-        
-        if (data.profile) {
-          log('Profile found!', 'success')
-          state.profile = data.profile
-          state.screen = 'success'
-        } else {
-          log('No profile, showing setup', 'info')
-          state.screen = 'profileSetup'
-        }
-        render()
-      } catch (error) {
-        log(`Profile load error: ${error.message}`, 'warning')
-        state.screen = 'profileSetup'
-        render()
-      }
-    }
-
-    window.handleProfileSubmit = async function(event) {
-      event.preventDefault()
-      
-      try {
-        state.error = null
-        render()
-        
-        const formData = {
-          name: document.getElementById('name').value.trim(),
-          age: parseInt(document.getElementById('age').value),
-          gender: document.getElementById('gender').value,
-          bio: document.getElementById('bio').value.trim() || '',
-          interests: document.getElementById('interests')?.value
-            .split(',')
-            .map(i => i.trim())
-            .filter(Boolean) || []
-        }
-
-        log(`Creating profile: ${formData.name}`, 'info')
-        
-        const data = await api('/api/profile/create', {
-          method: 'POST',
-          body: JSON.stringify(formData)
-        })
-
-        if (data.success) {
-          log('Profile created!', 'success')
-          state.profile = data.profile
-          state.screen = 'success'
-          render()
-        } else {
-          throw new Error(data.error || 'Failed to create profile')
-        }
-      } catch (error) {
-        log(`Profile error: ${error.message}`, 'error')
-        state.error = error.message || 'Failed to create profile'
-        render()
-      }
-    }
-
-    // ============================================
-    // INITIALIZATION
+    // INIT
     // ============================================
     async function init() {
-      log('App initializing...', 'info')
+      console.log('🚀 App initialization started')
       
       setTimeout(async () => {
         try {
           if (state.token) {
-            log('Token found', 'info')
+            console.log('🔑 Token found - loading profile')
             try {
               await loadProfile()
             } catch (error) {
-              log('Profile load failed, showing sign in', 'warning')
+              console.error('❌ Profile load failed:', error)
               state.screen = 'signin'
               render()
             }
           } else {
-            log('No token, showing sign in', 'info')
+            console.log('🔐 No token - showing sign in')
             state.screen = 'signin'
             render()
           }
         } catch (error) {
-          log(`Init error: ${error.message}`, 'error')
+          console.error('❌ Init error:', error)
           state.screen = 'signin'
           render()
         }
       }, 1000)
     }
 
-    // ============================================
-    // START APP
-    // ============================================
-    log('Elite Connect loaded!', 'success')
     render()
     init()
+    console.log('✅ Elite Connect loaded!')
   </script>
 </body>
 </html>
