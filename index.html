@@ -1249,9 +1249,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Elite Connect</title>
+  
+  <!-- Prevent any external navigation -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://api.anthropic.com http://localhost:5002 https://*.onrender.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; connect-src 'self' https://api.anthropic.com http://localhost:5002 https://*.onrender.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;">
+  
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
   <style>
     * {
       margin: 0;
@@ -1265,12 +1270,12 @@
       width: 100%;
       overflow: hidden;
       position: fixed;
+      overscroll-behavior: none;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      overscroll-behavior: none;
     }
 
     .container {
@@ -1279,6 +1284,7 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
+      overflow-y: auto;
     }
 
     .card {
@@ -1313,6 +1319,12 @@
       margin-bottom: 1rem;
     }
 
+    h2 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
     p {
       color: #666;
       line-height: 1.6;
@@ -1333,7 +1345,7 @@
       margin-top: 0.5rem;
       transition: all 0.2s;
       -webkit-appearance: none;
-      appearance: none; 
+      appearance: none;
       touch-action: manipulation;
     }
 
@@ -1344,6 +1356,10 @@
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
     }
 
     .error-message {
@@ -1378,6 +1394,17 @@
       font-size: 0.875rem;
     }
 
+    .warning-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      padding: 1rem;
+      border-radius: 12px;
+      color: #856404;
+      margin: 1rem 0;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
     .loading {
       text-align: center;
       padding: 2rem;
@@ -1404,12 +1431,44 @@
       font-family: inherit;
     }
 
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+
     label {
       display: block;
       font-weight: 600;
       color: #333;
       margin-top: 1rem;
       text-align: left;
+    }
+
+    details {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #999;
+      user-select: none;
+    }
+
+    .debug-log {
+      max-height: 150px;
+      overflow-y: auto;
+      background: #f5f5f5;
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      font-family: monospace;
+      font-size: 0.7rem;
+    }
+
+    .debug-log div {
+      margin: 0.25rem 0;
     }
   </style>
 </head>
@@ -1419,80 +1478,126 @@
       <div class="card">
         <div class="logo">💕</div>
         <h1>Elite Connect</h1>
-        <p>Initializing...</p>
+        <p>Loading...</p>
       </div>
     </div>
   </div>
 
-  <script type="module">
+  <script>
     // ============================================
-    // CRITICAL: BLOCK ALL EXTERNAL NAVIGATION
+    // ULTRA-AGGRESSIVE REDIRECT PREVENTION
     // ============================================
     
-    console.log('🔒 Installing navigation blockers...')
+    console.log('🔒 Installing MAXIMUM redirect blockers...')
 
-    // Block all form submissions that might redirect
-    document.addEventListener('submit', (e) => {
-      e.preventDefault()
-      console.log('⚠️ Form submission blocked')
-    }, true)
-
-    // Block all link clicks that might redirect
-    document.addEventListener('click', (e) => {
-      if (e.target.tagName === 'A' && e.target.href) {
-        // Allow World App internal links
-        if (!e.target.href.includes('worldapp://') && 
-            !e.target.href.startsWith('#')) {
-          e.preventDefault()
-          console.log('⚠️ External link blocked:', e.target.href)
-        }
-      }
-    }, true)
-
-    // Override window.location to prevent redirects
-    let isRedirecting = false
-    const originalLocation = window.location
+    // 1. Block ALL navigation attempts
+    let navigationBlocked = false
+    
+    // Override window.location in ALL ways
+    const realLocation = window.location
+    
     Object.defineProperty(window, 'location', {
-      get() {
-        return originalLocation
-      },
-      set(value) {
-        console.log('⚠️ Location change blocked:', value)
+      get: () => realLocation,
+      set: (value) => {
+        console.warn('🚫 BLOCKED: window.location =', value)
         return false
       }
     })
 
-    // Block window.open
+    // Block location methods
+    const blockLocationMethod = (method) => {
+      const original = realLocation[method]
+      if (original) {
+        realLocation[method] = function(...args) {
+          console.warn(`🚫 BLOCKED: location.${method}`, args)
+          return false
+        }
+      }
+    }
+
+    ['assign', 'replace', 'reload'].forEach(blockLocationMethod)
+
+    // 2. Block window.open
     window.open = function(...args) {
-      console.log('⚠️ window.open blocked:', args)
+      console.warn('🚫 BLOCKED: window.open', args)
       return null
     }
 
-    // Block navigation via history
+    // 3. Block all forms
+    document.addEventListener('submit', (e) => {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      console.warn('🚫 BLOCKED: Form submission')
+      return false
+    }, true)
+
+    // 4. Block all link clicks
+    document.addEventListener('click', (e) => {
+      let target = e.target
+      while (target && target !== document) {
+        if (target.tagName === 'A' && target.href) {
+          if (!target.href.startsWith('#') && 
+              !target.href.includes('javascript:') &&
+              !target.href.includes('worldapp://')) {
+            e.preventDefault()
+            e.stopImmediatePropagation()
+            console.warn('🚫 BLOCKED: Link click to', target.href)
+            return false
+          }
+        }
+        target = target.parentElement
+      }
+    }, true)
+
+    // 5. Block beforeunload
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+      console.warn('🚫 BLOCKED: beforeunload navigation')
+      return ''
+    }, true)
+
+    // 6. Intercept fetch and XMLHttpRequest to external OAuth endpoints
+    const originalFetch = window.fetch
+    window.fetch = function(...args) {
+      const url = args[0]
+      if (typeof url === 'string') {
+        // Block OAuth-related URLs
+        if (url.includes('worldcoin.org') && 
+            (url.includes('/authorize') || 
+             url.includes('/token') || 
+             url.includes('/oauth'))) {
+          console.warn('🚫 BLOCKED: OAuth fetch to', url)
+          return Promise.reject(new Error('OAuth endpoint blocked'))
+        }
+      }
+      return originalFetch.apply(this, args)
+    }
+
+    // 7. Block history manipulation that causes navigation
     const originalPushState = history.pushState
     const originalReplaceState = history.replaceState
     
     history.pushState = function(...args) {
-      console.log('ℹ️ pushState called:', args)
+      console.log('ℹ️ pushState:', args)
       return originalPushState.apply(this, args)
     }
     
     history.replaceState = function(...args) {
-      console.log('ℹ️ replaceState called:', args)
+      console.log('ℹ️ replaceState:', args)
       return originalReplaceState.apply(this, args)
     }
 
-    // Prevent beforeunload redirects
-    window.addEventListener('beforeunload', (e) => {
-      if (!isRedirecting) {
-        e.preventDefault()
-        e.returnValue = ''
-        console.log('⚠️ Navigation blocked via beforeunload')
-      }
-    })
+    // 8. Prevent popstate navigation
+    window.addEventListener('popstate', (e) => {
+      e.preventDefault()
+      console.warn('🚫 BLOCKED: popstate navigation')
+    }, true)
 
-    console.log('✅ All navigation blockers installed')
+    console.log('✅ MAXIMUM redirect blockers installed')
+  </script>
 
+  <script type="module">
     // ============================================
     // IMPORT MINIKIT
     // ============================================
@@ -1503,16 +1608,19 @@
     // CONFIGURATION
     // ============================================
     const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ YOUR APP ID
-    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ YOUR BACKEND URL
+    const API_URL = 'http://localhost:5002' // ⚠️ YOUR BACKEND URL
 
-    console.log('🚀 Elite Connect starting...')
-    console.log('APP_ID:', APP_ID)
-    console.log('API_URL:', API_URL)
+    console.log('🚀 Elite Connect initializing...')
+    console.log('📱 APP_ID:', APP_ID)
+    console.log('🌐 API_URL:', API_URL)
+
+    // ============================================
+    // AGGRESSIVE MINIKIT INSTALLATION
+    // ============================================
     
-    // Install MiniKit with error handling
     try {
+      // Install with options that might help
       MiniKit.install(APP_ID, {
-        // Force in-app mode
         enableTelemetry: false
       })
       console.log('✅ MiniKit installed')
@@ -1530,12 +1638,20 @@
       token: localStorage.getItem('token'),
       error: null,
       loading: false,
-      debugInfo: []
+      debugLog: []
     }
 
-    function addDebug(message) {
-      state.debugInfo.push(`${new Date().toLocaleTimeString()}: ${message}`)
-      console.log(message)
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString()
+      const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️'
+      const logEntry = `${timestamp} ${emoji} ${message}`
+      state.debugLog.push(logEntry)
+      console.log(logEntry)
+      
+      // Keep only last 50 logs
+      if (state.debugLog.length > 50) {
+        state.debugLog = state.debugLog.slice(-50)
+      }
     }
 
     // ============================================
@@ -1548,17 +1664,17 @@
       }
       
       try {
-        addDebug(`📡 API: ${endpoint}`)
+        log(`API call: ${endpoint}`)
         const response = await fetch(`${API_URL}${endpoint}`, {
           ...options,
           headers: { ...headers, ...options.headers }
         })
         
         const data = await response.json()
-        addDebug(`✅ API Response: ${data.success ? 'success' : 'failed'}`)
+        log(`API response: ${data.success ? 'success' : 'failed'}`)
         return data
       } catch (error) {
-        addDebug(`❌ API Error: ${error.message}`)
+        log(`API error: ${error.message}`, 'error')
         throw error
       }
     }
@@ -1569,13 +1685,22 @@
     function render() {
       const app = document.getElementById('app')
       
+      const debugSection = state.debugLog.length > 0 ? `
+        <details style="margin-top: 1rem;">
+          <summary>🐛 Debug Log (${state.debugLog.length})</summary>
+          <div class="debug-log">
+            ${state.debugLog.slice(-20).map(log => `<div>${log}</div>`).join('')}
+          </div>
+        </details>
+      ` : ''
+      
       if (state.screen === 'loading') {
         app.innerHTML = `
           <div class="container">
             <div class="card">
               <div class="logo">💕</div>
               <h1>Elite Connect</h1>
-              <p class="loading">Starting app</p>
+              <p class="loading">Initializing app</p>
             </div>
           </div>
         `
@@ -1596,30 +1721,28 @@
               
               ${state.loading ? `
                 <p class="loading">Verifying with World ID</p>
-                <div class="info-box">
-                  Please approve in World App...<br>
-                  Do NOT tap outside this app!
+                <div class="warning-box">
+                  <strong>⚠️ IMPORTANT:</strong><br>
+                  • Stay in this app<br>
+                  • If it tries to open browser, come back here<br>
+                  • Look for World ID approval screen<br>
+                  • The app might try to redirect - we're blocking it
                 </div>
               ` : `
-                <button onclick="handleSignIn()" ${state.loading ? 'disabled' : ''}>
+                <button onclick="handleSignIn()">
                   🌍 Sign in with World ID
                 </button>
+                
+                <div class="info-box" style="margin-top: 1rem;">
+                  <strong>How it works:</strong><br>
+                  1. Tap the button above<br>
+                  2. Approve in World ID screen<br>
+                  3. Stay in World App<br>
+                  4. If redirected, come back to this tab
+                </div>
               `}
               
-              <div class="info-box" style="margin-top: 2rem;">
-                <strong>✓</strong> Privacy-preserving verification<br>
-                <strong>✓</strong> One person, one profile<br>
-                <strong>✓</strong> Verified humans only
-              </div>
-
-              ${state.debugInfo.length > 0 ? `
-                <details style="margin-top: 1rem;">
-                  <summary style="color: #999; font-size: 0.75rem; cursor: pointer;">Debug Info</summary>
-                  <div style="font-size: 0.75rem; color: #666; margin-top: 0.5rem; max-height: 100px; overflow-y: auto;">
-                    ${state.debugInfo.slice(-10).map(info => `<div>${info}</div>`).join('')}
-                  </div>
-                </details>
-              ` : ''}
+              ${debugSection}
             </div>
           </div>
         `
@@ -1629,7 +1752,7 @@
             <div class="card">
               <div class="logo">✨</div>
               <h1>Create Your Profile</h1>
-              <p>Tell us about yourself</p>
+              <p>Almost there! Set up your profile</p>
               
               ${state.error ? `
                 <div class="error-message">${state.error}</div>
@@ -1660,6 +1783,8 @@
                   ✅ Create Profile
                 </button>
               </form>
+              
+              ${debugSection}
             </div>
           </div>
         `
@@ -1668,23 +1793,28 @@
           <div class="container">
             <div class="card">
               <div class="logo">🎉</div>
-              <h1>Welcome to Elite Connect!</h1>
+              <h1>Welcome!</h1>
               <div class="success-message">
                 <strong>✅ Profile Created Successfully!</strong><br><br>
-                You're all set! Your profile:<br>
-                <strong>${state.profile?.name}</strong>, ${state.profile?.age}<br>
-                ${state.profile?.bio ? `"${state.profile.bio}"` : ''}
+                ${state.profile ? `
+                  <strong>${state.profile.name}</strong>, ${state.profile.age}<br>
+                  ${state.profile.bio ? `"${state.profile.bio}"` : ''}
+                ` : ''}
               </div>
               <p style="color: #999; font-size: 0.875rem; margin-top: 2rem;">
-                In the full app, you would now see:<br>
+                🎉 <strong>Success!</strong> You've completed the demo flow.<br><br>
+                In the full app, you would now have access to:<br>
                 • Swipe & Match system<br>
-                • Real-time chat<br>
+                • Real-time chat with matches<br>
                 • Premium subscriptions<br>
-                • And more!
+                • Profile customization<br>
+                • And much more!
               </p>
-              <button onclick="location.reload()" style="margin-top: 1rem; background: linear-gradient(135deg, #3b82f6, #2563eb);">
+              <button onclick="location.reload()" class="btn-secondary" style="margin-top: 1rem;">
                 🔄 Restart Demo
               </button>
+              
+              ${debugSection}
             </div>
           </div>
         `
@@ -1696,29 +1826,30 @@
     // ============================================
     window.handleSignIn = async function() {
       try {
-        addDebug('🔐 Sign in started')
+        log('Sign in initiated', 'info')
         state.error = null
         state.loading = true
         render()
         
-        // Small delay to show loading state
+        // Small delay
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        addDebug('📱 Calling MiniKit.verify...')
+        log('Calling MiniKit.verify...', 'info')
         
-        // CRITICAL: Call verification with Device level
+        // CRITICAL: Attempt to force in-app verification
         const result = await MiniKit.commandsAsync.verify({
           action: 'login',
           signal: '',
           verification_level: VerificationLevel.Device
         })
 
-        addDebug(`✅ MiniKit returned: ${result.finalPayload?.status || 'unknown'}`)
+        log(`MiniKit response: ${result.finalPayload?.status}`, 'info')
 
         const { finalPayload } = result
 
         if (finalPayload.status === 'success') {
-          addDebug('📤 Sending to backend...')
+          log('World ID verification successful!', 'success')
+          log('Sending to backend...', 'info')
           
           const data = await api('/api/auth/verify', {
             method: 'POST',
@@ -1729,7 +1860,7 @@
           })
 
           if (data.success) {
-            addDebug('✅ Backend auth successful')
+            log('Backend authentication successful!', 'success')
             state.user = data.user
             state.token = data.token
             state.loading = false
@@ -1745,7 +1876,7 @@
           throw new Error('Verification cancelled or failed: ' + finalPayload.status)
         }
       } catch (error) {
-        addDebug(`❌ Error: ${error.message}`)
+        log(`Sign in error: ${error.message}`, 'error')
         state.error = error.message || 'Sign in failed. Please try again.'
         state.loading = false
         state.screen = 'signin'
@@ -1758,20 +1889,20 @@
     // ============================================
     async function loadProfile() {
       try {
-        addDebug('📋 Loading profile...')
+        log('Loading profile...', 'info')
         const data = await api('/api/profile/me')
         
         if (data.profile) {
-          addDebug('✅ Profile found')
+          log('Profile found!', 'success')
           state.profile = data.profile
           state.screen = 'success'
         } else {
-          addDebug('📝 No profile, showing setup')
+          log('No profile found, showing setup', 'info')
           state.screen = 'profileSetup'
         }
         render()
       } catch (error) {
-        addDebug(`⚠️ No profile: ${error.message}`)
+        log(`Profile load error: ${error.message}`, 'warning')
         state.screen = 'profileSetup'
         render()
       }
@@ -1795,7 +1926,7 @@
             .filter(Boolean) || []
         }
 
-        addDebug(`📤 Creating profile: ${formData.name}`)
+        log(`Creating profile: ${formData.name}`, 'info')
         
         const data = await api('/api/profile/create', {
           method: 'POST',
@@ -1803,7 +1934,7 @@
         })
 
         if (data.success) {
-          addDebug('✅ Profile created!')
+          log('Profile created successfully!', 'success')
           state.profile = data.profile
           state.screen = 'success'
           render()
@@ -1811,7 +1942,7 @@
           throw new Error(data.error || 'Failed to create profile')
         }
       } catch (error) {
-        addDebug(`❌ Profile error: ${error.message}`)
+        log(`Profile creation error: ${error.message}`, 'error')
         state.error = error.message || 'Failed to create profile. Please try again.'
         render()
       }
@@ -1821,26 +1952,26 @@
     // INITIALIZATION
     // ============================================
     async function init() {
-      addDebug('🚀 App initializing...')
+      log('App initializing...', 'info')
       
       setTimeout(async () => {
         try {
           if (state.token) {
-            addDebug('🔑 Token found')
+            log('Token found in storage', 'info')
             try {
               await loadProfile()
             } catch (error) {
-              addDebug('⚠️ Profile load failed, show sign in')
+              log('Profile load failed, showing sign in', 'warning')
               state.screen = 'signin'
               render()
             }
           } else {
-            addDebug('🔐 No token, show sign in')
+            log('No token found, showing sign in', 'info')
             state.screen = 'signin'
             render()
           }
         } catch (error) {
-          addDebug(`❌ Init error: ${error.message}`)
+          log(`Init error: ${error.message}`, 'error')
           state.screen = 'signin'
           state.error = 'Initialization failed'
           render()
@@ -1851,8 +1982,8 @@
     // ============================================
     // START APP
     // ============================================
-    addDebug('✅ Elite Connect loaded')
-    addDebug('📱 Environment: World App')
+    log('Elite Connect loaded successfully', 'success')
+    log('Running in World App environment', 'info')
     render()
     init()
   </script>
