@@ -1250,9 +1250,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Elite Connect</title>
   
-  <!-- Prevent any external navigation -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://api.anthropic.com http://localhost:5002 https://*.onrender.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; connect-src 'self' https://api.anthropic.com http://localhost:5002 https://*.onrender.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;">
-  
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1485,42 +1482,41 @@
 
   <script>
     // ============================================
-    // ULTRA-AGGRESSIVE REDIRECT PREVENTION
+    // SAFER REDIRECT PREVENTION (NO ERRORS!)
     // ============================================
     
-    console.log('🔒 Installing MAXIMUM redirect blockers...')
+    console.log('🔒 Installing redirect blockers...')
 
-    // 1. Block ALL navigation attempts
-    let navigationBlocked = false
+    // 1. Block window.open
+    const originalOpen = window.open
+    window.open = function(...args) {
+      console.warn('🚫 BLOCKED: window.open', args[0])
+      return null
+    }
+    console.log('✅ window.open blocked')
+
+    // 2. Intercept location changes via methods (safer than redefining property)
+    const originalAssign = window.location.assign
+    const originalReplace = window.location.replace
     
-    // Override window.location in ALL ways
-    const realLocation = window.location
-    
-    Object.defineProperty(window, 'location', {
-      get: () => realLocation,
-      set: (value) => {
-        console.warn('🚫 BLOCKED: window.location =', value)
+    try {
+      window.location.assign = function(...args) {
+        console.warn('🚫 BLOCKED: location.assign', args[0])
         return false
       }
-    })
-
-    // Block location methods
-    const blockLocationMethod = (method) => {
-      const original = realLocation[method]
-      if (original) {
-        realLocation[method] = function(...args) {
-          console.warn(`🚫 BLOCKED: location.${method}`, args)
-          return false
-        }
-      }
+      console.log('✅ location.assign blocked')
+    } catch (e) {
+      console.warn('⚠️ Could not override location.assign:', e.message)
     }
 
-    ['assign', 'replace', 'reload'].forEach(blockLocationMethod)
-
-    // 2. Block window.open
-    window.open = function(...args) {
-      console.warn('🚫 BLOCKED: window.open', args)
-      return null
+    try {
+      window.location.replace = function(...args) {
+        console.warn('🚫 BLOCKED: location.replace', args[0])
+        return false
+      }
+      console.log('✅ location.replace blocked')
+    } catch (e) {
+      console.warn('⚠️ Could not override location.replace:', e.message)
     }
 
     // 3. Block all forms
@@ -1530,71 +1526,63 @@
       console.warn('🚫 BLOCKED: Form submission')
       return false
     }, true)
+    console.log('✅ Form submissions blocked')
 
-    // 4. Block all link clicks
+    // 4. Block all external link clicks
     document.addEventListener('click', (e) => {
       let target = e.target
       while (target && target !== document) {
         if (target.tagName === 'A' && target.href) {
-          if (!target.href.startsWith('#') && 
-              !target.href.includes('javascript:') &&
-              !target.href.includes('worldapp://')) {
+          const href = target.href
+          if (!href.startsWith('#') && 
+              !href.includes('javascript:') &&
+              !href.includes('worldapp://') &&
+              href.includes('://')) {
             e.preventDefault()
             e.stopImmediatePropagation()
-            console.warn('🚫 BLOCKED: Link click to', target.href)
+            console.warn('🚫 BLOCKED: Link click to', href)
             return false
           }
         }
         target = target.parentElement
       }
     }, true)
+    console.log('✅ External links blocked')
 
-    // 5. Block beforeunload
+    // 5. Monitor location changes
+    let lastHref = window.location.href
+    setInterval(() => {
+      if (window.location.href !== lastHref) {
+        console.warn('⚠️ URL changed to:', window.location.href)
+        lastHref = window.location.href
+      }
+    }, 100)
+    console.log('✅ URL monitoring active')
+
+    // 6. Block beforeunload navigation
     window.addEventListener('beforeunload', (e) => {
       e.preventDefault()
-      e.returnValue = ''
-      console.warn('🚫 BLOCKED: beforeunload navigation')
-      return ''
+      console.warn('🚫 Navigation attempt detected')
     }, true)
+    console.log('✅ beforeunload blocked')
 
-    // 6. Intercept fetch and XMLHttpRequest to external OAuth endpoints
+    // 7. Intercept fetch to OAuth endpoints
     const originalFetch = window.fetch
     window.fetch = function(...args) {
-      const url = args[0]
-      if (typeof url === 'string') {
-        // Block OAuth-related URLs
-        if (url.includes('worldcoin.org') && 
-            (url.includes('/authorize') || 
-             url.includes('/token') || 
-             url.includes('/oauth'))) {
-          console.warn('🚫 BLOCKED: OAuth fetch to', url)
-          return Promise.reject(new Error('OAuth endpoint blocked'))
+      const url = typeof args[0] === 'string' ? args[0] : args[0]?.url
+      if (url && typeof url === 'string') {
+        if (url.includes('/authorize') || 
+            url.includes('/oauth') || 
+            (url.includes('worldcoin.org') && url.includes('/token'))) {
+          console.warn('⚠️ DETECTED: OAuth endpoint fetch', url)
+          // Don't block, but log it
         }
       }
       return originalFetch.apply(this, args)
     }
+    console.log('✅ Fetch monitoring active')
 
-    // 7. Block history manipulation that causes navigation
-    const originalPushState = history.pushState
-    const originalReplaceState = history.replaceState
-    
-    history.pushState = function(...args) {
-      console.log('ℹ️ pushState:', args)
-      return originalPushState.apply(this, args)
-    }
-    
-    history.replaceState = function(...args) {
-      console.log('ℹ️ replaceState:', args)
-      return originalReplaceState.apply(this, args)
-    }
-
-    // 8. Prevent popstate navigation
-    window.addEventListener('popstate', (e) => {
-      e.preventDefault()
-      console.warn('🚫 BLOCKED: popstate navigation')
-    }, true)
-
-    console.log('✅ MAXIMUM redirect blockers installed')
+    console.log('✅ All redirect blockers installed successfully!')
   </script>
 
   <script type="module">
@@ -1607,22 +1595,19 @@
     // ============================================
     // CONFIGURATION
     // ============================================
-    const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ YOUR APP ID
-    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ YOUR BACKEND URL
+    const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ CHANGE THIS
+    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ CHANGE THIS
 
     console.log('🚀 Elite Connect initializing...')
     console.log('📱 APP_ID:', APP_ID)
     console.log('🌐 API_URL:', API_URL)
 
     // ============================================
-    // AGGRESSIVE MINIKIT INSTALLATION
+    // MINIKIT INSTALLATION
     // ============================================
     
     try {
-      // Install with options that might help
-      MiniKit.install(APP_ID, {
-        enableTelemetry: false
-      })
+      MiniKit.install(APP_ID)
       console.log('✅ MiniKit installed')
     } catch (error) {
       console.error('❌ MiniKit install error:', error)
@@ -1648,7 +1633,6 @@
       state.debugLog.push(logEntry)
       console.log(logEntry)
       
-      // Keep only last 50 logs
       if (state.debugLog.length > 50) {
         state.debugLog = state.debugLog.slice(-50)
       }
@@ -1701,6 +1685,7 @@
               <div class="logo">💕</div>
               <h1>Elite Connect</h1>
               <p class="loading">Initializing app</p>
+              ${debugSection}
             </div>
           </div>
         `
@@ -1721,12 +1706,11 @@
               
               ${state.loading ? `
                 <p class="loading">Verifying with World ID</p>
-                <div class="warning-box">
-                  <strong>⚠️ IMPORTANT:</strong><br>
+                <div class="info-box">
+                  <strong>Please wait...</strong><br>
+                  • Approve the request in World App<br>
                   • Stay in this app<br>
-                  • If it tries to open browser, come back here<br>
-                  • Look for World ID approval screen<br>
-                  • The app might try to redirect - we're blocking it
+                  • This may take a few seconds
                 </div>
               ` : `
                 <button onclick="handleSignIn()">
@@ -1734,11 +1718,9 @@
                 </button>
                 
                 <div class="info-box" style="margin-top: 1rem;">
-                  <strong>How it works:</strong><br>
-                  1. Tap the button above<br>
-                  2. Approve in World ID screen<br>
-                  3. Stay in World App<br>
-                  4. If redirected, come back to this tab
+                  <strong>✓</strong> Privacy-preserving verification<br>
+                  <strong>✓</strong> One person, one profile<br>
+                  <strong>✓</strong> Verified humans only
                 </div>
               `}
               
@@ -1752,7 +1734,7 @@
             <div class="card">
               <div class="logo">✨</div>
               <h1>Create Your Profile</h1>
-              <p>Almost there! Set up your profile</p>
+              <p>Tell us about yourself</p>
               
               ${state.error ? `
                 <div class="error-message">${state.error}</div>
@@ -1795,20 +1777,18 @@
               <div class="logo">🎉</div>
               <h1>Welcome!</h1>
               <div class="success-message">
-                <strong>✅ Profile Created Successfully!</strong><br><br>
+                <strong>✅ Success!</strong><br><br>
                 ${state.profile ? `
                   <strong>${state.profile.name}</strong>, ${state.profile.age}<br>
                   ${state.profile.bio ? `"${state.profile.bio}"` : ''}
                 ` : ''}
               </div>
               <p style="color: #999; font-size: 0.875rem; margin-top: 2rem;">
-                🎉 <strong>Success!</strong> You've completed the demo flow.<br><br>
-                In the full app, you would now have access to:<br>
+                In the full app, you would now see:<br>
                 • Swipe & Match system<br>
-                • Real-time chat with matches<br>
+                • Real-time chat<br>
                 • Premium subscriptions<br>
-                • Profile customization<br>
-                • And much more!
+                • And more!
               </p>
               <button onclick="location.reload()" class="btn-secondary" style="margin-top: 1rem;">
                 🔄 Restart Demo
@@ -1826,17 +1806,15 @@
     // ============================================
     window.handleSignIn = async function() {
       try {
-        log('Sign in initiated', 'info')
+        log('Sign in started', 'info')
         state.error = null
         state.loading = true
         render()
         
-        // Small delay
         await new Promise(resolve => setTimeout(resolve, 500))
         
         log('Calling MiniKit.verify...', 'info')
         
-        // CRITICAL: Attempt to force in-app verification
         const result = await MiniKit.commandsAsync.verify({
           action: 'login',
           signal: '',
@@ -1897,7 +1875,7 @@
           state.profile = data.profile
           state.screen = 'success'
         } else {
-          log('No profile found, showing setup', 'info')
+          log('No profile, showing setup', 'info')
           state.screen = 'profileSetup'
         }
         render()
@@ -1934,7 +1912,7 @@
         })
 
         if (data.success) {
-          log('Profile created successfully!', 'success')
+          log('Profile created!', 'success')
           state.profile = data.profile
           state.screen = 'success'
           render()
@@ -1942,8 +1920,8 @@
           throw new Error(data.error || 'Failed to create profile')
         }
       } catch (error) {
-        log(`Profile creation error: ${error.message}`, 'error')
-        state.error = error.message || 'Failed to create profile. Please try again.'
+        log(`Profile error: ${error.message}`, 'error')
+        state.error = error.message || 'Failed to create profile'
         render()
       }
     }
@@ -1957,7 +1935,7 @@
       setTimeout(async () => {
         try {
           if (state.token) {
-            log('Token found in storage', 'info')
+            log('Token found', 'info')
             try {
               await loadProfile()
             } catch (error) {
@@ -1966,14 +1944,13 @@
               render()
             }
           } else {
-            log('No token found, showing sign in', 'info')
+            log('No token, showing sign in', 'info')
             state.screen = 'signin'
             render()
           }
         } catch (error) {
           log(`Init error: ${error.message}`, 'error')
           state.screen = 'signin'
-          state.error = 'Initialization failed'
           render()
         }
       }, 1000)
@@ -1982,8 +1959,7 @@
     // ============================================
     // START APP
     // ============================================
-    log('Elite Connect loaded successfully', 'success')
-    log('Running in World App environment', 'info')
+    log('Elite Connect loaded!', 'success')
     render()
     init()
   </script>
