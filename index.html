@@ -1247,24 +1247,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Elite Connect</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: fixed;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
+      overscroll-behavior: none;
     }
 
     .container {
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1286,27 +1296,10 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .screen {
-      min-height: 100vh;
-      padding-bottom: 80px;
-    }
-
-    .screen-content {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-
     .logo {
       font-size: 4rem;
       text-align: center;
       margin-bottom: 1rem;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
     }
 
     h1 {
@@ -1320,16 +1313,11 @@
       margin-bottom: 1rem;
     }
 
-    h2 {
-      font-size: 1.5rem;
-      color: #333;
-      margin-bottom: 1rem;
-    }
-
     p {
       color: #666;
       line-height: 1.6;
       margin-bottom: 1rem;
+      text-align: center;
     }
 
     button {
@@ -1344,15 +1332,13 @@
       width: 100%;
       margin-top: 0.5rem;
       transition: all 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+      -webkit-appearance: none;
+      appearance: none; 
+      touch-action: manipulation;
     }
 
     button:active {
-      transform: translateY(0);
+      transform: scale(0.98);
     }
 
     button:disabled {
@@ -1360,22 +1346,52 @@
       cursor: not-allowed;
     }
 
-    .btn-secondary {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-    }
-
-    .btn-small {
-      padding: 0.5rem 1rem;
+    .error-message {
+      background: #fee;
+      border: 2px solid #fcc;
+      padding: 1rem;
+      border-radius: 12px;
+      color: #c33;
+      margin: 1rem 0;
+      text-align: left;
       font-size: 0.875rem;
-      width: auto;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border: 2px solid #28a745;
+      padding: 1rem;
+      border-radius: 12px;
+      color: #155724;
+      margin: 1rem 0;
+      text-align: left;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border: 2px solid #2196f3;
+      padding: 1rem;
+      border-radius: 12px;
+      color: #0d47a1;
+      margin: 1rem 0;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
     }
 
     input, textarea, select {
@@ -1388,372 +1404,121 @@
       font-family: inherit;
     }
 
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #8b5cf6;
-    }
-
     label {
       display: block;
       font-weight: 600;
       color: #333;
       margin-top: 1rem;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.75rem;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
-
-    .nav-btn {
-      background: none;
-      border: none;
-      color: #666;
-      font-size: 0.75rem;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0.5rem;
-      width: auto;
-      margin: 0;
-      transition: color 0.2s;
-    }
-
-    .nav-btn:hover {
-      transform: none;
-      box-shadow: none;
-    }
-
-    .nav-btn.active {
-      color: #8b5cf6;
-    }
-
-    .nav-btn span {
-      font-size: 1.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .swipe-container {
-      position: relative;
-      height: 70vh;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    .swipe-card {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: white;
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-
-    .swipe-photo {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 6rem;
-      margin-bottom: 1rem;
-    }
-
-    .swipe-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    .swipe-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .swipe-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .match-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .match-content {
-      text-align: center;
-      color: white;
-      padding: 2rem;
-    }
-
-    .match-content .logo {
-      font-size: 6rem;
-      animation: bounce 0.5s;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
-
-    .list-item {
-      background: white;
-      padding: 1rem;
-      border-radius: 12px;
-      margin-bottom: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .list-item:hover {
-      transform: translateX(4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .list-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      flex-shrink: 0;
-    }
-
-    .list-info {
-      flex: 1;
-    }
-
-    .list-name {
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #333;
-    }
-
-    .list-detail {
-      font-size: 0.875rem;
-      color: #666;
-      margin-top: 0.25rem;
-    }
-
-    .badge {
-      background: #8b5cf6;
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-    }
-
-    .chat-messages {
-      height: 60vh;
-      overflow-y: auto;
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 12px;
-    }
-
-    .message {
-      background: white;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      max-width: 80%;
-    }
-
-    .message.own {
-      background: #8b5cf6;
-      color: white;
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .message.other {
-      background: #e9ecef;
-    }
-
-    .message-time {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-top: 0.25rem;
-    }
-
-    .message-input-container {
-      display: flex;
-      gap: 0.5rem;
-      background: white;
-      padding: 1rem;
-      border-radius: 12px;
-    }
-
-    .message-input-container input {
-      margin-top: 0;
-      flex: 1;
-    }
-
-    .message-input-container button {
-      margin-top: 0;
-      width: auto;
-      padding: 0.875rem 1.5rem;
-    }
-
-    .plan-card {
-      background: white;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      border: 2px solid #e0e0e0;
-      transition: all 0.2s;
-    }
-
-    .plan-card:hover {
-      border-color: #8b5cf6;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
-    }
-
-    .plan-card.featured {
-      border-color: #8b5cf6;
-      position: relative;
-    }
-
-    .plan-badge {
-      position: absolute;
-      top: -12px;
-      right: 20px;
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-    }
-
-    .plan-price {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #333;
-      margin: 0.5rem 0;
-    }
-
-    .plan-features {
-      list-style: none;
-      margin: 1rem 0;
-    }
-
-    .plan-features li {
-      padding: 0.5rem 0;
-      color: #666;
-    }
-
-    .plan-features li:before {
-      content: "✓ ";
-      color: #10b981;
-      font-weight: bold;
-      margin-right: 0.5rem;
-    }
-
-    .text-center {
-      text-align: center;
-    }
-
-    .mt-1 { margin-top: 0.5rem; }
-    .mt-2 { margin-top: 1rem; }
-    .mt-3 { margin-top: 1.5rem; }
-    .mb-1 { margin-bottom: 0.5rem; }
-    .mb-2 { margin-bottom: 1rem; }
-
-    .loading {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #999;
-    }
-
-    .empty-state .logo {
-      font-size: 3rem;
-      opacity: 0.3;
-    }
-
-    .error-message {
-      background: #fee;
-      border: 2px solid #fcc;
-      padding: 1rem;
-      border-radius: 12px;
-      color: #c33;
-      margin: 1rem 0;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <div class="container">
+      <div class="card">
+        <div class="logo">💕</div>
+        <h1>Elite Connect</h1>
+        <p>Initializing...</p>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
+    // ============================================
+    // CRITICAL: BLOCK ALL EXTERNAL NAVIGATION
+    // ============================================
+    
+    console.log('🔒 Installing navigation blockers...')
+
+    // Block all form submissions that might redirect
+    document.addEventListener('submit', (e) => {
+      e.preventDefault()
+      console.log('⚠️ Form submission blocked')
+    }, true)
+
+    // Block all link clicks that might redirect
+    document.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A' && e.target.href) {
+        // Allow World App internal links
+        if (!e.target.href.includes('worldapp://') && 
+            !e.target.href.startsWith('#')) {
+          e.preventDefault()
+          console.log('⚠️ External link blocked:', e.target.href)
+        }
+      }
+    }, true)
+
+    // Override window.location to prevent redirects
+    let isRedirecting = false
+    const originalLocation = window.location
+    Object.defineProperty(window, 'location', {
+      get() {
+        return originalLocation
+      },
+      set(value) {
+        console.log('⚠️ Location change blocked:', value)
+        return false
+      }
+    })
+
+    // Block window.open
+    window.open = function(...args) {
+      console.log('⚠️ window.open blocked:', args)
+      return null
+    }
+
+    // Block navigation via history
+    const originalPushState = history.pushState
+    const originalReplaceState = history.replaceState
+    
+    history.pushState = function(...args) {
+      console.log('ℹ️ pushState called:', args)
+      return originalPushState.apply(this, args)
+    }
+    
+    history.replaceState = function(...args) {
+      console.log('ℹ️ replaceState called:', args)
+      return originalReplaceState.apply(this, args)
+    }
+
+    // Prevent beforeunload redirects
+    window.addEventListener('beforeunload', (e) => {
+      if (!isRedirecting) {
+        e.preventDefault()
+        e.returnValue = ''
+        console.log('⚠️ Navigation blocked via beforeunload')
+      }
+    })
+
+    console.log('✅ All navigation blockers installed')
+
+    // ============================================
+    // IMPORT MINIKIT
+    // ============================================
+    
     import { MiniKit, VerificationLevel } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.9.6/+esm'
 
     // ============================================
     // CONFIGURATION
     // ============================================
-    const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ CHANGE THIS!
-    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ CHANGE FOR PRODUCTION!
+    const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ YOUR APP ID
+    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api' // ⚠️ YOUR BACKEND URL
 
-    console.log('🔧 Initializing Elite Connect...')
+    console.log('🚀 Elite Connect starting...')
+    console.log('APP_ID:', APP_ID)
+    console.log('API_URL:', API_URL)
     
-    // Install MiniKit
-    MiniKit.install(APP_ID)
-    console.log('✅ MiniKit installed with APP_ID:', APP_ID)
+    // Install MiniKit with error handling
+    try {
+      MiniKit.install(APP_ID, {
+        // Force in-app mode
+        enableTelemetry: false
+      })
+      console.log('✅ MiniKit installed')
+    } catch (error) {
+      console.error('❌ MiniKit install error:', error)
+    }
 
     // ============================================
     // STATE MANAGEMENT
@@ -1764,18 +1529,13 @@
       profile: null,
       token: localStorage.getItem('token'),
       error: null,
-      
-      exploreUsers: [],
-      currentUserIndex: 0,
-      
-      matches: [],
-      
-      currentMatch: null,
-      messages: [],
-      conversations: [],
-      
-      subscription: null,
-      plans: []
+      loading: false,
+      debugInfo: []
+    }
+
+    function addDebug(message) {
+      state.debugInfo.push(`${new Date().toLocaleTimeString()}: ${message}`)
+      console.log(message)
     }
 
     // ============================================
@@ -1788,40 +1548,177 @@
       }
       
       try {
+        addDebug(`📡 API: ${endpoint}`)
         const response = await fetch(`${API_URL}${endpoint}`, {
           ...options,
           headers: { ...headers, ...options.headers }
         })
         
         const data = await response.json()
+        addDebug(`✅ API Response: ${data.success ? 'success' : 'failed'}`)
         return data
       } catch (error) {
-        console.error('API Error:', error)
+        addDebug(`❌ API Error: ${error.message}`)
         throw error
+      }
+    }
+
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
+    function render() {
+      const app = document.getElementById('app')
+      
+      if (state.screen === 'loading') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="logo">💕</div>
+              <h1>Elite Connect</h1>
+              <p class="loading">Starting app</p>
+            </div>
+          </div>
+        `
+      } else if (state.screen === 'signin') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="logo">💕</div>
+              <h1>Elite Connect</h1>
+              <p>Verified connections, genuine hearts</p>
+              
+              ${state.error ? `
+                <div class="error-message">
+                  <strong>⚠️ Error:</strong><br>
+                  ${state.error}
+                </div>
+              ` : ''}
+              
+              ${state.loading ? `
+                <p class="loading">Verifying with World ID</p>
+                <div class="info-box">
+                  Please approve in World App...<br>
+                  Do NOT tap outside this app!
+                </div>
+              ` : `
+                <button onclick="handleSignIn()" ${state.loading ? 'disabled' : ''}>
+                  🌍 Sign in with World ID
+                </button>
+              `}
+              
+              <div class="info-box" style="margin-top: 2rem;">
+                <strong>✓</strong> Privacy-preserving verification<br>
+                <strong>✓</strong> One person, one profile<br>
+                <strong>✓</strong> Verified humans only
+              </div>
+
+              ${state.debugInfo.length > 0 ? `
+                <details style="margin-top: 1rem;">
+                  <summary style="color: #999; font-size: 0.75rem; cursor: pointer;">Debug Info</summary>
+                  <div style="font-size: 0.75rem; color: #666; margin-top: 0.5rem; max-height: 100px; overflow-y: auto;">
+                    ${state.debugInfo.slice(-10).map(info => `<div>${info}</div>`).join('')}
+                  </div>
+                </details>
+              ` : ''}
+            </div>
+          </div>
+        `
+      } else if (state.screen === 'profileSetup') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="logo">✨</div>
+              <h1>Create Your Profile</h1>
+              <p>Tell us about yourself</p>
+              
+              ${state.error ? `
+                <div class="error-message">${state.error}</div>
+              ` : ''}
+              
+              <form onsubmit="handleProfileSubmit(event)">
+                <label>Name *</label>
+                <input type="text" id="name" required placeholder="Your name" autocomplete="off">
+                
+                <label>Age *</label>
+                <input type="number" id="age" required min="18" max="100" placeholder="Your age">
+                
+                <label>Gender *</label>
+                <select id="gender" required>
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                
+                <label>Bio</label>
+                <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                
+                <label>Interests (comma-separated)</label>
+                <input type="text" id="interests" placeholder="e.g. hiking, music, travel">
+                
+                <button type="submit" style="margin-top: 1.5rem;">
+                  ✅ Create Profile
+                </button>
+              </form>
+            </div>
+          </div>
+        `
+      } else if (state.screen === 'success') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="logo">🎉</div>
+              <h1>Welcome to Elite Connect!</h1>
+              <div class="success-message">
+                <strong>✅ Profile Created Successfully!</strong><br><br>
+                You're all set! Your profile:<br>
+                <strong>${state.profile?.name}</strong>, ${state.profile?.age}<br>
+                ${state.profile?.bio ? `"${state.profile.bio}"` : ''}
+              </div>
+              <p style="color: #999; font-size: 0.875rem; margin-top: 2rem;">
+                In the full app, you would now see:<br>
+                • Swipe & Match system<br>
+                • Real-time chat<br>
+                • Premium subscriptions<br>
+                • And more!
+              </p>
+              <button onclick="location.reload()" style="margin-top: 1rem; background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                🔄 Restart Demo
+              </button>
+            </div>
+          </div>
+        `
       }
     }
 
     // ============================================
     // AUTH FUNCTIONS
     // ============================================
-    async function handleSignIn() {
+    window.handleSignIn = async function() {
       try {
-        console.log('🔐 Starting sign in...')
+        addDebug('🔐 Sign in started')
         state.error = null
+        state.loading = true
         render()
         
-        // ⚠️ CRITICAL: This must happen INSIDE World App
-        const { finalPayload } = await MiniKit.commandsAsync.verify({
+        // Small delay to show loading state
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        addDebug('📱 Calling MiniKit.verify...')
+        
+        // CRITICAL: Call verification with Device level
+        const result = await MiniKit.commandsAsync.verify({
           action: 'login',
           signal: '',
-          verification_level: VerificationLevel.Device  // ✅ Device level (no biometrics)
+          verification_level: VerificationLevel.Device
         })
 
-        console.log('✅ World ID verification complete')
-        console.log('Payload status:', finalPayload.status)
+        addDebug(`✅ MiniKit returned: ${result.finalPayload?.status || 'unknown'}`)
+
+        const { finalPayload } = result
 
         if (finalPayload.status === 'success') {
-          console.log('📤 Sending to backend...')
+          addDebug('📤 Sending to backend...')
           
           const data = await api('/api/auth/verify', {
             method: 'POST',
@@ -1831,43 +1728,29 @@
             })
           })
 
-          console.log('Backend response:', data)
-
           if (data.success) {
-            console.log('✅ Authentication successful!')
+            addDebug('✅ Backend auth successful')
             state.user = data.user
             state.token = data.token
+            state.loading = false
             localStorage.setItem('token', data.token)
             
             await loadProfile()
           } else {
-            console.error('❌ Backend error:', data.error)
-            state.error = data.error || 'Authentication failed'
-            render()
+            throw new Error(data.error || 'Backend authentication failed')
           }
+        } else if (finalPayload.status === 'error') {
+          throw new Error(finalPayload.error_message || 'World ID verification failed')
         } else {
-          console.error('❌ World ID verification failed:', finalPayload.status)
-          state.error = 'World ID verification failed'
-          render()
+          throw new Error('Verification cancelled or failed: ' + finalPayload.status)
         }
       } catch (error) {
-        console.error('❌ Sign in error:', error)
+        addDebug(`❌ Error: ${error.message}`)
         state.error = error.message || 'Sign in failed. Please try again.'
+        state.loading = false
+        state.screen = 'signin'
         render()
       }
-    }
-
-    async function handleLogout() {
-      localStorage.removeItem('token')
-      state = { 
-        ...state, 
-        screen: 'signin', 
-        user: null, 
-        profile: null, 
-        token: null,
-        error: null
-      }
-      render()
     }
 
     // ============================================
@@ -1875,640 +1758,103 @@
     // ============================================
     async function loadProfile() {
       try {
-        console.log('📋 Loading profile...')
+        addDebug('📋 Loading profile...')
         const data = await api('/api/profile/me')
         
         if (data.profile) {
-          console.log('✅ Profile found')
+          addDebug('✅ Profile found')
           state.profile = data.profile
-          state.screen = 'explore'
-          await loadExploreUsers()
+          state.screen = 'success'
         } else {
-          console.log('📝 No profile, showing setup')
+          addDebug('📝 No profile, showing setup')
           state.screen = 'profileSetup'
         }
         render()
       } catch (error) {
-        console.error('❌ Profile load error:', error)
+        addDebug(`⚠️ No profile: ${error.message}`)
         state.screen = 'profileSetup'
         render()
       }
     }
 
-    async function handleProfileSubmit(event) {
+    window.handleProfileSubmit = async function(event) {
       event.preventDefault()
+      
       try {
+        state.error = null
+        render()
+        
         const formData = {
-          name: document.getElementById('name').value,
-          age: document.getElementById('age').value,
+          name: document.getElementById('name').value.trim(),
+          age: parseInt(document.getElementById('age').value),
           gender: document.getElementById('gender').value,
-          bio: document.getElementById('bio').value,
-          interests: document.getElementById('interests')?.value.split(',').map(i => i.trim()).filter(Boolean) || []
+          bio: document.getElementById('bio').value.trim() || '',
+          interests: document.getElementById('interests')?.value
+            .split(',')
+            .map(i => i.trim())
+            .filter(Boolean) || []
         }
 
+        addDebug(`📤 Creating profile: ${formData.name}`)
+        
         const data = await api('/api/profile/create', {
           method: 'POST',
           body: JSON.stringify(formData)
         })
 
         if (data.success) {
+          addDebug('✅ Profile created!')
           state.profile = data.profile
-          state.screen = 'explore'
-          await loadExploreUsers()
+          state.screen = 'success'
           render()
         } else {
-          alert('Failed: ' + data.error)
+          throw new Error(data.error || 'Failed to create profile')
         }
       } catch (error) {
-        alert('Error: ' + error.message)
-      }
-    }
-
-    // ============================================
-    // EXPLORE FUNCTIONS
-    // ============================================
-    async function loadExploreUsers() {
-      try {
-        const data = await api('/api/explore/users', { method: 'POST' })
-        if (data.success) {
-          state.exploreUsers = data.users
-          state.currentUserIndex = 0
-        }
-      } catch (error) {
-        console.error('Error loading users:', error)
-      }
-    }
-
-    async function handleSwipe(action) {
-      if (state.currentUserIndex >= state.exploreUsers.length) {
-        await loadExploreUsers()
+        addDebug(`❌ Profile error: ${error.message}`)
+        state.error = error.message || 'Failed to create profile. Please try again.'
         render()
-        return
-      }
-
-      const currentUser = state.exploreUsers[state.currentUserIndex]
-      
-      try {
-        const data = await api('/api/explore/swipe', {
-          method: 'POST',
-          body: JSON.stringify({
-            target_user_id: currentUser.id,
-            action
-          })
-        })
-
-        if (data.success) {
-          if (data.is_match) {
-            showMatchModal(currentUser)
-          }
-          
-          state.currentUserIndex++
-          render()
-        }
-      } catch (error) {
-        console.error('Error swiping:', error)
-      }
-    }
-
-    function showMatchModal(user) {
-      const modal = document.createElement('div')
-      modal.className = 'match-modal'
-      modal.innerHTML = `
-        <div class="match-content">
-          <div class="logo">🎉</div>
-          <h1 style="color: white; font-size: 3rem;">It's a Match!</h1>
-          <p style="color: white; font-size: 1.2rem; margin: 1rem 0;">
-            You and ${user.name} liked each other!
-          </p>
-          <button onclick="closeMatchModal()">Send Message</button>
-          <button class="btn-secondary" onclick="closeMatchModal(); changeScreen('explore')">Keep Swiping</button>
-        </div>
-      `
-      document.body.appendChild(modal)
-      
-      window.closeMatchModal = () => {
-        modal.remove()
-        changeScreen('matches')
       }
     }
 
     // ============================================
-    // MATCHES FUNCTIONS
-    // ============================================
-    async function loadMatches() {
-      try {
-        const data = await api('/api/explore/matches')
-        if (data.success) {
-          state.matches = data.matches
-          render()
-        }
-      } catch (error) {
-        console.error('Error loading matches:', error)
-      }
-    }
-
-    // ============================================
-    // CHAT FUNCTIONS
-    // ============================================
-    async function loadConversations() {
-      try {
-        const data = await api('/api/chat/conversations')
-        if (data.success) {
-          state.conversations = data.conversations
-          render()
-        }
-      } catch (error) {
-        console.error('Error loading conversations:', error)
-      }
-    }
-
-    async function openChat(matchId) {
-      state.currentMatch = matchId
-      await loadMessages(matchId)
-      render()
-    }
-
-    function closeChat() {
-      state.currentMatch = null
-      render()
-    }
-
-    async function loadMessages(matchId) {
-      try {
-        const data = await api(`/api/chat/messages/${matchId}`)
-        if (data.success) {
-          state.messages = data.messages
-          render()
-          setTimeout(scrollToBottom, 100)
-        }
-      } catch (error) {
-        console.error('Error loading messages:', error)
-      }
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('messageInput')
-      const text = input.value.trim()
-      if (!text) return
-
-      try {
-        const data = await api('/api/chat/send', {
-          method: 'POST',
-          body: JSON.stringify({
-            match_id: state.currentMatch,
-            text
-          })
-        })
-
-        if (data.success) {
-          input.value = ''
-          await loadMessages(state.currentMatch)
-        }
-      } catch (error) {
-        console.error('Error sending message:', error)
-      }
-    }
-
-    function scrollToBottom() {
-      const messagesDiv = document.getElementById('messages')
-      if (messagesDiv) {
-        messagesDiv.scrollTop = messagesDiv.scrollHeight
-      }
-    }
-
-    // ============================================
-    // SUBSCRIPTION FUNCTIONS
-    // ============================================
-    async function loadSubscriptionInfo() {
-      try {
-        const [plansData, statusData] = await Promise.all([
-          api('/api/subscription/plans'),
-          api('/api/subscription/status')
-        ])
-        
-        if (plansData.success) state.plans = plansData.plans
-        if (statusData.success) state.subscription = statusData.subscription
-        
-        render()
-      } catch (error) {
-        console.error('Error loading subscription:', error)
-      }
-    }
-
-    async function subscribe(planId) {
-      try {
-        const data = await api('/api/subscription/subscribe', {
-          method: 'POST',
-          body: JSON.stringify({ plan: planId })
-        })
-
-        if (data.success) {
-          alert('✅ Subscription successful!')
-          await loadSubscriptionInfo()
-        } else {
-          alert('Failed: ' + data.error)
-        }
-      } catch (error) {
-        alert('Error: ' + error.message)
-      }
-    }
-
-    // ============================================
-    // NAVIGATION
-    // ============================================
-    window.changeScreen = function(screen) {
-      state.screen = screen
-      state.error = null
-      
-      if (screen === 'explore') {
-        loadExploreUsers()
-      } else if (screen === 'matches') {
-        loadMatches()
-      } else if (screen === 'chat') {
-        state.currentMatch = null
-        loadConversations()
-      } else if (screen === 'subscription') {
-        loadSubscriptionInfo()
-      }
-      
-      render()
-    }
-
-    window.handleSignIn = handleSignIn
-    window.handleLogout = handleLogout
-    window.handleProfileSubmit = handleProfileSubmit
-    window.handleSwipe = handleSwipe
-    window.openChat = openChat
-    window.closeChat = closeChat
-    window.sendMessage = sendMessage
-    window.subscribe = subscribe
-
-    // ============================================
-    // RENDER FUNCTIONS
-    // ============================================
-    function renderLoading() {
-      return `
-        <div class="container">
-          <div class="card">
-            <div class="logo">💕</div>
-            <h1>Elite Connect</h1>
-            <p class="text-center">Initializing...</p>
-          </div>
-        </div>
-      `
-    }
-
-    function renderSignIn() {
-      return `
-        <div class="container">
-          <div class="card">
-            <div class="logo">💕</div>
-            <h1>Elite Connect</h1>
-            <p class="text-center">Verified connections, genuine hearts</p>
-            
-            ${state.error ? `
-              <div class="error-message">
-                ⚠️ ${state.error}
-              </div>
-            ` : ''}
-            
-            <button onclick="handleSignIn()">
-              🌍 Sign in with World ID
-            </button>
-            
-            <div class="text-center mt-3" style="font-size: 0.875rem; color: #666;">
-              <p>✓ Privacy-preserving verification</p>
-              <p>✓ One person, one profile</p>
-              <p>✓ Verified humans only</p>
-            </div>
-          </div>
-        </div>
-      `
-    }
-
-    function renderProfileSetup() {
-      return `
-        <div class="container">
-          <div class="card">
-            <div class="logo">✨</div>
-            <h1>Create Your Profile</h1>
-            <p class="text-center">Tell us about yourself</p>
-            <form onsubmit="handleProfileSubmit(event)">
-              <label>Name *</label>
-              <input type="text" id="name" required placeholder="Your name">
-              
-              <label>Age *</label>
-              <input type="number" id="age" required min="18" max="100" placeholder="Your age">
-              
-              <label>Gender *</label>
-              <select id="gender" required>
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-              
-              <label>Bio</label>
-              <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
-              
-              <label>Interests (comma-separated)</label>
-              <input type="text" id="interests" placeholder="e.g. hiking, music, travel">
-              
-              <button type="submit" class="mt-2">✅ Create Profile</button>
-            </form>
-          </div>
-        </div>
-      `
-    }
-
-    function renderExplore() {
-      const currentUser = state.exploreUsers[state.currentUserIndex]
-      
-      if (!currentUser) {
-        return `
-          <div class="screen">
-            <div class="screen-content">
-              <div class="empty-state">
-                <div class="logo">🔍</div>
-                <h2>No More Users</h2>
-                <p>Check back later for more profiles!</p>
-                <button onclick="changeScreen('explore')" class="mt-2">🔄 Refresh</button>
-              </div>
-            </div>
-          </div>
-          ${renderNav('explore')}
-        `
-      }
-
-      const emoji = currentUser.gender === 'male' ? '👨' : currentUser.gender === 'female' ? '👩' : '🧑'
-      
-      return `
-        <div class="screen">
-          <div class="screen-content">
-            <h2 class="text-center mb-2">Discover</h2>
-            <div class="swipe-container">
-              <div class="swipe-card">
-                <div class="swipe-photo">${emoji}</div>
-                <h2>${currentUser.name}, ${currentUser.age}</h2>
-                <p style="color: #999;">${currentUser.bio || 'No bio yet'}</p>
-                ${currentUser.interests && currentUser.interests.length > 0 ? `
-                  <div style="margin-top: 1rem;">
-                    ${currentUser.interests.map(i => `<span class="badge">${i}</span>`).join(' ')}
-                  </div>
-                ` : ''}
-                <div class="swipe-actions">
-                  <button class="swipe-btn btn-danger" onclick="handleSwipe('pass')">✖️</button>
-                  <button class="swipe-btn btn-success" onclick="handleSwipe('like')">💚</button>
-                  <button class="swipe-btn btn-secondary" onclick="handleSwipe('super_like')">⭐</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        ${renderNav('explore')}
-      `
-    }
-
-    function renderMatches() {
-      return `
-        <div class="screen">
-          <div class="screen-content">
-            <h2 class="mb-2">Your Matches</h2>
-            ${state.matches.length === 0 ? `
-              <div class="empty-state">
-                <div class="logo">💔</div>
-                <p>No matches yet. Keep swiping!</p>
-                <button onclick="changeScreen('explore')" class="mt-2">Start Swiping</button>
-              </div>
-            ` : `
-              ${state.matches.map(match => {
-                const emoji = match.user.gender === 'male' ? '👨' : match.user.gender === 'female' ? '👩' : '🧑'
-                return `
-                  <div class="list-item" onclick="openChat('${match.match_id}')">
-                    <div class="list-avatar">${emoji}</div>
-                    <div class="list-info">
-                      <div class="list-name">${match.user.name}, ${match.user.age}</div>
-                      <div class="list-detail">Matched ${new Date(match.matched_at).toLocaleDateString()}</div>
-                    </div>
-                  </div>
-                `
-              }).join('')}
-            `}
-          </div>
-        </div>
-        ${renderNav('matches')}
-      `
-    }
-
-    function renderChat() {
-      if (!state.currentMatch) {
-        return `
-          <div class="screen">
-            <div class="screen-content">
-              <h2 class="mb-2">Messages</h2>
-              ${state.conversations.length === 0 ? `
-                <div class="empty-state">
-                  <div class="logo">💬</div>
-                  <p>No conversations yet</p>
-                  <button onclick="changeScreen('matches')" class="mt-2">View Matches</button>
-                </div>
-              ` : `
-                ${state.conversations.map(conv => {
-                  const emoji = conv.user?.gender === 'male' ? '👨' : conv.user?.gender === 'female' ? '👩' : '🧑'
-                  return `
-                    <div class="list-item" onclick="openChat('${conv.match_id}')">
-                      <div class="list-avatar">${emoji}</div>
-                      <div class="list-info">
-                        <div class="list-name">${conv.user?.name || 'User'}</div>
-                        <div class="list-detail">
-                          ${conv.last_message ? (conv.last_message.is_mine ? 'You: ' : '') + conv.last_message.text.substring(0, 40) + '...' : 'Say hi!'}
-                        </div>
-                      </div>
-                      ${conv.unread_count > 0 ? `<span class="badge">${conv.unread_count}</span>` : ''}
-                    </div>
-                  `
-                }).join('')}
-              `}
-            </div>
-          </div>
-          ${renderNav('chat')}
-        `
-      }
-
-      const conversation = state.conversations.find(c => c.match_id === state.currentMatch)
-      const userName = conversation?.user?.name || 'User'
-      
-      return `
-        <div class="screen">
-          <div class="screen-content">
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: white; padding: 1rem; border-radius: 12px;">
-              <button onclick="closeChat()" class="btn-small">← Back</button>
-              <h2 style="margin: 0;">${userName}</h2>
-            </div>
-            <div class="chat-messages" id="messages">
-              ${state.messages.length === 0 ? `
-                <p class="text-center" style="color: #999;">No messages yet. Say hi!</p>
-              ` : `
-                ${state.messages.map(msg => `
-                  <div class="message ${msg.is_mine ? 'own' : 'other'}">
-                    <p>${msg.text}</p>
-                    <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
-                  </div>
-                `).join('')}
-              `}
-            </div>
-            <div class="message-input-container">
-              <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="Type a message..." 
-                onkeypress="if(event.key==='Enter') sendMessage()"
-              >
-              <button onclick="sendMessage()">Send</button>
-            </div>
-          </div>
-        </div>
-        ${renderNav('chat')}
-      `
-    }
-
-    function renderSubscription() {
-      return `
-        <div class="screen">
-          <div class="screen-content">
-            <h2 class="mb-2">Premium Plans</h2>
-            ${state.subscription ? `
-              <div class="plan-card featured">
-                <div class="plan-badge">ACTIVE</div>
-                <h3>${state.subscription.plan.toUpperCase()}</h3>
-                <div class="plan-price">Active</div>
-                <p>Expires: ${new Date(state.subscription.expires_at).toLocaleDateString()}</p>
-              </div>
-            ` : ''}
-            ${state.plans.map(plan => `
-              <div class="plan-card ${plan.id === 'premium' ? 'featured' : ''}">
-                ${plan.id === 'premium' ? '<div class="plan-badge">POPULAR</div>' : ''}
-                <h3>${plan.name}</h3>
-                <div class="plan-price">$${plan.price}<span style="font-size: 1rem;">/mo</span></div>
-                <ul class="plan-features">
-                  ${plan.features.unlimited_likes ? '<li>Unlimited Likes</li>' : ''}
-                  ${plan.features.super_likes > 0 ? `<li>${plan.features.super_likes} Super Likes</li>` : ''}
-                  ${plan.features.rewind ? '<li>Rewind</li>' : ''}
-                  ${plan.features.see_who_liked_you ? '<li>See Who Liked You</li>' : ''}
-                  ${plan.features.boost > 0 ? `<li>${plan.features.boost} Boosts</li>` : ''}
-                  ${plan.features.no_ads ? '<li>No Ads</li>' : ''}
-                </ul>
-                <button onclick="subscribe('${plan.id}')" ${state.subscription ? 'disabled' : ''}>
-                  ${state.subscription ? 'Subscribed' : 'Subscribe'}
-                </button>
-              </div>
-            `).join('')}
-            <div class="text-center mt-3">
-              <button class="btn-secondary" onclick="changeScreen('explore')">Back to App</button>
-            </div>
-          </div>
-        </div>
-        ${renderNav('subscription')}
-      `
-    }
-
-    function renderNav(active) {
-      return `
-        <div class="nav">
-          <button class="nav-btn ${active === 'explore' ? 'active' : ''}" onclick="changeScreen('explore')">
-            <span>🔥</span>
-            Explore
-          </button>
-          <button class="nav-btn ${active === 'matches' ? 'active' : ''}" onclick="changeScreen('matches')">
-            <span>💕</span>
-            Matches
-          </button>
-          <button class="nav-btn ${active === 'chat' ? 'active' : ''}" onclick="changeScreen('chat')">
-            <span>💬</span>
-            Chat
-          </button>
-          <button class="nav-btn ${active === 'subscription' ? 'active' : ''}" onclick="changeScreen('subscription')">
-            <span>⭐</span>
-            Premium
-          </button>
-        </div>
-      `
-    }
-
-    // ============================================
-    // MAIN RENDER
-    // ============================================
-    function render() {
-      const app = document.getElementById('app')
-      let html = ''
-
-      switch (state.screen) {
-        case 'loading':
-          html = renderLoading()
-          break
-        case 'signin':
-          html = renderSignIn()
-          break
-        case 'profileSetup':
-          html = renderProfileSetup()
-          break
-        case 'explore':
-          html = renderExplore()
-          break
-        case 'matches':
-          html = renderMatches()
-          break
-        case 'chat':
-          html = renderChat()
-          break
-        case 'subscription':
-          html = renderSubscription()
-          break
-      }
-
-      app.innerHTML = html
-    }
-
-    // ============================================
-    // INIT
+    // INITIALIZATION
     // ============================================
     async function init() {
-      console.log('🚀 App initialization started')
-      console.log('📍 Running inside World App')
+      addDebug('🚀 App initializing...')
       
       setTimeout(async () => {
         try {
-          // Check if MiniKit is properly installed
-          console.log('🔍 Checking MiniKit installation...')
-          
-          // Check for existing token
           if (state.token) {
-            console.log('🔑 Token found - loading profile')
+            addDebug('🔑 Token found')
             try {
               await loadProfile()
             } catch (error) {
-              console.error('❌ Profile load failed:', error)
+              addDebug('⚠️ Profile load failed, show sign in')
               state.screen = 'signin'
               render()
             }
           } else {
-            console.log('🔐 No token - showing sign in')
+            addDebug('🔐 No token, show sign in')
             state.screen = 'signin'
             render()
           }
         } catch (error) {
-          console.error('❌ Init error:', error)
+          addDebug(`❌ Init error: ${error.message}`)
           state.screen = 'signin'
+          state.error = 'Initialization failed'
           render()
         }
       }, 1000)
     }
 
-    // Start app
+    // ============================================
+    // START APP
+    // ============================================
+    addDebug('✅ Elite Connect loaded')
+    addDebug('📱 Environment: World App')
     render()
     init()
-    
-    console.log('✅ Elite Connect loaded!')
   </script>
 </body>
 </html>
