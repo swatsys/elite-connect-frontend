@@ -1322,7 +1322,7 @@
     // CONFIGURATION
     // ============================================
     const APP_ID = 'app_486e187afe7bc69a19456a3fa901a162' // ⚠️ CHANGE THIS
-    const API_URL = 'https://elite-connect-backend-ktv9.onrender.com/api'// ⚠️ CHANGE THIS
+    const API_URL = 'http://localhost:5002' // ⚠️ CHANGE THIS
 
     console.log('🚀 Elite Connect initializing...')
     MiniKit.install(APP_ID)
@@ -1367,15 +1367,16 @@
     // ============================================
     async function handleSignIn() {
       try {
-        console.log('🔐 Starting sign in...')
+        console.log('🔐 Starting sign in with ORB verification...')
         state.error = null
         state.loading = true
         render()
         
+        // ⚠️ USING ORB VERIFICATION - THIS WORKED FOR YOU!
         const { finalPayload } = await MiniKit.commandsAsync.verify({
           action: 'login',
           signal: '',
-          verification_level: VerificationLevel.Device
+          verification_level: VerificationLevel.Orb  // ✅ ORB - NOT DEVICE!
         })
 
         console.log('✅ World ID verification:', finalPayload.status)
@@ -1459,7 +1460,7 @@
         if (data.success) {
           console.log('✅ Profile created!')
           state.profile = data.profile
-          state.screen = 'explore'  // ✅ NAVIGATE TO EXPLORE PAGE
+          state.screen = 'explore'
           await loadExploreUsers()
           render()
         } else {
@@ -1643,7 +1644,7 @@
               <button onclick="handleSignIn()">🌍 Sign in with World ID</button>
               
               <div class="info-box" style="margin-top: 2rem;">
-                <strong>✓</strong> Privacy-preserving verification<br>
+                <strong>✓</strong> Orb-verified authentication<br>
                 <strong>✓</strong> One person, one profile<br>
                 <strong>✓</strong> Verified humans only
               </div>
@@ -1883,7 +1884,7 @@
 
     render()
     init()
-    console.log('✅ Elite Connect loaded!')
+    console.log('✅ Elite Connect loaded with ORB verification!')
   </script>
 </body>
 </html>
