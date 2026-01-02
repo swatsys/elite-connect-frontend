@@ -4007,7 +4007,6 @@
       overflow-y: auto;
     }
     
-    /* Rest of your existing styles... */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
@@ -4291,9 +4290,10 @@
 
   <!-- MiniKit SDK from CDN -->
   <script type="module">
-   import { MiniKit } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js/+esm'
-  
-  console.log('🚀 Elite Connect - Starting...')
+    import { MiniKit } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.0.2/+esm'
+    
+    console.log('🚀 Elite Connect - Starting...')
+    console.log('📦 MiniKit imported')
     
     // Make MiniKit globally available
     window.MiniKit = MiniKit
@@ -4302,16 +4302,22 @@
     // CONFIGURATION
     // ============================================
     const CONFIG = {
-      API_URL: 'https://elite-connect-backend-ktv9.onrender.com',  // Replace with your deployed backend URL
-      APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',         // Replace with your World Portal APP_ID
-      ACTION_ID: 'signin' // Replace with your action ID
+      API_URL: 'https://elite-connect-backend-ktv9.onrender.com',  // ✅ NO /api at end
+      APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',
+      ACTION_ID: 'signin'
     }
+    
+    console.log('⚙️ Config loaded:', {
+      API_URL: CONFIG.API_URL,
+      APP_ID: CONFIG.APP_ID,
+      ACTION_ID: CONFIG.ACTION_ID
+    })
     
     // ============================================
     // STATE
     // ============================================
     let state = {
-      screen: 'checking',  // checking | signin | profile-setup | home | explore | chat | chat-conversation | profile
+      screen: 'checking',
       user: null,
       profile: null,
       token: localStorage.getItem('elite_token'),
@@ -4329,6 +4335,7 @@
     // ============================================
     function initMiniKit() {
       try {
+        console.log('🔧 Installing MiniKit...')
         MiniKit.install(CONFIG.APP_ID)
         state.isWorldApp = MiniKit.isInstalled()
         
@@ -4337,7 +4344,10 @@
         console.log('💰 Wallet:', MiniKit.walletAddress || 'Not connected')
         
         if (state.isWorldApp) {
+          console.log('✅ Running inside World App')
           setupWorldIDListener()
+        } else {
+          console.log('⚠️ Not running in World App')
         }
       } catch (error) {
         console.error('❌ MiniKit installation error:', error)
@@ -4349,14 +4359,19 @@
     // WORLD ID AUTHENTICATION
     // ============================================
     function setupWorldIDListener() {
+      console.log('🎧 Setting up World ID listener...')
+      
       MiniKit.subscribe('miniAppVerifyAction', async (payload) => {
-        console.log('🔐 World ID Response:', payload)
+        console.log('🔐 World ID Response received:', payload)
         
         if (payload.status === 'error') {
           console.error('❌ World ID error:', payload)
           alert('Verification failed. Please try again.')
           return
         }
+        
+        console.log('✅ World ID verification successful on frontend')
+        console.log('📤 Sending proof to backend...')
         
         // Send proof to backend for verification
         try {
@@ -4369,24 +4384,30 @@
             })
           })
           
+          console.log('📡 Backend response status:', response.status)
+          
           const data = await response.json()
-          console.log('✅ Backend response:', data)
+          console.log('📥 Backend response data:', data)
           
           if (data.success) {
+            console.log('✅ Backend verification successful!')
             state.user = data.user
             state.token = data.token
             localStorage.setItem('elite_token', data.token)
             
             if (data.hasProfile) {
+              console.log('✅ User has profile, loading home...')
               state.profile = data.profile
               state.screen = 'home'
               await loadUsers()
             } else {
+              console.log('ℹ️ No profile found, showing setup...')
               state.screen = 'profile-setup'
             }
             
             render()
           } else {
+            console.error('❌ Backend verification failed:', data.error)
             alert('Authentication failed: ' + (data.error || 'Unknown error'))
           }
         } catch (error) {
@@ -4394,27 +4415,39 @@
           alert('Failed to verify with backend. Please check your connection.')
         }
       })
+      
+      console.log('✅ World ID listener setup complete')
     }
     
     function triggerWorldIDVerify() {
       if (!state.isWorldApp) {
+        console.error('❌ Cannot verify - not in World App')
         alert('This app must be opened in World App')
         return
       }
       
       console.log('🔐 Triggering World ID verification...')
+      console.log('Action ID:', CONFIG.ACTION_ID)
       
-      MiniKit.commands.verify({
-        action: CONFIG.ACTION_ID,
-        verification_level: 'orb' // Only Orb-verified users
-      })
+      try {
+        MiniKit.commands.verify({
+          action: CONFIG.ACTION_ID,
+          verification_level: 'orb'
+        })
+        console.log('✅ World ID verification command sent')
+      } catch (error) {
+        console.error('❌ Error triggering verification:', error)
+        alert('Failed to start verification: ' + error.message)
+      }
     }
     
     // ============================================
-    // API HELPER
+    // API HELPER WITH TIMEOUT
     // ============================================
     async function api(endpoint, options = {}) {
       const url = endpoint.startsWith('http') ? endpoint : `${CONFIG.API_URL}${endpoint}`
+      
+      console.log('🌐 API call:', url)
       
       const defaultOptions = {
         headers: {
@@ -4423,35 +4456,62 @@
         }
       }
       
-      const response = await fetch(url, { ...defaultOptions, ...options })
+      // Add 15 second timeout (Render can take time to wake up)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
       
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
+      try {
+        const response = await fetch(url, { 
+          ...defaultOptions, 
+          ...options,
+          signal: controller.signal 
+        })
+        
+        clearTimeout(timeoutId)
+        
+        console.log('📡 Response status:', response.status)
+        
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        console.log('✅ API success:', endpoint)
+        return data
+      } catch (error) {
+        clearTimeout(timeoutId)
+        if (error.name === 'AbortError') {
+          console.error('⏱️ Request timeout - backend may be sleeping')
+          throw new Error('Request timeout - backend may be waking up (Render free tier). Please try again in 30 seconds.')
+        }
+        console.error('❌ API error:', error)
+        throw error
       }
-      
-      return response.json()
     }
     
     // ============================================
-    // YOUR EXISTING FUNCTIONS
-    // (loadUsers, createProfile, swipe, etc.)
+    // DATA LOADING FUNCTIONS
     // ============================================
     
     async function loadUsers() {
       try {
+        console.log('📥 Loading users...')
         const data = await api('/api/explore/users', { method: 'POST' })
         if (data.success) {
           state.users = data.users
           state.currentUserIndex = 0
+          console.log('✅ Loaded', data.users.length, 'users')
           render()
         }
       } catch (error) {
-        console.error('Error loading users:', error)
+        console.error('❌ Error loading users:', error)
+        alert('Failed to load users: ' + error.message)
       }
     }
     
     async function loadAllUsers() {
       try {
+        console.log('📥 Loading all users for chat...')
         const usersData = await api('/api/explore/users', { method: 'POST' })
         const likedData = await api('/api/explore/liked')
         
@@ -4469,15 +4529,18 @@
             return 0
           })
           
+          console.log('✅ Loaded', state.allUsers.length, 'users for chat')
           render()
         }
       } catch (error) {
-        console.error('Error loading all users:', error)
+        console.error('❌ Error loading all users:', error)
       }
     }
     
     async function createProfile(e) {
       e.preventDefault()
+      console.log('📝 Creating profile...')
+      
       try {
         const formData = {
           name: document.getElementById('name').value,
@@ -4489,6 +4552,8 @@
             .map(i => i.trim())
             .filter(Boolean)
         }
+        
+        console.log('Form data:', formData)
 
         const data = await api('/api/profile/create', {
           method: 'POST',
@@ -4496,19 +4561,28 @@
         })
 
         if (data.success) {
+          console.log('✅ Profile created successfully')
           state.profile = data.profile
           state.screen = 'home'
           await loadUsers()
           render()
         } else {
+          console.error('❌ Profile creation failed:', data.error)
           alert('Error: ' + data.error)
         }
       } catch (error) {
+        console.error('❌ Error creating profile:', error)
         alert('Error: ' + error.message)
       }
     }
     
+    // ============================================
+    // SWIPE FUNCTIONS
+    // ============================================
+    
     function showConfirmation(action, userName) {
+      console.log('❓ Showing confirmation:', action, 'for', userName)
+      
       const modal = document.getElementById('confirmModal')
       const title = document.getElementById('modalTitle')
       const message = document.getElementById('modalMessage')
@@ -4526,12 +4600,14 @@
     }
 
     function cancelAction() {
+      console.log('❌ Action cancelled')
       const modal = document.getElementById('confirmModal')
       modal.classList.remove('show')
       state.pendingAction = null
     }
 
     async function confirmAction() {
+      console.log('✅ Action confirmed:', state.pendingAction)
       const modal = document.getElementById('confirmModal')
       modal.classList.remove('show')
       await executeSwipe(state.pendingAction)
@@ -4551,6 +4627,7 @@
 
     async function swipe(action) {
       if (state.currentUserIndex >= state.users.length) {
+        console.log('🔄 No more users, reloading...')
         await loadUsers()
         return
       }
@@ -4559,6 +4636,7 @@
 
     async function executeSwipe(action) {
       const user = state.users[state.currentUserIndex]
+      console.log('👉 Swiping', action, 'on', user.name)
       
       try {
         const data = await api('/api/explore/swipe', {
@@ -4567,17 +4645,25 @@
         })
 
         if (data.success && data.is_match) {
+          console.log('🎉 Match with', user.name)
           alert(`🎉 It's a Match with ${user.name}!`)
         }
         
         state.currentUserIndex++
+        console.log('➡️ Moving to next user')
         render()
       } catch (error) {
-        console.error('Swipe error:', error)
+        console.error('❌ Swipe error:', error)
+        alert('Failed to swipe: ' + error.message)
       }
     }
     
+    // ============================================
+    // CHAT FUNCTIONS
+    // ============================================
+    
     async function openChatWithUser(userId, userName) {
+      console.log('💬 Opening chat with', userName)
       state.currentChatUser = { id: userId, name: userName }
       await loadMessagesWithUser(userId)
       state.screen = 'chat-conversation'
@@ -4586,9 +4672,11 @@
 
     async function loadMessagesWithUser(userId) {
       try {
+        console.log('📥 Loading messages with user:', userId)
         const data = await api(`/api/chat/messages/user/${userId}`)
         if (data.success) {
           state.messages = data.messages || []
+          console.log('✅ Loaded', state.messages.length, 'messages')
         } else {
           state.messages = []
         }
@@ -4598,7 +4686,7 @@
           if (div) div.scrollTop = div.scrollHeight
         }, 100)
       } catch (error) {
-        console.error('Error loading messages:', error)
+        console.error('❌ Error loading messages:', error)
         state.messages = []
         render()
       }
@@ -4610,6 +4698,8 @@
       
       const text = input.value.trim()
       if (!text) return
+      
+      console.log('📤 Sending message:', text)
 
       api('/api/chat/send-direct', {
         method: 'POST',
@@ -4620,19 +4710,26 @@
       })
       .then(data => {
         if (data.success) {
+          console.log('✅ Message sent')
           input.value = ''
           loadMessagesWithUser(state.currentChatUser.id)
         } else {
+          console.error('❌ Send failed:', data.error)
           alert('Failed to send: ' + (data.error || 'Unknown error'))
         }
       })
       .catch(error => {
-        console.error('Send error:', error)
+        console.error('❌ Send error:', error)
         alert('Error: ' + error.message)
       })
     }
     
+    // ============================================
+    // NAVIGATION FUNCTIONS
+    // ============================================
+    
     function goTo(screen) {
+      console.log('🧭 Navigating to:', screen)
       state.screen = screen
       
       if (screen === 'home') loadUsers()
@@ -4643,6 +4740,7 @@
     }
 
     function logout() {
+      console.log('🚪 Logging out...')
       localStorage.removeItem('elite_token')
       state = {
         screen: 'signin',
@@ -4687,6 +4785,7 @@
     }
 
     function render() {
+      console.log('🎨 Rendering screen:', state.screen)
       const app = document.getElementById('app')
       
       // CHECKING SCREEN
@@ -4721,6 +4820,9 @@
                   <strong>For Developers:</strong><br>
                   Testing locally? Use ngrok or expose your local server, then update the App URL in World Developer Portal.
                 </div>
+                <button onclick="localStorage.clear(); location.reload()">
+                  🗑️ Clear Cache & Reload
+                </button>
               </div>
             </div>
           </div>
@@ -4806,7 +4908,7 @@
         `
       }
       
-      // HOME & EXPLORE SCREENS (your existing code)
+      // HOME & EXPLORE SCREENS
       else if (state.screen === 'home' || state.screen === 'explore') {
         const user = state.users[state.currentUserIndex]
         const title = state.screen === 'home' ? '🏠 Home' : '🔥 Explore'
@@ -4881,7 +4983,7 @@
           <div class="container">
             <div class="card">
               <div class="content">
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-top: 2px solid #e0e0e0;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #e0e0e0;">
                   <button class="btn-small btn-secondary" onclick="goTo('chat')">← Back</button>
                   <h2 style="margin: 0;">${state.currentChatUser?.name || 'Chat'}</h2>
                 </div>
@@ -4943,7 +5045,7 @@
     }
     
     // ============================================
-    // EXPOSE FUNCTIONS
+    // EXPOSE FUNCTIONS TO WINDOW
     // ============================================
     window.createProfile = createProfile
     window.swipe = swipe
@@ -4958,40 +5060,54 @@
     window.triggerWorldIDVerify = triggerWorldIDVerify
     
     // ============================================
-    // INIT
+    // INIT - SHOWS SIGNIN IMMEDIATELY
     // ============================================
     async function init() {
+      console.log('🚀 Init starting...')
+      
       // Initialize MiniKit
       initMiniKit()
       
+      console.log('📱 Is World App:', state.isWorldApp)
+      
       // Check if in World App
       if (!state.isWorldApp) {
+        console.log('❌ Not in World App - showing error')
         state.screen = 'not-world-app'
         render()
         return
       }
       
-      // Check if has token
+      console.log('✅ In World App!')
+      
+      // ✅ SHOW SIGN-IN SCREEN IMMEDIATELY (DON'T WAIT FOR BACKEND)
+      state.screen = 'signin'
+      render()
+      
+      console.log('✅ Sign-in screen rendered')
+      
+      // Try to restore session in background (optional)
       if (state.token) {
+        console.log('🔑 Found token, attempting auto-login in background...')
         try {
-          // Verify token is still valid
           const data = await api('/api/profile/me')
+          console.log('✅ Token valid, auto-logging in')
           if (data.profile) {
             state.profile = data.profile
             state.screen = 'home'
             await loadUsers()
-          } else {
-            state.screen = 'profile-setup'
+            render()
           }
         } catch (error) {
-          // Token invalid, show signin
-          state.screen = 'signin'
+          console.log('❌ Token invalid or backend unavailable:', error.message)
+          console.log('User can still sign in manually')
+          // Stay on signin screen - user can click "Sign in with World ID"
         }
       } else {
-        state.screen = 'signin'
+        console.log('ℹ️ No token found - waiting for user to sign in')
       }
       
-      render()
+      console.log('✅ Init complete!')
     }
     
     init()
