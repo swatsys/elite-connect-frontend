@@ -3969,29 +3969,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Elite Connect - Testing Version</title>
+  <title>Elite Connect - World Mini App</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overscroll-behavior: none;
+      overflow: hidden;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 1rem;
     }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
     .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      min-height: 700px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-top: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 0 0 20px 20px;
+      flex-shrink: 0;
+    }
+    
+    .nav-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: #999;
+      transition: all 0.2s;
+    }
+    
+    .nav-icon:hover { transform: scale(1.1); }
+    .nav-icon.active { color: #8b5cf6; }
+    .nav-icon span { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .nav-icon small { font-size: 0.7rem; }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.show { display: flex; }
+    
+    .modal-content {
       background: white;
       padding: 2rem;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      max-width: 500px;
-      width: 100%;
+      max-width: 400px;
+      width: 90%;
       text-align: center;
     }
-    .logo { font-size: 4rem; margin-bottom: 1rem; }
-    h1 { color: #8b5cf6; margin-bottom: 0.5rem; }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .modal-buttons button {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .logo { font-size: 4rem; text-align: center; margin-bottom: 1rem; }
+    
+    h1 {
+      text-align: center;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    
     button {
       width: 100%;
       padding: 1rem;
@@ -4002,30 +4091,174 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 1rem;
       transition: transform 0.2s;
+      margin-top: 1rem;
     }
+    
     button:hover { transform: scale(1.02); }
+    button:active { transform: scale(0.98); }
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-    .info {
-      background: #f0fdf4;
-      padding: 1rem;
-      border-radius: 8px;
-      margin: 1rem 0;
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+    
+    .btn-cancel {
+      background: #ef4444;
+    }
+    
+    .btn-small {
+      padding: 0.5rem 1rem;
+      width: auto;
       font-size: 0.9rem;
-      text-align: left;
     }
-    .warning {
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      margin: 0.5rem 0 1rem;
+      font-size: 1rem;
+    }
+    
+    .user-card {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    
+    .user-photo {
+      font-size: 8rem;
+      margin: 1rem 0;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: #f3e8ff;
+      color: #8b5cf6;
+      border-radius: 20px;
+      margin: 0.25rem;
+      font-size: 0.9rem;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .action-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      font-size: 2rem;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .action-btn.pass { background: #ef4444; }
+    .action-btn.like { background: #22c55e; }
+    .action-btn.super { background: #fbbf24; }
+    
+    .empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #666;
+    }
+    
+    .user-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .user-item:hover {
+      border-color: #8b5cf6;
+      background: #f9fafb;
+    }
+    
+    .user-avatar {
+      font-size: 3rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3e8ff;
+      border-radius: 50%;
+    }
+    
+    .chat-messages {
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+    
+    .message {
+      max-width: 70%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      background: white;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .message.own {
+      margin-left: auto;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: white;
+      border-color: transparent;
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    
+    .message-input {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .message-input input {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .message-input button {
+      width: auto;
+      padding: 0.75rem 1.5rem;
+      margin: 0;
+    }
+    
+    .info {
       background: #fef3c7;
-      color: #92400e;
       padding: 1rem;
       border-radius: 8px;
-      margin: 1rem 0;
-      text-align: left;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      text-align: center;
     }
+    
     .error {
       background: #fee2e2;
       color: #dc2626;
@@ -4033,6 +4266,7 @@
       border-radius: 8px;
       margin: 1rem 0;
     }
+    
     .success {
       background: #d1fae5;
       color: #059669;
@@ -4040,97 +4274,91 @@
       border-radius: 8px;
       margin: 1rem 0;
     }
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin: 0.25rem;
-    }
-    .badge-orb {
-      background: #fbbf24;
-      color: #78350f;
-    }
-    .badge-device {
-      background: #93c5fd;
-      color: #1e40af;
-    }
-    pre {
-      background: #1f2937;
-      color: #10b981;
-      padding: 1rem;
-      border-radius: 8px;
-      overflow-x: auto;
-      text-align: left;
-      font-size: 0.75rem;
-      margin: 1rem 0;
-    }
   </style>
 </head>
 <body>
-  <div class="card" id="app">
-    <div class="logo">⏳</div>
-    <h1>Loading...</h1>
-    <p>Initializing...</p>
+  <div id="app"></div>
+  
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <div class="logo">💕</div>
+      <h2 id="modalTitle">Confirm Action</h2>
+      <p id="modalMessage">Do you want to like this profile?</p>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="cancelAction()">❌ Cancel</button>
+        <button onclick="confirmAction()">✅ Accept</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
     import { MiniKit } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.0.2/+esm'
     
-    console.log('🚀 Elite Connect - Testing Version')
+    console.log('🚀 Elite Connect - Starting...')
+    console.log('📦 MiniKit imported')
+    
+    window.MiniKit = MiniKit
     
     // ============================================
-    // CONFIGURATION - TESTING MODE
+    // CONFIGURATION
     // ============================================
     const CONFIG = {
+      API_URL: 'https://elite-connect-backend-ktv9.onrender.com',
       APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',
       ACTION_ID: 'signin',
-      // ✅ TESTING MODE: Use 'device' verification
-      // This allows testing without Orb verification
-      VERIFICATION_LEVEL: 'device'  // Change to 'orb' for production
+      VERIFICATION_LEVEL: 'device'  // Use 'device' for testing, 'orb' for production
     }
     
-    console.log('⚙️ Configuration:', CONFIG)
-    console.log('🔐 Verification Level:', CONFIG.VERIFICATION_LEVEL)
+    console.log('⚙️ Config:', CONFIG)
     
-    if (CONFIG.VERIFICATION_LEVEL === 'device') {
-      console.log('⚠️ TESTING MODE: Using device verification')
-      console.log('ℹ️ Any World ID user can test (no Orb needed)')
-    } else {
-      console.log('🎖️ PRODUCTION MODE: Using Orb verification')
-      console.log('⚠️ Only Orb-verified users can authenticate')
-    }
-    
+    // ============================================
+    // STATE
+    // ============================================
     let state = {
-      authenticated: false,
-      userData: null
+      screen: 'checking',
+      user: null,
+      profile: null,
+      token: localStorage.getItem('elite_token'),
+      users: [],
+      currentUserIndex: 0,
+      allUsers: [],
+      currentChatUser: null,
+      messages: [],
+      pendingAction: null,
+      isWorldApp: false,
+      authenticating: false
     }
     
     // ============================================
-    // INITIALIZE MINIKIT
+    // MINIKIT INITIALIZATION
     // ============================================
-    try {
-      MiniKit.install(CONFIG.APP_ID)
-      const isWorldApp = MiniKit.isInstalled()
-      
-      console.log('📱 Is World App:', isWorldApp)
-      
-      if (!isWorldApp) {
-        showNotInWorldApp()
-      } else {
-        setupWorldID()
-        showSignIn()
+    function initMiniKit() {
+      try {
+        console.log('🔧 Installing MiniKit...')
+        MiniKit.install(CONFIG.APP_ID)
+        state.isWorldApp = MiniKit.isInstalled()
+        
+        console.log('✅ MiniKit installed')
+        console.log('📱 Is World App:', state.isWorldApp)
+        
+        if (state.isWorldApp) {
+          console.log('✅ Running inside World App')
+          setupWorldIDListener()
+        } else {
+          console.log('⚠️ Not in World App')
+        }
+      } catch (error) {
+        console.error('❌ MiniKit error:', error)
+        state.isWorldApp = false
       }
-    } catch (error) {
-      console.error('❌ Error:', error)
-      showError('Initialization failed: ' + error.message)
     }
     
     // ============================================
-    // WORLD ID SETUP
+    // WORLD ID AUTHENTICATION
+    // NO WINDOW.LOCATION REDIRECTS!
     // ============================================
-    function setupWorldID() {
+    function setupWorldIDListener() {
       console.log('🎧 Setting up World ID listener...')
       
       MiniKit.subscribe('miniAppVerifyAction', async (payload) => {
@@ -4138,208 +4366,790 @@
         console.log('🔐 WORLD ID RESPONSE RECEIVED')
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         console.log('Status:', payload.status)
-        console.log('Verification Level:', payload.verification_level)
-        console.log('Nullifier:', payload.nullifier_hash?.substring(0, 10) + '...')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Verification:', payload.verification_level)
         
-        if (payload.status === 'error') {
-          console.error('❌ Verification failed:', payload)
-          showError('World ID verification failed. Please try again.')
+        if (state.authenticating) {
+          console.log('⚠️ Already authenticating')
           return
         }
         
-        // Show processing
-        showLoading('Processing verification...')
+        if (payload.status === 'error') {
+          console.error('❌ World ID error:', payload)
+          alert('Verification failed. Please try again.')
+          return
+        }
         
-        // Simulate backend verification
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        console.log('✅ World ID verification successful')
+        state.authenticating = true
         
-        // SUCCESS - STAY IN WORLD APP
-        state.authenticated = true
-        state.userData = payload
-        
-        console.log('✅ AUTHENTICATION SUCCESSFUL!')
-        console.log('📱 Still in World App?', MiniKit.isInstalled())
-        console.log('🎉 NO REDIRECT - Staying in World App!')
-        
-        showSuccess(payload)
+        try {
+          console.log('📤 Sending to backend...')
+          const response = await fetch(`${CONFIG.API_URL}/api/auth/world-id-verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              payload: payload,
+              action: CONFIG.ACTION_ID
+            })
+          })
+          
+          console.log('📡 Backend status:', response.status)
+          
+          const data = await response.json()
+          console.log('📥 Backend data:', data)
+          
+          if (data.success) {
+            console.log('✅ Backend verification successful!')
+            
+            // ✅✅✅ CRITICAL: SAVE DATA AND CHANGE STATE ✅✅✅
+            // ❌❌❌ NO WINDOW.LOCATION HERE! ❌❌❌
+            
+            state.user = data.user
+            state.token = data.token
+            localStorage.setItem('elite_token', data.token)
+            
+            console.log('💾 Token saved')
+            
+            if (data.hasProfile) {
+              console.log('✅ Has profile, going to home')
+              state.profile = data.profile
+              state.screen = 'home'  // ✅ Change state
+              await loadUsers()
+            } else {
+              console.log('ℹ️ No profile, showing setup')
+              state.screen = 'profile-setup'  // ✅ Change state
+            }
+            
+            // ✅✅✅ RE-RENDER UI - STAYS IN WORLD APP ✅✅✅
+            render()
+            
+            console.log('✅ Screen updated!')
+            console.log('📱 Still in World App?', MiniKit.isInstalled())
+            console.log('🎉 SUCCESS - NO REDIRECT!')
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            
+            state.authenticating = false
+            
+          } else {
+            console.error('❌ Backend failed:', data.error)
+            alert('Authentication failed: ' + (data.error || 'Unknown error'))
+            state.authenticating = false
+          }
+        } catch (error) {
+          console.error('❌ Backend error:', error)
+          alert('Failed to verify: ' + error.message)
+          state.authenticating = false
+        }
       })
       
       console.log('✅ World ID listener ready')
     }
     
-    // ============================================
-    // TRIGGER VERIFICATION
-    // ============================================
-    function triggerWorldID() {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🔐 TRIGGERING WORLD ID VERIFICATION')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    function triggerWorldIDVerify() {
+      if (!state.isWorldApp) {
+        console.error('❌ Not in World App')
+        alert('This app must be opened in World App')
+        return
+      }
+      
+      if (state.authenticating) {
+        console.log('⚠️ Already authenticating')
+        return
+      }
+      
+      console.log('🔐 Triggering World ID verification...')
       console.log('Action:', CONFIG.ACTION_ID)
-      console.log('Verification Level:', CONFIG.VERIFICATION_LEVEL)
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('Level:', CONFIG.VERIFICATION_LEVEL)
       
       try {
         MiniKit.commands.verify({
           action: CONFIG.ACTION_ID,
-          verification_level: CONFIG.VERIFICATION_LEVEL  // 'device' for testing
+          verification_level: CONFIG.VERIFICATION_LEVEL
         })
-        console.log('✅ Verification command sent')
-        console.log('⏳ Waiting for user to verify...')
+        console.log('✅ Verification triggered')
       } catch (error) {
-        console.error('❌ Error:', error)
-        showError('Failed to start verification: ' + error.message)
+        console.error('❌ Trigger error:', error)
+        alert('Failed to start verification: ' + error.message)
       }
     }
     
     // ============================================
-    // UI FUNCTIONS
+    // API HELPER
     // ============================================
-    function showNotInWorldApp() {
-      document.getElementById('app').innerHTML = `
-        <div class="logo">⚠️</div>
-        <h1>Not in World App</h1>
-        <div class="error">
-          <strong>This app must be opened inside World App.</strong>
-          <br><br>
-          1. Get shareable link from World Developer Portal<br>
-          2. Open link on your phone<br>
-          3. Choose "Open in World App"
-        </div>
-        <div class="info">
-          <strong>📱 Detected:</strong><br>
-          MiniKit.isInstalled() = false<br>
-          Running in: ${navigator.userAgent.includes('Safari') ? 'Safari' : 
-                        navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}
+    async function api(endpoint, options = {}) {
+      const url = endpoint.startsWith('http') ? endpoint : `${CONFIG.API_URL}${endpoint}`
+      
+      console.log('🌐 API:', endpoint)
+      
+      const defaultOptions = {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.token && { 'Authorization': `Bearer ${state.token}` })
+        }
+      }
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+      
+      try {
+        const response = await fetch(url, { 
+          ...defaultOptions, 
+          ...options,
+          signal: controller.signal 
+        })
+        
+        clearTimeout(timeoutId)
+        
+        console.log('📡 Status:', response.status)
+        
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        console.log('✅ API success')
+        return data
+      } catch (error) {
+        clearTimeout(timeoutId)
+        if (error.name === 'AbortError') {
+          console.error('⏱️ Timeout')
+          throw new Error('Request timeout')
+        }
+        console.error('❌ API error:', error)
+        throw error
+      }
+    }
+    
+    // ============================================
+    // DATA LOADING
+    // ============================================
+    async function loadUsers() {
+      try {
+        console.log('📥 Loading users...')
+        const data = await api('/api/explore/users', { method: 'POST' })
+        if (data.success) {
+          state.users = data.users
+          state.currentUserIndex = 0
+          console.log('✅ Loaded', data.users.length, 'users')
+          render()
+        }
+      } catch (error) {
+        console.error('❌ Load users error:', error)
+        alert('Failed to load users: ' + error.message)
+      }
+    }
+    
+    async function loadAllUsers() {
+      try {
+        console.log('📥 Loading all users...')
+        const usersData = await api('/api/explore/users', { method: 'POST' })
+        const likedData = await api('/api/explore/liked')
+        
+        if (usersData.success) {
+          const likedIds = new Set((likedData.users || []).map(u => u.id))
+          
+          state.allUsers = usersData.users.map(user => ({
+            ...user,
+            isLiked: likedIds.has(user.id)
+          }))
+          
+          state.allUsers.sort((a, b) => {
+            if (a.isLiked && !b.isLiked) return -1
+            if (!a.isLiked && b.isLiked) return 1
+            return 0
+          })
+          
+          console.log('✅ Loaded', state.allUsers.length, 'users')
+          render()
+        }
+      } catch (error) {
+        console.error('❌ Load all users error:', error)
+      }
+    }
+    
+    // ============================================
+    // PROFILE CREATION
+    // NO WINDOW.LOCATION REDIRECTS!
+    // ============================================
+    async function createProfile(e) {
+      e.preventDefault()
+      console.log('📝 Creating profile...')
+      
+      try {
+        const formData = {
+          name: document.getElementById('name').value,
+          age: parseInt(document.getElementById('age').value),
+          gender: document.getElementById('gender').value,
+          bio: document.getElementById('bio').value || '',
+          interests: (document.getElementById('interests').value || '')
+            .split(',')
+            .map(i => i.trim())
+            .filter(Boolean)
+        }
+        
+        console.log('Form:', formData)
+
+        const data = await api('/api/profile/create', {
+          method: 'POST',
+          body: JSON.stringify(formData)
+        })
+
+        if (data.success) {
+          console.log('✅ Profile created')
+          state.profile = data.profile
+          
+          // ✅ Change state and render - NO REDIRECT!
+          state.screen = 'home'
+          await loadUsers()
+          render()
+          
+          // ❌ NO: window.location.href = '/home'
+          
+        } else {
+          console.error('❌ Create failed:', data.error)
+          alert('Error: ' + data.error)
+        }
+      } catch (error) {
+        console.error('❌ Create error:', error)
+        alert('Error: ' + error.message)
+      }
+    }
+    
+    // ============================================
+    // SWIPE FUNCTIONS
+    // ============================================
+    function showConfirmation(action, userName) {
+      console.log('❓ Confirmation:', action, userName)
+      
+      const modal = document.getElementById('confirmModal')
+      const title = document.getElementById('modalTitle')
+      const message = document.getElementById('modalMessage')
+      
+      if (action === 'like') {
+        title.textContent = '💚 Like Profile?'
+        message.textContent = `Do you want to like ${userName}?`
+      } else if (action === 'super_like') {
+        title.textContent = '⭐ Super Like?'
+        message.textContent = `Do you want to super like ${userName}?`
+      }
+      
+      state.pendingAction = action
+      modal.classList.add('show')
+    }
+
+    function cancelAction() {
+      console.log('❌ Cancelled')
+      const modal = document.getElementById('confirmModal')
+      modal.classList.remove('show')
+      state.pendingAction = null
+    }
+
+    async function confirmAction() {
+      console.log('✅ Confirmed:', state.pendingAction)
+      const modal = document.getElementById('confirmModal')
+      modal.classList.remove('show')
+      await executeSwipe(state.pendingAction)
+      state.pendingAction = null
+    }
+
+    function swipeWithConfirmation(action) {
+      if (action === 'pass') {
+        swipe(action)
+      } else {
+        const user = state.users[state.currentUserIndex]
+        if (user) {
+          showConfirmation(action, user.name)
+        }
+      }
+    }
+
+    async function swipe(action) {
+      if (state.currentUserIndex >= state.users.length) {
+        console.log('🔄 No more users')
+        await loadUsers()
+        return
+      }
+      await executeSwipe(action)
+    }
+
+    async function executeSwipe(action) {
+      const user = state.users[state.currentUserIndex]
+      console.log('👉 Swipe:', action, user.name)
+      
+      try {
+        const data = await api('/api/explore/swipe', {
+          method: 'POST',
+          body: JSON.stringify({ target_user_id: user.id, action })
+        })
+
+        if (data.success && data.is_match) {
+          console.log('🎉 Match!')
+          alert(`🎉 It's a Match with ${user.name}!`)
+        }
+        
+        state.currentUserIndex++
+        console.log('➡️ Next user')
+        render()
+      } catch (error) {
+        console.error('❌ Swipe error:', error)
+        alert('Failed to swipe: ' + error.message)
+      }
+    }
+    
+    // ============================================
+    // CHAT FUNCTIONS
+    // NO WINDOW.LOCATION REDIRECTS!
+    // ============================================
+    async function openChatWithUser(userId, userName) {
+      console.log('💬 Opening chat:', userName)
+      state.currentChatUser = { id: userId, name: userName }
+      await loadMessagesWithUser(userId)
+      
+      // ✅ Change state and render - NO REDIRECT!
+      state.screen = 'chat-conversation'
+      render()
+      
+      // ❌ NO: window.location.href = '/chat/' + userId
+    }
+
+    async function loadMessagesWithUser(userId) {
+      try {
+        console.log('📥 Loading messages...')
+        const data = await api(`/api/chat/messages/user/${userId}`)
+        if (data.success) {
+          state.messages = data.messages || []
+          console.log('✅ Loaded', state.messages.length, 'messages')
+        } else {
+          state.messages = []
+        }
+        render()
+        setTimeout(() => {
+          const div = document.getElementById('messages')
+          if (div) div.scrollTop = div.scrollHeight
+        }, 100)
+      } catch (error) {
+        console.error('❌ Load messages error:', error)
+        state.messages = []
+        render()
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput')
+      if (!input) return
+      
+      const text = input.value.trim()
+      if (!text) return
+      
+      console.log('📤 Sending:', text)
+
+      api('/api/chat/send-direct', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          recipient_id: state.currentChatUser.id,
+          text 
+        })
+      })
+      .then(data => {
+        if (data.success) {
+          console.log('✅ Sent')
+          input.value = ''
+          loadMessagesWithUser(state.currentChatUser.id)
+        } else {
+          console.error('❌ Send failed:', data.error)
+          alert('Failed to send: ' + (data.error || 'Unknown error'))
+        }
+      })
+      .catch(error => {
+        console.error('❌ Send error:', error)
+        alert('Error: ' + error.message)
+      })
+    }
+    
+    // ============================================
+    // NAVIGATION
+    // NO WINDOW.LOCATION REDIRECTS!
+    // ============================================
+    function goTo(screen) {
+      console.log('🧭 Navigate to:', screen)
+      
+      // ✅ Change state and render - NO REDIRECT!
+      state.screen = screen
+      
+      if (screen === 'home') loadUsers()
+      else if (screen === 'explore') loadUsers()
+      else if (screen === 'chat') loadAllUsers()
+      
+      render()
+      
+      // ❌ NO: window.location.href = '/' + screen
+    }
+
+    function logout() {
+      console.log('🚪 Logout')
+      localStorage.removeItem('elite_token')
+      
+      state = {
+        screen: 'signin',
+        user: null,
+        profile: null,
+        token: null,
+        users: [],
+        currentUserIndex: 0,
+        allUsers: [],
+        currentChatUser: null,
+        messages: [],
+        pendingAction: null,
+        isWorldApp: state.isWorldApp,
+        authenticating: false
+      }
+      
+      // ✅ Just render - NO REDIRECT!
+      render()
+      
+      // ❌ NO: window.location.href = '/signin'
+    }
+    
+    // ============================================
+    // RENDER
+    // ============================================
+    function renderBottomNav(active) {
+      return `
+        <div class="bottom-nav">
+          <button class="nav-icon ${active === 'home' ? 'active' : ''}" onclick="goTo('home')">
+            <span>🏠</span>
+            <small>Home</small>
+          </button>
+          <button class="nav-icon ${active === 'explore' ? 'active' : ''}" onclick="goTo('explore')">
+            <span>🔥</span>
+            <small>Explore</small>
+          </button>
+          <button class="nav-icon ${active === 'chat' ? 'active' : ''}" onclick="goTo('chat')">
+            <span>💬</span>
+            <small>Chat</small>
+          </button>
+          <button class="nav-icon ${active === 'profile' ? 'active' : ''}" onclick="goTo('profile')">
+            <span>👤</span>
+            <small>Profile</small>
+          </button>
         </div>
       `
     }
-    
-    function showSignIn() {
-      const verificationBadge = CONFIG.VERIFICATION_LEVEL === 'orb' 
-        ? '<span class="badge badge-orb">🎖️ ORB REQUIRED</span>'
-        : '<span class="badge badge-device">📱 DEVICE VERIFICATION</span>'
+
+    function render() {
+      console.log('🎨 Render:', state.screen)
+      const app = document.getElementById('app')
       
-      const modeInfo = CONFIG.VERIFICATION_LEVEL === 'device'
-        ? `<div class="warning">
-            <strong>⚠️ TESTING MODE</strong><br>
-            Using device verification for testing.<br>
-            Any World ID user can sign in (no Orb needed).<br>
-            <br>
-            <strong>For Production:</strong> Change verification_level to 'orb'
-          </div>`
-        : `<div class="info">
-            <strong>🎖️ PRODUCTION MODE</strong><br>
-            Using Orb verification.<br>
-            Only Orb-verified users can sign in.<br>
-            <br>
-            <strong>Note:</strong> User must have visited an Orb location.
-          </div>`
-      
-      document.getElementById('app').innerHTML = `
-        <div class="logo">🌍</div>
-        <h1>Elite Connect</h1>
-        <p>Test World ID Authentication</p>
-        
-        ${verificationBadge}
-        
-        <div class="info">
-          <strong>✅ Running in World App</strong><br>
-          MiniKit.isInstalled() = true<br>
-          Ready to authenticate
-        </div>
-        
-        ${modeInfo}
-        
-        <button onclick="triggerWorldID()">
-          🌍 Sign in with World ID
-        </button>
-        
-        <div class="info" style="font-size: 0.8rem; margin-top: 1.5rem;">
-          <strong>What will happen:</strong><br>
-          1. World ID verification drawer opens<br>
-          2. You verify your identity<br>
-          3. App receives verification proof<br>
-          4. ✅ App STAYS in World App (no redirect!)<br>
-          5. Shows success screen
-        </div>
-      `
-    }
-    
-    function showLoading(message) {
-      document.getElementById('app').innerHTML = `
-        <div class="logo">⏳</div>
-        <h1>${message}</h1>
-        <p>Please wait...</p>
-      `
-    }
-    
-    function showSuccess(payload) {
-      const stillInWorldApp = MiniKit.isInstalled()
-      
-      document.getElementById('app').innerHTML = `
-        <div class="logo">🎉</div>
-        <h1>Authentication Success!</h1>
-        
-        <div class="success">
-          <strong>✅ World ID Verified</strong><br>
-          Verification Level: ${payload.verification_level}<br>
-          Nullifier: ${payload.nullifier_hash.substring(0, 12)}...
-        </div>
-        
-        <div class="${stillInWorldApp ? 'success' : 'error'}">
-          <strong>📱 Still in World App?</strong><br>
-          ${stillInWorldApp 
-            ? '✅ YES! App stayed in World App (no redirect)' 
-            : '❌ NO! App was redirected to browser'}
-        </div>
-        
-        ${stillInWorldApp 
-          ? '<div class="success"><strong>🎉 SUCCESS!</strong><br>Your app is working correctly. The redirect issue is fixed!</div>'
-          : '<div class="error"><strong>⚠️ PROBLEM!</strong><br>App redirected to browser. Check World Portal settings.</div>'}
-        
-        <div class="info">
-          <strong>Console Output:</strong>
-          <pre>Status: ${payload.status}
-Verification: ${payload.verification_level}
-Still in World App: ${stillInWorldApp}
-No redirect: ${stillInWorldApp ? 'YES ✅' : 'NO ❌'}</pre>
-        </div>
-        
-        <button onclick="location.reload()">
-          🔄 Test Again
-        </button>
-        
-        ${!stillInWorldApp ? `
-          <div class="warning">
-            <strong>How to fix redirect:</strong><br>
-            1. Go to developer.worldcoin.org<br>
-            2. Your App → Configuration<br>
-            3. Advanced Settings<br>
-            4. UNCHECK "External"<br>
-            5. CHECK "Mini App" only<br>
-            6. Save and wait 5 minutes<br>
-            7. Test again
+      if (state.screen === 'checking') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div class="logo">🌍</div>
+                <h1>Elite Connect</h1>
+                <p style="text-align: center; margin-top: 1rem;">Initializing...</p>
+              </div>
+            </div>
           </div>
-        ` : ''}
-      `
+        `
+      }
+      
+      else if (!state.isWorldApp) {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div class="logo">⚠️</div>
+                <h1>Open in World App</h1>
+                <div class="error">
+                  <strong>This app must be opened inside World App.</strong>
+                  <br><br>
+                  Please scan the QR code in World App or open via the Mini Apps section.
+                </div>
+                <div class="info">
+                  <strong>For Testing:</strong><br>
+                  Get shareable link from World Developer Portal and open it on your phone. Choose "Open in World App".
+                </div>
+                <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload()">
+                  🗑️ Clear Cache & Reload
+                </button>
+              </div>
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'signin') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div class="logo">💕</div>
+                <h1>Elite Connect</h1>
+                <p style="text-align: center;">Verified connections for real people</p>
+                
+                <div style="background: #f0fdf4; padding: 1.5rem; border-radius: 12px; margin: 2rem 0;">
+                  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <span style="font-size: 2.5rem;">🌍</span>
+                    <div>
+                      <strong>World ID Required</strong><br>
+                      <small>Verified humans only</small>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2.5rem;">✨</span>
+                    <div>
+                      <strong>No Bots, No Fakes</strong><br>
+                      <small>100% authentic connections</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <button onclick="triggerWorldIDVerify()" ${state.authenticating ? 'disabled' : ''}>
+                  🌍 ${state.authenticating ? 'Verifying...' : 'Sign in with World ID'}
+                </button>
+                
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; opacity: 0.7;">
+                  By continuing, you agree to our Terms of Service and Privacy Policy
+                </p>
+              </div>
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'profile-setup') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div class="logo">✨</div>
+                <h1>Create Your Profile</h1>
+                <p style="text-align: center; margin-bottom: 2rem;">Tell us about yourself</p>
+                
+                <form onsubmit="createProfile(event); return false;">
+                  <label>Name *</label>
+                  <input type="text" id="name" required placeholder="Your name">
+                  
+                  <label>Age *</label>
+                  <input type="number" id="age" required min="18" max="100" placeholder="18">
+                  
+                  <label>Gender *</label>
+                  <select id="gender" required>
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  
+                  <label>Bio</label>
+                  <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                  
+                  <label>Interests (comma-separated)</label>
+                  <input type="text" id="interests" placeholder="hiking, music, travel">
+                  
+                  <button type="submit">✅ Create Profile</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'home' || state.screen === 'explore') {
+        const user = state.users[state.currentUserIndex]
+        const title = state.screen === 'home' ? '🏠 Home' : '🔥 Explore'
+        
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <h2 style="text-align: center;">${title}</h2>
+                ${!user ? `
+                  <div class="empty">
+                    <div class="logo">🔍</div>
+                    <p>No more users</p>
+                    <button onclick="loadUsers()">🔄 Refresh</button>
+                  </div>
+                ` : `
+                  <div class="user-card">
+                    <div class="user-photo">${user.gender === 'male' ? '👨' : user.gender === 'female' ? '👩' : '🧑'}</div>
+                    <h2 style="margin: 0;">${user.name}, ${user.age}</h2>
+                    <p style="color: #666; margin: 1rem 0;">${user.bio || 'No bio'}</p>
+                    ${user.interests && user.interests.length > 0 ? 
+                      user.interests.map(i => `<span class="badge">${i}</span>`).join('') : ''}
+                    <div class="actions">
+                      <button class="action-btn pass" onclick="swipe('pass')">✖️</button>
+                      <button class="action-btn like" onclick="swipeWithConfirmation('like')">💚</button>
+                      <button class="action-btn super" onclick="swipeWithConfirmation('super_like')">⭐</button>
+                    </div>
+                  </div>
+                `}
+              </div>
+              ${renderBottomNav(state.screen)}
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'chat') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <h2>💬 Chat with Users</h2>
+                ${state.allUsers.length === 0 ? `
+                  <div class="empty">
+                    <div class="logo">💬</div>
+                    <p>Loading users...</p>
+                  </div>
+                ` : state.allUsers.map(user => {
+                  const emoji = user.gender === 'male' ? '👨' : user.gender === 'female' ? '👩' : '🧑'
+                  const likedBadge = user.isLiked ? '💚' : ''
+                  return `
+                    <div class="user-item" onclick="openChatWithUser('${user.id}', '${user.name}')">
+                      <div class="user-avatar">${emoji}</div>
+                      <div style="flex: 1;">
+                        <strong style="font-size: 1.1rem;">${user.name}, ${user.age} ${likedBadge}</strong><br>
+                        <small style="color: #666;">${user.bio || 'No bio'}</small>
+                      </div>
+                    </div>
+                  `
+                }).join('')}
+              </div>
+              ${renderBottomNav('chat')}
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'chat-conversation') {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #e0e0e0;">
+                  <button class="btn-small btn-secondary" onclick="goTo('chat')">← Back</button>
+                  <h2 style="margin: 0;">${state.currentChatUser?.name || 'Chat'}</h2>
+                </div>
+                <div class="chat-messages" id="messages">
+                  ${state.messages.length === 0 ? 
+                    '<p style="text-align: center; color: #999; padding: 2rem;">No messages yet. Say hi!</p>' :
+                    state.messages.map(msg => `
+                      <div class="message ${msg.is_mine ? 'own' : ''}">
+                        ${msg.text}
+                        <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
+                      </div>
+                    `).join('')
+                  }
+                </div>
+                <div class="message-input">
+                  <input type="text" id="messageInput" placeholder="Type a message..." 
+                    onkeydown="if(event.key==='Enter') { event.preventDefault(); sendMessage(); }">
+                  <button type="button" onclick="sendMessage()">Send</button>
+                </div>
+              </div>
+              ${renderBottomNav('chat')}
+            </div>
+          </div>
+        `
+      }
+      
+      else if (state.screen === 'profile' && state.profile) {
+        app.innerHTML = `
+          <div class="container">
+            <div class="card">
+              <div class="content">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                  <div style="font-size: 6rem;">${state.profile.gender === 'male' ? '👨' : state.profile.gender === 'female' ? '👩' : '🧑'}</div>
+                  <h2>${state.profile.name}, ${state.profile.age}</h2>
+                  <p style="color: #666; margin-top: 0.5rem;">${state.profile.bio || 'No bio'}</p>
+                </div>
+                
+                ${state.profile.interests && state.profile.interests.length > 0 ? `
+                  <div style="margin-bottom: 2rem;">
+                    <strong>Interests:</strong><br>
+                    ${state.profile.interests.map(i => `<span class="badge">${i}</span>`).join('')}
+                  </div>
+                ` : ''}
+                
+                <div class="success">
+                  ✅ Verified with World ID
+                </div>
+                
+                <button onclick="logout()" class="btn-cancel">
+                  🚪 Logout
+                </button>
+              </div>
+              ${renderBottomNav('profile')}
+            </div>
+          </div>
+        `
+      }
     }
     
-    function showError(message) {
-      document.getElementById('app').innerHTML = `
-        <div class="logo">❌</div>
-        <h1>Error</h1>
-        <div class="error">${message}</div>
-        <button onclick="location.reload()">
-          🔄 Try Again
-        </button>
-      `
+    // ============================================
+    // EXPOSE FUNCTIONS
+    // ============================================
+    window.createProfile = createProfile
+    window.swipe = swipe
+    window.swipeWithConfirmation = swipeWithConfirmation
+    window.cancelAction = cancelAction
+    window.confirmAction = confirmAction
+    window.goTo = goTo
+    window.openChatWithUser = openChatWithUser
+    window.sendMessage = sendMessage
+    window.loadUsers = loadUsers
+    window.logout = logout
+    window.triggerWorldIDVerify = triggerWorldIDVerify
+    
+    // ============================================
+    // INIT
+    // ============================================
+    async function init() {
+      console.log('🚀 Init starting...')
+      
+      initMiniKit()
+      
+      console.log('📱 Is World App:', state.isWorldApp)
+      
+      if (!state.isWorldApp) {
+        console.log('❌ Not in World App')
+        state.screen = 'not-world-app'
+        render()
+        return
+      }
+      
+      console.log('✅ In World App!')
+      
+      // Show sign-in immediately
+      state.screen = 'signin'
+      render()
+      
+      console.log('✅ Sign-in screen shown')
+      
+      // Try auto-login in background
+      if (state.token) {
+        console.log('🔑 Token found, trying auto-login...')
+        try {
+          const data = await api('/api/profile/me')
+          console.log('✅ Token valid')
+          if (data.profile) {
+            state.profile = data.profile
+            state.screen = 'home'
+            await loadUsers()
+            render()
+          }
+        } catch (error) {
+          console.log('❌ Token invalid:', error.message)
+        }
+      }
+      
+      console.log('✅ Init complete!')
     }
     
-    // Expose to window
-    window.triggerWorldID = triggerWorldID
-    
-    console.log('✅ App loaded and ready')
+    init()
+    console.log('✅ App loaded!')
   </script>
 </body>
 </html>
