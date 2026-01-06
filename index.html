@@ -3968,8 +3968,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World App Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Elite Connect - Testing Version</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -3986,12 +3986,12 @@
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      max-width: 400px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
     }
     .logo { font-size: 4rem; margin-bottom: 1rem; }
-    h1 { color: #8b5cf6; margin-bottom: 1rem; }
+    h1 { color: #8b5cf6; margin-bottom: 0.5rem; }
     button {
       width: 100%;
       padding: 1rem;
@@ -4003,6 +4003,12 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 1rem;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.02); }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
     .info {
       background: #f0fdf4;
@@ -4010,6 +4016,14 @@
       border-radius: 8px;
       margin: 1rem 0;
       font-size: 0.9rem;
+      text-align: left;
+    }
+    .warning {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
       text-align: left;
     }
     .error {
@@ -4026,35 +4040,81 @@
       border-radius: 8px;
       margin: 1rem 0;
     }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin: 0.25rem;
+    }
+    .badge-orb {
+      background: #fbbf24;
+      color: #78350f;
+    }
+    .badge-device {
+      background: #93c5fd;
+      color: #1e40af;
+    }
+    pre {
+      background: #1f2937;
+      color: #10b981;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      text-align: left;
+      font-size: 0.75rem;
+      margin: 1rem 0;
+    }
   </style>
 </head>
 <body>
   <div class="card" id="app">
     <div class="logo">⏳</div>
     <h1>Loading...</h1>
-    <p>Initializing World App connection...</p>
+    <p>Initializing...</p>
   </div>
 
   <script type="module">
     import { MiniKit } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.0.2/+esm'
     
-    console.log('🚀 Test App Starting...')
+    console.log('🚀 Elite Connect - Testing Version')
     
-    // YOUR APP CONFIGURATION
+    // ============================================
+    // CONFIGURATION - TESTING MODE
+    // ============================================
     const CONFIG = {
-      APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',  // ← Your APP_ID
-      ACTION_ID: 'signin'  // ← Your action ID
+      APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',
+      ACTION_ID: 'signin',
+      // ✅ TESTING MODE: Use 'device' verification
+      // This allows testing without Orb verification
+      VERIFICATION_LEVEL: 'device'  // Change to 'orb' for production
     }
     
-    let authenticated = false
+    console.log('⚙️ Configuration:', CONFIG)
+    console.log('🔐 Verification Level:', CONFIG.VERIFICATION_LEVEL)
     
-    // Initialize MiniKit
+    if (CONFIG.VERIFICATION_LEVEL === 'device') {
+      console.log('⚠️ TESTING MODE: Using device verification')
+      console.log('ℹ️ Any World ID user can test (no Orb needed)')
+    } else {
+      console.log('🎖️ PRODUCTION MODE: Using Orb verification')
+      console.log('⚠️ Only Orb-verified users can authenticate')
+    }
+    
+    let state = {
+      authenticated: false,
+      userData: null
+    }
+    
+    // ============================================
+    // INITIALIZE MINIKIT
+    // ============================================
     try {
       MiniKit.install(CONFIG.APP_ID)
       const isWorldApp = MiniKit.isInstalled()
       
       console.log('📱 Is World App:', isWorldApp)
-      console.log('🆔 APP_ID:', CONFIG.APP_ID)
       
       if (!isWorldApp) {
         showNotInWorldApp()
@@ -4064,76 +4124,145 @@
       }
     } catch (error) {
       console.error('❌ Error:', error)
-      showError('Failed to initialize: ' + error.message)
+      showError('Initialization failed: ' + error.message)
     }
     
-    // Setup World ID listener
+    // ============================================
+    // WORLD ID SETUP
+    // ============================================
     function setupWorldID() {
       console.log('🎧 Setting up World ID listener...')
       
       MiniKit.subscribe('miniAppVerifyAction', async (payload) => {
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('🔐 World ID Response:', payload)
+        console.log('🔐 WORLD ID RESPONSE RECEIVED')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Status:', payload.status)
+        console.log('Verification Level:', payload.verification_level)
+        console.log('Nullifier:', payload.nullifier_hash?.substring(0, 10) + '...')
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         
         if (payload.status === 'error') {
-          console.error('❌ Verification failed')
-          showError('World ID verification failed')
+          console.error('❌ Verification failed:', payload)
+          showError('World ID verification failed. Please try again.')
           return
         }
         
-        // Simulate processing
-        showLoading('Verifying...')
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Show processing
+        showLoading('Processing verification...')
         
-        // SUCCESS - Stay in World App!
-        authenticated = true
-        showSuccess(payload)
+        // Simulate backend verification
+        await new Promise(resolve => setTimeout(resolve, 1500))
         
-        console.log('✅ Authentication complete!')
+        // SUCCESS - STAY IN WORLD APP
+        state.authenticated = true
+        state.userData = payload
+        
+        console.log('✅ AUTHENTICATION SUCCESSFUL!')
         console.log('📱 Still in World App?', MiniKit.isInstalled())
+        console.log('🎉 NO REDIRECT - Staying in World App!')
+        
+        showSuccess(payload)
       })
+      
+      console.log('✅ World ID listener ready')
     }
     
-    // Trigger World ID verification
+    // ============================================
+    // TRIGGER VERIFICATION
+    // ============================================
     function triggerWorldID() {
-      console.log('🔐 Triggering World ID...')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('🔐 TRIGGERING WORLD ID VERIFICATION')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('Action:', CONFIG.ACTION_ID)
+      console.log('Verification Level:', CONFIG.VERIFICATION_LEVEL)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      
       try {
         MiniKit.commands.verify({
           action: CONFIG.ACTION_ID,
-          verification_level: 'device'
+          verification_level: CONFIG.VERIFICATION_LEVEL  // 'device' for testing
         })
+        console.log('✅ Verification command sent')
+        console.log('⏳ Waiting for user to verify...')
       } catch (error) {
         console.error('❌ Error:', error)
         showError('Failed to start verification: ' + error.message)
       }
     }
     
-    // UI Functions
+    // ============================================
+    // UI FUNCTIONS
+    // ============================================
     function showNotInWorldApp() {
       document.getElementById('app').innerHTML = `
         <div class="logo">⚠️</div>
-        <h1>Open in World App</h1>
+        <h1>Not in World App</h1>
         <div class="error">
-          This app must be opened inside World App.
+          <strong>This app must be opened inside World App.</strong>
           <br><br>
-          Please use the shareable link from World Portal.
+          1. Get shareable link from World Developer Portal<br>
+          2. Open link on your phone<br>
+          3. Choose "Open in World App"
+        </div>
+        <div class="info">
+          <strong>📱 Detected:</strong><br>
+          MiniKit.isInstalled() = false<br>
+          Running in: ${navigator.userAgent.includes('Safari') ? 'Safari' : 
+                        navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}
         </div>
       `
     }
     
     function showSignIn() {
+      const verificationBadge = CONFIG.VERIFICATION_LEVEL === 'orb' 
+        ? '<span class="badge badge-orb">🎖️ ORB REQUIRED</span>'
+        : '<span class="badge badge-device">📱 DEVICE VERIFICATION</span>'
+      
+      const modeInfo = CONFIG.VERIFICATION_LEVEL === 'device'
+        ? `<div class="warning">
+            <strong>⚠️ TESTING MODE</strong><br>
+            Using device verification for testing.<br>
+            Any World ID user can sign in (no Orb needed).<br>
+            <br>
+            <strong>For Production:</strong> Change verification_level to 'orb'
+          </div>`
+        : `<div class="info">
+            <strong>🎖️ PRODUCTION MODE</strong><br>
+            Using Orb verification.<br>
+            Only Orb-verified users can sign in.<br>
+            <br>
+            <strong>Note:</strong> User must have visited an Orb location.
+          </div>`
+      
       document.getElementById('app').innerHTML = `
         <div class="logo">🌍</div>
-        <h1>World App Test</h1>
-        <p>Testing World ID integration</p>
+        <h1>Elite Connect</h1>
+        <p>Test World ID Authentication</p>
+        
+        ${verificationBadge}
+        
         <div class="info">
           <strong>✅ Running in World App</strong><br>
-          Ready to test World ID authentication
+          MiniKit.isInstalled() = true<br>
+          Ready to authenticate
         </div>
+        
+        ${modeInfo}
+        
         <button onclick="triggerWorldID()">
           🌍 Sign in with World ID
         </button>
+        
+        <div class="info" style="font-size: 0.8rem; margin-top: 1.5rem;">
+          <strong>What will happen:</strong><br>
+          1. World ID verification drawer opens<br>
+          2. You verify your identity<br>
+          3. App receives verification proof<br>
+          4. ✅ App STAYS in World App (no redirect!)<br>
+          5. Shows success screen
+        </div>
       `
     }
     
@@ -4146,21 +4275,53 @@
     }
     
     function showSuccess(payload) {
+      const stillInWorldApp = MiniKit.isInstalled()
+      
       document.getElementById('app').innerHTML = `
         <div class="logo">🎉</div>
-        <h1>Success!</h1>
+        <h1>Authentication Success!</h1>
+        
         <div class="success">
           <strong>✅ World ID Verified</strong><br>
-          Nullifier: ${payload.nullifier_hash.substring(0, 10)}...<br>
-          Level: ${payload.verification_level}
+          Verification Level: ${payload.verification_level}<br>
+          Nullifier: ${payload.nullifier_hash.substring(0, 12)}...
         </div>
-        <div class="info">
+        
+        <div class="${stillInWorldApp ? 'success' : 'error'}">
           <strong>📱 Still in World App?</strong><br>
-          ${MiniKit.isInstalled() ? '✅ YES!' : '❌ NO (redirected)'}
+          ${stillInWorldApp 
+            ? '✅ YES! App stayed in World App (no redirect)' 
+            : '❌ NO! App was redirected to browser'}
         </div>
+        
+        ${stillInWorldApp 
+          ? '<div class="success"><strong>🎉 SUCCESS!</strong><br>Your app is working correctly. The redirect issue is fixed!</div>'
+          : '<div class="error"><strong>⚠️ PROBLEM!</strong><br>App redirected to browser. Check World Portal settings.</div>'}
+        
+        <div class="info">
+          <strong>Console Output:</strong>
+          <pre>Status: ${payload.status}
+Verification: ${payload.verification_level}
+Still in World App: ${stillInWorldApp}
+No redirect: ${stillInWorldApp ? 'YES ✅' : 'NO ❌'}</pre>
+        </div>
+        
         <button onclick="location.reload()">
           🔄 Test Again
         </button>
+        
+        ${!stillInWorldApp ? `
+          <div class="warning">
+            <strong>How to fix redirect:</strong><br>
+            1. Go to developer.worldcoin.org<br>
+            2. Your App → Configuration<br>
+            3. Advanced Settings<br>
+            4. UNCHECK "External"<br>
+            5. CHECK "Mini App" only<br>
+            6. Save and wait 5 minutes<br>
+            7. Test again
+          </div>
+        ` : ''}
       `
     }
     
@@ -4175,10 +4336,10 @@
       `
     }
     
-    // Expose function to window
+    // Expose to window
     window.triggerWorldID = triggerWorldID
     
-    console.log('✅ Test app loaded')
+    console.log('✅ App loaded and ready')
   </script>
 </body>
 </html>
