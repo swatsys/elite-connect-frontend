@@ -4270,6 +4270,15 @@
       border-radius: 8px;
       margin: 1rem 0;
     }
+    
+    .loading {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -4293,7 +4302,7 @@
     import { MiniKit } from 'https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@1.0.2/+esm'
     
     console.log('🚀 Elite Connect - Starting...')
-    console.log('📦 MiniKit imported')
+    console.log('📦 MiniKit imported successfully')
     
     // Make MiniKit globally available
     window.MiniKit = MiniKit
@@ -4302,19 +4311,19 @@
     // CONFIGURATION
     // ============================================
     const CONFIG = {
-      API_URL: 'https://elite-connect-backend-ktv9.onrender.com',  // ✅ NO /api at end
+      API_URL: 'https://elite-connect-backend-ktv9.onrender.com',  // ✅ NO /api
       APP_ID: 'app_486e187afe7bc69a19456a3fa901a162',
       ACTION_ID: 'signin'
     }
     
-    console.log('⚙️ Config loaded:', {
+    console.log('⚙️ Configuration:', {
       API_URL: CONFIG.API_URL,
       APP_ID: CONFIG.APP_ID,
       ACTION_ID: CONFIG.ACTION_ID
     })
     
     // ============================================
-    // STATE
+    // STATE MANAGEMENT
     // ============================================
     let state = {
       screen: 'checking',
@@ -4327,7 +4336,8 @@
       currentChatUser: null,
       messages: [],
       pendingAction: null,
-      isWorldApp: false
+      isWorldApp: false,
+      authenticating: false  // ← Prevents double authentication
     }
     
     // ============================================
@@ -4335,19 +4345,20 @@
     // ============================================
     function initMiniKit() {
       try {
-        console.log('🔧 Installing MiniKit...')
+        console.log('🔧 Installing MiniKit with APP_ID:', CONFIG.APP_ID)
         MiniKit.install(CONFIG.APP_ID)
+        
         state.isWorldApp = MiniKit.isInstalled()
         
-        console.log('✅ MiniKit installed')
+        console.log('✅ MiniKit installed successfully')
         console.log('📱 Is World App:', state.isWorldApp)
-        console.log('💰 Wallet:', MiniKit.walletAddress || 'Not connected')
+        console.log('💰 Wallet Address:', MiniKit.walletAddress || 'Not connected')
         
         if (state.isWorldApp) {
-          console.log('✅ Running inside World App')
+          console.log('✅ Running inside World App - Setting up listeners')
           setupWorldIDListener()
         } else {
-          console.log('⚠️ Not running in World App')
+          console.log('⚠️ NOT running in World App - Will show error screen')
         }
       } catch (error) {
         console.error('❌ MiniKit installation error:', error)
@@ -4356,63 +4367,125 @@
     }
     
     // ============================================
-    // WORLD ID AUTHENTICATION
+    // WORLD ID AUTHENTICATION - NO REDIRECTS!
     // ============================================
     function setupWorldIDListener() {
-      console.log('🎧 Setting up World ID listener...')
+      console.log('🎧 Setting up World ID authentication listener...')
       
       MiniKit.subscribe('miniAppVerifyAction', async (payload) => {
-        console.log('🔐 World ID Response received:', payload)
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('🔐 STEP 1: World ID Response Received')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Payload:', payload)
         
-        if (payload.status === 'error') {
-          console.error('❌ World ID error:', payload)
-          alert('Verification failed. Please try again.')
+        if (state.authenticating) {
+          console.log('⚠️ Already authenticating, ignoring duplicate callback')
           return
         }
         
-        console.log('✅ World ID verification successful on frontend')
-        console.log('📤 Sending proof to backend...')
+        if (payload.status === 'error') {
+          console.error('❌ STEP 2: World ID returned error status')
+          console.error('Error details:', payload)
+          alert('World ID verification failed. Please try again.')
+          state.authenticating = false
+          return
+        }
         
-        // Send proof to backend for verification
+        console.log('✅ STEP 2: Payload status is success')
+        console.log('🔒 Nullifier hash:', payload.nullifier_hash)
+        console.log('🎖️ Verification level:', payload.verification_level)
+        
+        state.authenticating = true
+        
+        // Show loading state
+        showLoadingMessage('Verifying with backend...')
+        
         try {
+          console.log('📤 STEP 3: Sending proof to backend for verification')
+          console.log('Backend URL:', `${CONFIG.API_URL}/api/auth/world-id-verify`)
+          
           const response = await fetch(`${CONFIG.API_URL}/api/auth/world-id-verify`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
               payload: payload,
               action: CONFIG.ACTION_ID
             })
           })
           
-          console.log('📡 Backend response status:', response.status)
+          console.log('📡 STEP 4: Backend responded with status:', response.status)
+          
+          if (!response.ok) {
+            throw new Error(`Backend returned ${response.status}`)
+          }
           
           const data = await response.json()
-          console.log('📥 Backend response data:', data)
+          console.log('📥 STEP 5: Backend response parsed:', {
+            success: data.success,
+            hasProfile: data.hasProfile,
+            userId: data.user?.id
+          })
           
           if (data.success) {
-            console.log('✅ Backend verification successful!')
+            console.log('✅ STEP 6: Backend verification successful!')
+            console.log('💾 Saving user data and token...')
+            
+            // Save to state
             state.user = data.user
             state.token = data.token
-            localStorage.setItem('elite_token', data.token)
             
+            // Save token to localStorage
+            localStorage.setItem('elite_token', data.token)
+            console.log('✅ Token saved to localStorage')
+            
+            // Determine next screen
             if (data.hasProfile) {
-              console.log('✅ User has profile, loading home...')
+              console.log('✅ STEP 7: User has profile - Going to home')
               state.profile = data.profile
               state.screen = 'home'
+              
+              // Load users
+              console.log('📥 Loading users...')
               await loadUsers()
+              console.log('✅ Users loaded')
             } else {
-              console.log('ℹ️ No profile found, showing setup...')
+              console.log('ℹ️ STEP 7: No profile found - Going to profile setup')
               state.screen = 'profile-setup'
             }
             
+            console.log('🎨 STEP 8: Calling render() to update UI')
             render()
+            console.log('✅ STEP 9: Render complete!')
+            
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            console.log('🎉 AUTHENTICATION COMPLETE!')
+            console.log('Still in World App?', MiniKit.isInstalled())
+            console.log('Current screen:', state.screen)
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            
+            // ✅ NO REDIRECTS! Just render the new screen
+            // ❌ NO window.location
+            // ❌ NO window.open
+            // ❌ NO navigation outside the app
+            
           } else {
-            console.error('❌ Backend verification failed:', data.error)
+            console.error('❌ STEP 6: Backend verification failed')
+            console.error('Error:', data.error)
             alert('Authentication failed: ' + (data.error || 'Unknown error'))
+            state.authenticating = false
           }
         } catch (error) {
-          console.error('❌ Backend verification error:', error)
-          alert('Failed to verify with backend. Please check your connection.')
+          console.error('❌ ERROR in authentication flow:', error)
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+          })
+          alert('Failed to verify with backend: ' + error.message)
+          state.authenticating = false
+        } finally {
+          hideLoadingMessage()
         }
       })
       
@@ -4426,18 +4499,63 @@
         return
       }
       
-      console.log('🔐 Triggering World ID verification...')
+      if (state.authenticating) {
+        console.log('⚠️ Already authenticating...')
+        return
+      }
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('🔐 TRIGGERING WORLD ID VERIFICATION')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.log('Action ID:', CONFIG.ACTION_ID)
+      console.log('Verification Level: orb')
       
       try {
         MiniKit.commands.verify({
           action: CONFIG.ACTION_ID,
           verification_level: 'orb'
         })
-        console.log('✅ World ID verification command sent')
+        console.log('✅ World ID verification command sent to World App')
+        console.log('⏳ Waiting for user to complete verification...')
       } catch (error) {
-        console.error('❌ Error triggering verification:', error)
+        console.error('❌ Error triggering World ID verification:', error)
         alert('Failed to start verification: ' + error.message)
+      }
+    }
+    
+    // ============================================
+    // LOADING MESSAGE HELPERS
+    // ============================================
+    function showLoadingMessage(message) {
+      const app = document.getElementById('app')
+      const loadingDiv = document.createElement('div')
+      loadingDiv.id = 'loading-overlay'
+      loadingDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+      `
+      loadingDiv.innerHTML = `
+        <div style="background: white; padding: 2rem; border-radius: 12px; text-align: center;">
+          <div class="logo">⏳</div>
+          <h2 style="margin: 1rem 0;">${message}</h2>
+          <p style="color: #666;">Please wait...</p>
+        </div>
+      `
+      document.body.appendChild(loadingDiv)
+    }
+    
+    function hideLoadingMessage() {
+      const loadingDiv = document.getElementById('loading-overlay')
+      if (loadingDiv) {
+        loadingDiv.remove()
       }
     }
     
@@ -4447,7 +4565,7 @@
     async function api(endpoint, options = {}) {
       const url = endpoint.startsWith('http') ? endpoint : `${CONFIG.API_URL}${endpoint}`
       
-      console.log('🌐 API call:', url)
+      console.log('🌐 API Call:', endpoint)
       
       const defaultOptions = {
         headers: {
@@ -4456,7 +4574,6 @@
         }
       }
       
-      // Add 15 second timeout (Render can take time to wake up)
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000)
       
@@ -4476,15 +4593,15 @@
         }
         
         const data = await response.json()
-        console.log('✅ API success:', endpoint)
+        console.log('✅ API success')
         return data
       } catch (error) {
         clearTimeout(timeoutId)
         if (error.name === 'AbortError') {
-          console.error('⏱️ Request timeout - backend may be sleeping')
-          throw new Error('Request timeout - backend may be waking up (Render free tier). Please try again in 30 seconds.')
+          console.error('⏱️ Request timeout')
+          throw new Error('Request timeout - backend may be waking up. Please try again in 30 seconds.')
         }
-        console.error('❌ API error:', error)
+        console.error('❌ API error:', error.message)
         throw error
       }
     }
@@ -4495,7 +4612,7 @@
     
     async function loadUsers() {
       try {
-        console.log('📥 Loading users...')
+        console.log('📥 Loading users for swiping...')
         const data = await api('/api/explore/users', { method: 'POST' })
         if (data.success) {
           state.users = data.users
@@ -4565,7 +4682,7 @@
           state.profile = data.profile
           state.screen = 'home'
           await loadUsers()
-          render()
+          render()  // ✅ Just render, NO redirect!
         } else {
           console.error('❌ Profile creation failed:', data.error)
           alert('Error: ' + data.error)
@@ -4651,7 +4768,7 @@
         
         state.currentUserIndex++
         console.log('➡️ Moving to next user')
-        render()
+        render()  // ✅ Just render, NO redirect!
       } catch (error) {
         console.error('❌ Swipe error:', error)
         alert('Failed to swipe: ' + error.message)
@@ -4667,7 +4784,7 @@
       state.currentChatUser = { id: userId, name: userName }
       await loadMessagesWithUser(userId)
       state.screen = 'chat-conversation'
-      render()
+      render()  // ✅ Just render, NO redirect!
     }
 
     async function loadMessagesWithUser(userId) {
@@ -4680,7 +4797,7 @@
         } else {
           state.messages = []
         }
-        render()
+        render()  // ✅ Just render, NO redirect!
         setTimeout(() => {
           const div = document.getElementById('messages')
           if (div) div.scrollTop = div.scrollHeight
@@ -4725,7 +4842,7 @@
     }
     
     // ============================================
-    // NAVIGATION FUNCTIONS
+    // NAVIGATION FUNCTIONS - NO REDIRECTS!
     // ============================================
     
     function goTo(screen) {
@@ -4736,7 +4853,7 @@
       else if (screen === 'explore') loadUsers()
       else if (screen === 'chat') loadAllUsers()
       
-      render()
+      render()  // ✅ Just render, NO redirect!
     }
 
     function logout() {
@@ -4753,13 +4870,14 @@
         currentChatUser: null,
         messages: [],
         pendingAction: null,
-        isWorldApp: state.isWorldApp
+        isWorldApp: state.isWorldApp,
+        authenticating: false
       }
-      render()
+      render()  // ✅ Just render, NO redirect!
     }
     
     // ============================================
-    // RENDER
+    // RENDER FUNCTIONS
     // ============================================
     function renderBottomNav(active) {
       return `
@@ -4818,9 +4936,12 @@
                 </div>
                 <div class="info">
                   <strong>For Developers:</strong><br>
-                  Testing locally? Use ngrok or expose your local server, then update the App URL in World Developer Portal.
+                  Testing locally? Use ngrok to expose your server, then update the App URL in World Developer Portal.
+                  <br><br>
+                  <strong>Shareable Link:</strong><br>
+                  Get the shareable link from World Portal and open it on your phone. Choose "Open in World App".
                 </div>
-                <button onclick="localStorage.clear(); location.reload()">
+                <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload()">
                   🗑️ Clear Cache & Reload
                 </button>
               </div>
@@ -4856,8 +4977,8 @@
                   </div>
                 </div>
                 
-                <button onclick="triggerWorldIDVerify()">
-                  🌍 Sign in with World ID
+                <button onclick="triggerWorldIDVerify()" ${state.authenticating ? 'disabled' : ''}>
+                  🌍 ${state.authenticating ? 'Verifying...' : 'Sign in with World ID'}
                 </button>
                 
                 <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; opacity: 0.7;">
@@ -5063,7 +5184,9 @@
     // INIT - SHOWS SIGNIN IMMEDIATELY
     // ============================================
     async function init() {
-      console.log('🚀 Init starting...')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('🚀 ELITE CONNECT INITIALIZATION')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       
       // Initialize MiniKit
       initMiniKit()
@@ -5072,46 +5195,49 @@
       
       // Check if in World App
       if (!state.isWorldApp) {
-        console.log('❌ Not in World App - showing error')
+        console.log('❌ Not in World App - showing error screen')
         state.screen = 'not-world-app'
         render()
         return
       }
       
-      console.log('✅ In World App!')
+      console.log('✅ Running in World App!')
       
-      // ✅ SHOW SIGN-IN SCREEN IMMEDIATELY (DON'T WAIT FOR BACKEND)
+      // ✅ SHOW SIGN-IN SCREEN IMMEDIATELY
       state.screen = 'signin'
       render()
       
       console.log('✅ Sign-in screen rendered')
+      console.log('ℹ️ User can now click "Sign in with World ID"')
       
       // Try to restore session in background (optional)
       if (state.token) {
-        console.log('🔑 Found token, attempting auto-login in background...')
+        console.log('🔑 Found saved token, attempting auto-login in background...')
         try {
           const data = await api('/api/profile/me')
-          console.log('✅ Token valid, auto-logging in')
+          console.log('✅ Token is valid, auto-logging in')
           if (data.profile) {
             state.profile = data.profile
             state.screen = 'home'
             await loadUsers()
             render()
+            console.log('✅ Auto-login successful - user is on home screen')
           }
         } catch (error) {
           console.log('❌ Token invalid or backend unavailable:', error.message)
-          console.log('User can still sign in manually')
-          // Stay on signin screen - user can click "Sign in with World ID"
+          console.log('ℹ️ User can manually sign in with World ID button')
         }
       } else {
-        console.log('ℹ️ No token found - waiting for user to sign in')
+        console.log('ℹ️ No saved token - user must sign in')
       }
       
-      console.log('✅ Init complete!')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('✅ INITIALIZATION COMPLETE')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     }
     
     init()
-    console.log('✅ Elite Connect loaded!')
+    console.log('✅ Elite Connect script loaded!')
   </script>
 </body>
 </html>
