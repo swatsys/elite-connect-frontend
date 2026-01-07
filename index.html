@@ -1,13 +1,177 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#ec4899" />
     <title>Elite Connect</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <script type="module" crossorigin src="/assets/index-D0aDKenL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DDt5AiWD.css">
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ec4899">
+  <title>Elite Connect</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen - VISIBLE by default -->
+    <div id="auth" class="screen">
+      <div class="container">
+        <div class="auth-box">
+          <div class="logo">💖</div>
+          <h1>Elite Connect</h1>
+          <p class="subtitle">Premium dating for verified humans</p>
+          <button id="signInBtn" class="btn">🌍 Sign in with World ID</button>
+          <p class="footer-text">Verified by World ID • Privacy-First • No Bots</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Setup Screen - HIDDEN with inline style -->
+    <div id="profile-setup" class="screen hidden" style="display:none">
+      <div class="container">
+        <h2>Complete Your Profile</h2>
+        <form id="profileForm">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label>Age *</label>
+            <input type="number" id="age" name="age" min="18" max="100" required placeholder="18">
+          </div>
+          <div class="form-group">
+            <label>Gender *</label>
+            <select id="gender" name="gender" required>
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Interests (comma separated)</label>
+            <input type="text" id="interests" name="interests" placeholder="Travel, Music, Cooking...">
+          </div>
+          <button type="submit" class="btn">Save Profile</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Home Screen - HIDDEN with inline style -->
+    <div id="home" class="screen hidden" style="display:none">
+      <div class="container">
+        <h1 id="welcomeMessage">Welcome!</h1>
+        <div class="button-grid">
+          <button id="exploreBtn" class="btn">🔍 Explore Profiles</button>
+          <button id="viewProfileBtn" class="btn btn-secondary">👤 View My Profile</button>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-item active"><span>🏠</span>Home</button>
+        <button class="nav-item" onclick="app.showExplore()"><span>🔍</span>Explore</button>
+        <button class="nav-item" onclick="app.showProfile()"><span>👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- Explore Screen - HIDDEN with inline style -->
+    <div id="explore" class="screen hidden" style="display:none">
+      <div class="container">
+        <div class="header">
+          <button id="backToHomeBtn" class="btn-back">← Back</button>
+          <h2>Discover</h2>
+          <div style="width: 60px;"></div>
+        </div>
+        <div id="profilesList"></div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="app.showHome()"><span>🏠</span>Home</button>
+        <button class="nav-item active"><span>🔍</span>Explore</button>
+        <button class="nav-item" onclick="app.showProfile()"><span>👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- Profile Screen - HIDDEN with inline style -->
+    <div id="profile" class="screen hidden" style="display:none">
+      <div class="container">
+        <h2>My Profile</h2>
+        <div class="card">
+          <div class="profile-avatar">
+            <span id="profileInitial">?</span>
+          </div>
+          <h3 id="profileName" style="text-align: center;">Loading...</h3>
+          <p id="profileAge" style="text-align: center; color: var(--text-secondary);"></p>
+          <p id="profileBio" style="text-align: center; margin: 1rem 0;"></p>
+          <div id="profileInterests" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1rem;"></div>
+          <button id="editProfileBtn" class="btn btn-secondary">✏️ Edit Profile</button>
+          <button id="logoutBtn" class="btn btn-danger" style="margin-top: 0.5rem;">🚪 Logout</button>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="app.showHome()"><span>🏠</span>Home</button>
+        <button class="nav-item" onclick="app.showExplore()"><span>🔍</span>Explore</button>
+        <button class="nav-item active"><span>👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- Chat Screen - HIDDEN with inline style -->
+    <div id="chat" class="screen hidden" style="display:none">
+      <div class="container">
+        <button id="chatBackBtn" class="btn-back">← Back</button>
+        <div id="messagesList" class="messages-container"></div>
+        <div class="message-input">
+          <input type="text" id="messageInput" placeholder="Type a message...">
+          <button id="sendMessageBtn" class="btn-send">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription Screen - HIDDEN with inline style -->
+    <div id="subscription" class="screen hidden" style="display:none">
+      <div class="container">
+        <button id="subscriptionBackBtn" class="btn-back">← Back</button>
+        <h2>Premium Subscription</h2>
+        <div class="card">
+          <h3 style="text-align: center;">Unlimited Connections</h3>
+          <p style="font-size: 2rem; text-align: center; font-weight: bold; margin: 1rem 0;">3 WLD</p>
+          <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem;">per month</p>
+          <ul style="margin-bottom: 1.5rem;">
+            <li>✅ Unlimited chat unlocks</li>
+            <li>✅ Priority matching</li>
+            <li>✅ See who likes you</li>
+            <li>✅ Cancel anytime</li>
+          </ul>
+          <button id="subscribeBtn" class="btn">Subscribe Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Screen - HIDDEN with inline style -->
+    <div id="transactions" class="screen hidden" style="display:none">
+      <div class="container">
+        <button id="transactionBackBtn" class="btn-back">← Back</button>
+        <h2>Transactions</h2>
+        <div id="transactionsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import main.js which will import style.css -->
+</body>
 </html>

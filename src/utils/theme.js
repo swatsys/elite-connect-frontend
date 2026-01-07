@@ -1,4 +1,3 @@
-// Theme management
 export const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
