@@ -1,7 +1,5 @@
-
 {
   "name": "elite-connect-frontend",
-  "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -10,14 +8,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@worldcoin/minikit-js": "^1.9.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@worldcoin/minikit-js": "latest",
+    "emoji-picker-react": "^4.5.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.2"
+    "vite": "^5.0.0"
   }
 }
