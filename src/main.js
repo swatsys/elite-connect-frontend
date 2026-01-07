@@ -5,8 +5,9 @@ import { ThemeManager, THEMES } from './theme.js';
 import { Toast } from './toast.js';
 
 // ============================================
-// INITIALIZE MINIKIT PROPERLY
+// INITIALIZE MINIKIT - CRITICAL FOR WORLD APP
 // ============================================
+console.log('🔵 Installing MiniKit with App ID:', WORLD_APP_ID);
 MiniKit.install(WORLD_APP_ID);
 
 class App {
@@ -18,21 +19,30 @@ class App {
     this.selectedImage = null;
     this.showEmojiPicker = false;
     
+    console.log('🔵 App initializing...');
+    console.log('🔵 MiniKit installed?', MiniKit.isInstalled());
+    
     // Check if running inside World App
     if (!MiniKit.isInstalled()) {
+      console.log('❌ Not running inside World App');
       document.getElementById('app').innerHTML = `
         <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;background:var(--bg-secondary)">
           <div class="card">
             <div style="font-size:4rem;margin-bottom:1rem">⚠️</div>
             <h2>Please Open in World App</h2>
             <p style="color:var(--text-secondary);margin-top:1rem">
-              This app must be opened inside the World App to work properly.
+              This mini app must be opened inside the World App.
+            </p>
+            <p style="color:var(--text-secondary);margin-top:0.5rem;font-size:0.875rem">
+              Scan the QR code from the Developer Portal with World App.
             </p>
           </div>
         </div>
       `;
       return;
     }
+    
+    console.log('✅ Running inside World App');
     
     if (this.token) {
       this.init();
@@ -100,19 +110,21 @@ class App {
       const signInBtn = document.getElementById('signInBtn');
       if (signInBtn) {
         signInBtn.disabled = true;
-        signInBtn.textContent = 'Verifying...';
+        signInBtn.textContent = '⏳ Verifying...';
       }
 
       console.log('🔵 Calling MiniKit.commandsAsync.verify...');
+      console.log('🔵 Action: signin');
+      console.log('🔵 Verification Level: Device');
       
-      // Use the verify command with the action from Developer Portal
+      // ✅ THIS IS THE CORRECT WAY - STAYS INSIDE WORLD APP
       const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: 'signin', // This MUST match your action in Developer Portal
+        action: 'signin', // MUST match Developer Portal action identifier
         signal: '', // Optional additional data
         verification_level: VerificationLevel.Device // Accept both Orb and Device
       });
 
-      console.log('🔵 World ID verification payload:', finalPayload);
+      console.log('🔵 World ID verification response:', finalPayload);
 
       if (finalPayload.status === 'error') {
         console.error('❌ Verification error:', finalPayload);
@@ -125,10 +137,12 @@ class App {
       }
 
       if (finalPayload.status === 'success') {
-        console.log('✅ Verification successful! Sending to backend...');
-        Toast.info('Verifying your World ID...');
+        console.log('✅ Verification successful!');
+        console.log('✅ Nullifier hash:', finalPayload.nullifier_hash);
+        Toast.success('Verification successful! 🎉');
         
-        // Send the proof to your backend
+        // Send proof to backend for verification
+        console.log('🔵 Sending proof to backend...');
         const res = await fetch(`${API}/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -158,7 +172,7 @@ class App {
             }
           }, 500);
         } else {
-          console.error('❌ Backend error:', data.error);
+          console.error('❌ Backend verification failed:', data.error);
           Toast.error(data.error || 'Verification failed');
           if (signInBtn) {
             signInBtn.disabled = false;
@@ -180,23 +194,23 @@ class App {
   showProfileSetup() {
     this.currentPage = 'setup';
     document.getElementById('app').innerHTML = `
-      <div style="padding:2rem 1rem;max-width:600px;margin:0 auto">
+      <div style="padding:2rem 1rem;max-width:600px;margin:0 auto;min-height:100vh;background:var(--bg-secondary)">
         <h1 style="font-size:2rem;margin-bottom:0.5rem">Create Your Profile</h1>
         <p style="color:var(--text-secondary);margin-bottom:2rem">Tell us about yourself</p>
         
         <form id="profileForm" style="display:flex;flex-direction:column;gap:1.5rem">
           <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Name</label>
+            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Name *</label>
             <input type="text" name="name" required placeholder="Your name" />
           </div>
           
           <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Age</label>
+            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Age *</label>
             <input type="number" name="age" min="18" max="100" required placeholder="18" />
           </div>
           
           <div>
-            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Gender</label>
+            <label style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--text-primary)">Gender *</label>
             <select name="gender" required>
               <option value="">Select gender</option>
               <option value="male">Male</option>
@@ -322,9 +336,9 @@ class App {
                 <p style="color:var(--text-secondary);margin:0">Check back soon for new connections!</p>
               </div>
             ` : `
-              <div id="profileStack" style="position:relative;height:500px">
-                ${profiles.map((profile, index) => `
-                  <div class="profile-card" data-profile-id="${profile.id}" style="position:absolute;top:0;left:0;right:0;transition:all 0.3s ease;z-index:${profiles.length - index};transform:scale(${1 - index * 0.02}) translateY(${index * 10}px)">
+              <div id="profileStack">
+                ${profiles.map(profile => `
+                  <div class="profile-card" data-profile-id="${profile.id}" style="margin-bottom:1.5rem">
                     <div class="profile-image" style="margin:1rem auto">
                       ${profile.name.charAt(0)}
                     </div>
@@ -333,7 +347,7 @@ class App {
                     ${profile.bio ? `<p style="text-align:center;margin:1rem 0">${profile.bio}</p>` : ''}
                     
                     <div style="display:flex;justify-content:center;gap:1rem;margin-top:2rem">
-                      <button class="action-btn pass" onclick="window.app.swipe('${profile.id}', 'pass')" style="background:var(--bg-tertiary);color:var(--text-secondary)">
+                      <button class="action-btn pass" onclick="window.app.swipe('${profile.id}', 'pass')">
                         ❌
                       </button>
                       <button class="action-btn like" onclick="window.app.swipe('${profile.id}', 'like')">
@@ -371,10 +385,13 @@ class App {
 
       if (data.matched) {
         Toast.success('It\'s a match! 💕');
-        this.showSubscriptionOffer(data.matchId);
+        setTimeout(() => {
+          this.showSubscriptionOffer(data.matchId);
+        }, 1000);
       } else {
         const card = document.querySelector(`[data-profile-id="${profileId}"]`);
         if (card) {
+          card.style.transition = 'all 0.3s ease';
           card.style.transform = action === 'like' 
             ? 'translateX(1000px) rotate(30deg)' 
             : 'translateX(-1000px) rotate(-30deg)';
@@ -512,7 +529,9 @@ class App {
 
       if (data.success) {
         Toast.success('Chat unlocked! Start messaging 💬');
-        this.showChat();
+        setTimeout(() => {
+          this.showChat();
+        }, 500);
       } else {
         Toast.error('Failed to unlock chat');
       }
@@ -668,7 +687,6 @@ class App {
       if (data.success) {
         input.value = '';
         this.selectedImage = null;
-        this.showEmojiPicker = false;
         this.openChat(this.currentMatchId, this.currentMatchName);
       } else {
         Toast.error('Failed to send message');
@@ -854,4 +872,5 @@ class App {
 }
 
 // Initialize the app
+console.log('🔵 Creating App instance...');
 window.app = new App();
