@@ -1,3 +1,4 @@
+// Simple toast notification system
 export class Toast {
   static show(message, type = 'info') {
     const toast = document.createElement('div');
